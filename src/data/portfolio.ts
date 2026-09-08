@@ -10,13 +10,14 @@ export const profile = {
   github: "https://github.com/kashnordeen",
   linkedin: "https://www.linkedin.com/in/keshav-karn-933910352/",
   badgeId: "KK-27041-DEV",
+  experience: "Newbie",
   bio: "I build clean, scalable, and performant web applications. Currently pursuing my B.Tech at Thapar Institute of Engineering and Technology, I'm passionate about full-stack development and crafting elegant digital experiences.",
   aboutHeading: "Building Digital Experiences",
-  aboutDescription: "I'm a software engineering student at Thapar Institute of Engineering and Technology with 3 years of hands-on coding experience. I focus on building modern, performant web applications with clean architecture and intuitive user interfaces. I'm driven by curiosity and a passion for solving real-world problems through code.",
+  aboutDescription: "I'm a software engineering student at Thapar Institute of Engineering and Technology. As an enthusiastic newbie developer, I focus on building modern, performant web applications with clean architecture and intuitive user interfaces. I'm driven by curiosity and a passion for solving real-world problems through code.",
 };
 
 export const stats = [
-  { label: "Years Coding", value: "3+" },
+  { label: "Experience", value: "Newbie" },
   { label: "Projects Built", value: "10+" },
   { label: "Technologies Used", value: "15+" },
   { label: "Expected Graduation", value: "2027" },

@@ -167,7 +167,7 @@ export const HeroSection = () => {
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Experience</span>
-                    <span className="font-bold text-foreground text-xs">3+ Years</span>
+                    <span className="font-bold text-foreground text-xs">Newbie</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Status</span>
