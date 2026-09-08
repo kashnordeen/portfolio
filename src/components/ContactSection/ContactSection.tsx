@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Send, MapPin, Mail, Phone } from "lucide-react";
+import { Send, MapPin, Mail, Phone, CheckCircle2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -8,19 +8,46 @@ import { profile } from "@/data/portfolio";
 
 export const ContactSection = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
     
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    setStatus("idle");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          access_key: "53d7fa2e-64c5-4a4a-a0a5-49e08397f453",
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          subject: `New Portfolio Message from ${formData.name}`,
+          from_name: "Keshav Karn Portfolio",
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setStatus("success");
+        setFormData({ name: "", email: "", message: "" });
+        setTimeout(() => setStatus("idle"), 6000);
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    } finally {
       setIsLoading(false);
-      alert("Message sent successfully! I'll get back to you soon.");
-      setFormData({ name: "", email: "", message: "" });
-    }, 1500);
+    }
   };
 
   return (
@@ -114,6 +141,20 @@ export const ContactSection = () => {
               <Button type="submit" disabled={isLoading} size="lg" className="w-full rounded-xl bg-primary text-primary-foreground font-bold shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] mt-4 h-12">
                 {isLoading ? "Sending..." : <>Send Message <Send className="w-4 h-4 ml-1" /></>}
               </Button>
+
+              {status === "success" && (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>Message sent successfully! I'll get back to you soon.</span>
+                </div>
+              )}
+
+              {status === "error" && (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-sm font-medium">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Failed to send message. Please try again or email directly.</span>
+                </div>
+              )}
             </form>
           </div>
 
