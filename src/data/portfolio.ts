@@ -110,7 +110,7 @@ export const careerEvents = [
   {
     year: "2022 – 2023",
     title: "Completed High School",
-    subtitle: "Little Angels' High School",
+    subtitle: "Little Angels' High School ( Nepal )",
     description: "Graduated from Little Angels' High School under Nepal Education Board with GPA 2.91. Developed a strong foundation in mathematics and science.",
   },
   {
@@ -136,8 +136,8 @@ export const education = [
     ],
   },
   {
-    degree: "High School Diploma",
-    school: "Little Angels' High School",
+    degree: "High School",
+    school: "Little Angels' High School ( Nepal )",
     year: "2022 – 2023",
     badge: "Completed",
     badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
