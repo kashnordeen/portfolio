@@ -64,7 +64,7 @@ export const projects = [
     id: 1,
     title: "Portfolio Website",
     subtitle: "Personal portfolio built with React, TypeScript & Framer Motion",
-    link: "https://github.com/kashnordeen",
+    link: "https://github.com/kashnordeen/portfolio",
     image: "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=1200",
     gridClass: "md:col-span-7 h-[420px]",
   },
