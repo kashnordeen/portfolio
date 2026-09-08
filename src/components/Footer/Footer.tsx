@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, ArrowUp, Heart } from "lucide-react";
+import { Github, Linkedin, Mail, ArrowUp } from "lucide-react";
 import { MorphingText } from "@/components/ui/morphing-text";
 import { profile, morphingTexts } from "@/data/portfolio";
 
@@ -111,10 +111,8 @@ export const Footer = () => {
           </div>
 
           {/* Copyright notice */}
-          <div className="flex items-center gap-1.5 font-medium text-center md:text-right">
-            <span>© {new Date().getFullYear()} {profile.name}. Crafted with</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline-block" />
-            <span>& UI</span>
+          <div className="flex items-center font-medium text-center md:text-right">
+            <span>© {new Date().getFullYear()} {profile.name}</span>
           </div>
         </div>
 
