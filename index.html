@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keshav Kumar Karn — Software Engineer</title>
+    <meta name="description" content="Portfolio of Keshav Kumar Karn — Software Engineer specializing in full-stack web development. B.Tech student at Thapar Institute of Engineering and Technology." />
+    <meta property="og:title" content="Keshav Kumar Karn — Software Engineer" />
+    <meta property="og:description" content="Full-stack developer passionate about building clean, scalable, and performant web applications." />
+    <meta property="og:type" content="website" />
+    <script>
+      // Prevent FOUC: apply saved theme before first paint
+      (function() {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
