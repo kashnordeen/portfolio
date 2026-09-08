@@ -4,7 +4,6 @@ import TechStackSection from "../TechStackSection/TechStackSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HangingIdCard } from "@/components/ui/HangingIdCard";
-import { AuroraTextEffect } from "@/components/ui/aurora-text-effect";
 import { DotPattern } from "@/components/ui/dot-pattern";
 
 export const HeroSection = () => {
@@ -48,22 +47,10 @@ export const HeroSection = () => {
               Hi, I'm
             </h1>
             
-            {/* Light Theme: Clean Vibrant Gradient Text */}
-            <div className="block dark:hidden">
-              <span className="bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none">
-                Keshav Kumar Karn
-              </span>
-            </div>
-
-            {/* Dark Theme: Rich Lightswind Aurora Text Effect */}
-            <div className="hidden dark:block">
-              <AuroraTextEffect
-                text="Keshav Kumar Karn"
-                fontSize="clamp(3rem, 6.5vw, 5.5rem)"
-                className="bg-transparent overflow-visible p-0 justify-start"
-                textClassName="bg-gradient-to-r from-cyan-400 via-purple-400 to-sky-300 bg-clip-text text-transparent pb-2 font-extrabold"
-              />
-            </div>
+            {/* Theme-Aware Seamless Gradient Text */}
+            <span className="bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 dark:from-cyan-400 dark:via-purple-400 dark:to-sky-300 bg-clip-text text-transparent font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none dark:drop-shadow-[0_0_35px_rgba(168,85,247,0.3)]">
+              Keshav Kumar Karn
+            </span>
           </motion.div>
 
           <motion.p 
