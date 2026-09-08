@@ -11,9 +11,9 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/keshav-karn-933910352/",
   badgeId: "KK-27041-DEV",
   experience: "Newbie",
-  bio: "I build clean, scalable, and performant web applications. Currently pursuing my B.Tech at Thapar Institute of Engineering and Technology, I'm passionate about full-stack development and crafting elegant digital experiences.",
-  aboutHeading: "Building Digital Experiences",
-  aboutDescription: "I'm a software engineering student at Thapar Institute of Engineering and Technology. As an enthusiastic newbie developer, I focus on building modern, performant web applications with clean architecture and intuitive user interfaces. I'm driven by curiosity and a passion for solving real-world problems through code.",
+  bio: "I build robust, scalable applications across Full-Stack Web, Native Android, AI/ML models, and IoT devices. Currently pursuing my B.Tech at Thapar Institute of Engineering and Technology, I engineer intelligent systems from embedded hardware to modern user interfaces.",
+  aboutHeading: "Building Intelligent Digital Systems",
+  aboutDescription: "I'm a software engineering student at Thapar Institute of Engineering and Technology. Beyond full-stack web applications, my work spans machine learning architectures, native Android apps, and IoT embedded hardware. I'm passionate about connecting intelligent algorithms and physical telemetry into cohesive, high-performance products.",
 };
 
 export const stats = [

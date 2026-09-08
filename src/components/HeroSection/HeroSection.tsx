@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HangingIdCard } from "@/components/ui/HangingIdCard";
 import { DotPattern } from "@/components/ui/dot-pattern";
+import { profile } from "@/data/portfolio";
 
 export const HeroSection = () => {
   return (
@@ -59,7 +60,7 @@ export const HeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
-            I build clean, scalable, and performant web applications. Currently pursuing my B.Tech at Thapar Institute of Engineering and Technology, I'm passionate about full-stack development and crafting elegant digital experiences.
+            {profile.bio}
           </motion.p>
 
           <motion.div 
@@ -146,7 +147,7 @@ export const HeroSection = () => {
                 <div className="grid grid-cols-2 gap-2.5 w-full text-left bg-muted/40 p-3 rounded-xl border border-border/50">
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Specialty</span>
-                    <span className="font-bold text-foreground text-xs">Full-Stack Web Dev</span>
+                    <span className="font-bold text-foreground text-xs">Web, AI & IoT</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Location</span>
