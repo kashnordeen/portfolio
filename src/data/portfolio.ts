@@ -18,7 +18,7 @@ export const profile = {
 
 export const stats = [
   { label: "Experience", value: "Newbie" },
-  { label: "Projects Built", value: "10+" },
+  { label: "Projects Built", value: "4+" },
   { label: "Technologies Used", value: "15+" },
   { label: "Expected Graduation", value: "2027" },
 ];
@@ -148,6 +148,40 @@ export const education = [
       "Developed analytical thinking and problem-solving skills",
       "First exposure to programming concepts and computational thinking",
     ],
+  },
+];
+
+export const certifications = [
+  {
+    id: 1,
+    title: "Network Defense",
+    issuer: "Cisco Networking Academy",
+    institution: "Thapar Institute of Engineering and Technology",
+    instructor: "Gurpal Singh Chhabra",
+    issueDate: "February 2026",
+    badge: "Verified Credential",
+    badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+    description:
+      "Student-level credential in foundational network defense, securing Linux & Windows endpoints, simulating network firewalls, managing identity lifecycles, and configuring PKI data protection.",
+    competencies: [
+      "Documenting network security posture & threat models",
+      "Configuring firewall rules & simulated defense barriers",
+      "Hardening Linux and Windows network endpoints",
+      "Implementing Identity Lifecycle & Public Key Infrastructure (PKI)",
+      "Cloud security measures & virtual computing environments",
+    ],
+    skills: [
+      "Network Security",
+      "Firewall Configuration",
+      "Linux & Windows Hardening",
+      "Identity Management (IAM)",
+      "PKI & Data Protection",
+      "Cloud Security",
+    ],
+    certificatePdf: "/certificates/cisco-network-defense-certificate.pdf",
+    completionPdf: "/certificates/cisco-network-defense-completion.pdf",
+    certificateImage: "/certificates/cisco-network-defense-certificate.png",
+    completionImage: "/certificates/cisco-network-defense-completion.png",
   },
 ];
 

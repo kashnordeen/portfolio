@@ -1,4 +1,5 @@
 import SkillCategory from "./SkillCategory";
+import { CertificationsSection } from "./CertificationsSection";
 import { motion } from "framer-motion";
 import { GraduationCap, BookOpen, Award, CheckCircle2, Calendar, Building2, Sparkles } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
@@ -107,6 +108,9 @@ export const EducationSection = () => {
           })}
         </div>
       </div>
+
+      {/* Licenses & Certifications */}
+      <CertificationsSection />
 
       {/* Expertise & Skills Component */}
       <div>
