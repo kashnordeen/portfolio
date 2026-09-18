@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.0] - 2026-09-18
+
+### Added
+
+- GramFlow Android as a standalone project with its verified repository link and dedicated artwork.
+- Expanded cybersecurity, security tooling, systems, cloud, database, language, and AI/ML skill categories.
+
+### Updated
+
+- Standardized the portfolio identity to Keshav Karn and repositioned the profile as a CSE student.
+- Expanded the bio, About copy, project-based specialty, technology stack, and professional strengths.
+- Split GramFlow into dedicated Web and Android project entries.
+
+### Fixed
+
+- Removed self-assessed proficiency percentages from the skills section.
+- Removed the self-referential Portfolio Website project card.
+- Restored the ESLint 9 validation workflow with a project-local flat configuration.
+- Tightened shared form and theme-transition types and removed an invalid textarea utility class.
+
 ## [1.1.0] - 2026-09-18
 
 ### Added

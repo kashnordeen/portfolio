@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">GramFlow Android project artwork</title>
+  <desc id="desc">A dark mobile inventory dashboard with green accent cards and FIFO ledger graphics.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#07130d"/>
+      <stop offset="0.55" stop-color="#101711"/>
+      <stop offset="1" stop-color="#172617"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop stop-color="#d9ff3f"/>
+      <stop offset="1" stop-color="#71e100"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <circle cx="950" cy="80" r="210" fill="#9cff19" opacity=".08" filter="url(#glow)"/>
+  <circle cx="170" cy="650" r="250" fill="#9cff19" opacity=".07" filter="url(#glow)"/>
+  <g opacity=".13" stroke="#a8ff3f">
+    <path d="M0 120h1200M0 240h1200M0 360h1200M0 480h1200M0 600h1200"/>
+    <path d="M120 0v720M240 0v720M360 0v720M480 0v720M600 0v720M720 0v720M840 0v720M960 0v720M1080 0v720"/>
+  </g>
+  <g transform="translate(710 42)">
+    <rect x="0" y="0" width="304" height="636" rx="48" fill="#070b08" stroke="#53634e" stroke-width="8"/>
+    <rect x="18" y="18" width="268" height="600" rx="34" fill="#f0f1ed"/>
+    <rect x="106" y="29" width="92" height="13" rx="7" fill="#111711"/>
+    <text x="42" y="92" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#151a15">Good morning</text>
+    <text x="42" y="119" font-family="Arial, sans-serif" font-size="31" font-weight="900" fill="#101510">GramFlow</text>
+    <rect x="39" y="146" width="226" height="110" rx="22" fill="#141a14"/>
+    <text x="58" y="180" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#abb4a8">TOTAL STOCK VALUE</text>
+    <text x="58" y="222" font-family="Arial, sans-serif" font-size="34" font-weight="900" fill="#ffffff">₹ 48,250</text>
+    <circle cx="229" cy="202" r="22" fill="url(#accent)"/>
+    <path d="M218 202h22m-11-11v22" stroke="#102010" stroke-width="5" stroke-linecap="round"/>
+    <rect x="39" y="278" width="106" height="92" rx="18" fill="#dfff52"/>
+    <rect x="159" y="278" width="106" height="92" rx="18" fill="#ffffff" stroke="#d8ddd4"/>
+    <text x="55" y="307" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#53604e">PRODUCTS</text>
+    <text x="55" y="347" font-family="Arial, sans-serif" font-size="30" font-weight="900" fill="#172017">126</text>
+    <text x="175" y="307" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#6a7466">LOW STOCK</text>
+    <text x="175" y="347" font-family="Arial, sans-serif" font-size="30" font-weight="900" fill="#172017">08</text>
+    <text x="39" y="412" font-family="Arial, sans-serif" font-size="18" font-weight="900" fill="#151a15">FIFO inventory</text>
+    <g transform="translate(39 432)">
+      <rect width="226" height="55" rx="15" fill="#ffffff" stroke="#d8ddd4"/>
+      <circle cx="27" cy="27" r="13" fill="#ddff5b"/>
+      <path d="M21 27h12" stroke="#24301e" stroke-width="3"/>
+      <text x="51" y="25" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#171d16">Batch #GF-1042</text>
+      <text x="51" y="42" font-family="Arial, sans-serif" font-size="10" fill="#798075">24 units · First in queue</text>
+    </g>
+    <g transform="translate(39 500)">
+      <rect width="226" height="55" rx="15" fill="#ffffff" stroke="#d8ddd4"/>
+      <circle cx="27" cy="27" r="13" fill="#edf1e8"/>
+      <path d="M21 27h12" stroke="#697265" stroke-width="3"/>
+      <text x="51" y="25" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#171d16">Customer ledger</text>
+      <text x="51" y="42" font-family="Arial, sans-serif" font-size="10" fill="#798075">Secure offline records</text>
+    </g>
+  </g>
+  <g transform="translate(92 110)">
+    <rect x="0" y="0" width="485" height="500" rx="42" fill="#111a12" stroke="#384735" stroke-width="2"/>
+    <rect x="42" y="44" width="62" height="62" rx="18" fill="url(#accent)"/>
+    <path d="M59 61h28v28H59z" fill="none" stroke="#172217" stroke-width="5"/>
+    <path d="M65 76h16M73 68v16" stroke="#172217" stroke-width="4" stroke-linecap="round"/>
+    <text x="126" y="70" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#9aa69a" letter-spacing="4">NATIVE ANDROID</text>
+    <text x="42" y="170" font-family="Arial, sans-serif" font-size="64" font-weight="900" fill="#ffffff">GRAMFLOW</text>
+    <text x="42" y="224" font-family="Arial, sans-serif" font-size="31" font-weight="800" fill="#b8ff35">ANDROID</text>
+    <text x="42" y="284" font-family="Arial, sans-serif" font-size="20" fill="#b4beb2">Offline-first inventory</text>
+    <text x="42" y="315" font-family="Arial, sans-serif" font-size="20" fill="#b4beb2">and FIFO ledger system.</text>
+    <g transform="translate(42 365)" font-family="Arial, sans-serif" font-size="15" font-weight="700">
+      <rect width="106" height="42" rx="21" fill="#202b1f" stroke="#50614c"/>
+      <text x="22" y="27" fill="#e9f0e6">KOTLIN</text>
+      <rect x="118" width="160" height="42" rx="21" fill="#202b1f" stroke="#50614c"/>
+      <text x="140" y="27" fill="#e9f0e6">JETPACK COMPOSE</text>
+      <rect y="56" width="89" height="42" rx="21" fill="#202b1f" stroke="#50614c"/>
+      <text x="23" y="83" fill="#e9f0e6">ROOM</text>
+      <rect x="101" y="56" width="105" height="42" rx="21" fill="#202b1f" stroke="#50614c"/>
+      <text x="124" y="83" fill="#e9f0e6">MVVM</text>
+    </g>
+  </g>
+</svg>

@@ -33,6 +33,12 @@ const ANIMATION_TYPES: AnimationType[] = [
   "flip-x-in",
 ];
 
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (updateCallback: () => void) => {
+    ready: Promise<void>;
+  };
+};
+
 export interface ToggleThemeProps
   extends React.ComponentPropsWithoutRef<"button"> {
   duration?: number;
@@ -97,9 +103,10 @@ export function ThemeToggle({
         : animationType;
 
     const newTheme = !isDark;
+    const viewTransitionDocument = document as ViewTransitionDocument;
 
     // Fallback for browsers that do not support View Transitions
-    if (!(document as any).startViewTransition) {
+    if (!viewTransitionDocument.startViewTransition) {
       setIsDark(newTheme);
       if (newTheme) {
         document.documentElement.classList.add("dark");
@@ -110,7 +117,7 @@ export function ThemeToggle({
       return;
     }
 
-    const transition = (document as any).startViewTransition(() => {
+    const transition = viewTransitionDocument.startViewTransition(() => {
       flushSync(() => {
         setIsDark(newTheme);
         if (newTheme) {

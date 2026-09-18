@@ -1,4 +1,4 @@
-# Keshav Kumar Karn — Personal Portfolio
+# Keshav Karn — Personal Portfolio
 
 A modern, high-performance personal portfolio built with React, TypeScript, Vite, Tailwind CSS, and Framer Motion.
 

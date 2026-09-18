@@ -20,7 +20,7 @@ export const CareerTimeline = () => {
       <ScrollTimeline
         events={mappedEvents}
         title="Development Journey"
-        subtitle="Milestones in my path from curious beginner to software engineer"
+        subtitle="Milestones in my path from curious beginner to multidisciplinary developer"
         animationOrder="staggered"
         cardAlignment="alternating"
         cardVariant="elevated"

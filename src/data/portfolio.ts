@@ -1,7 +1,8 @@
 export const profile = {
-  name: "Keshav Kumar Karn",
+  name: "Keshav Karn",
   initials: "KK",
-  role: "Software Engineer",
+  role: "CSE Student",
+  specialty: "AI, Security & IoT",
   location: "Patiala, Punjab, India",
   email: "kash.nordeen@gmail.com",
   phone: "+91 7700895535",
@@ -10,9 +11,9 @@ export const profile = {
   resume: "",
   badgeId: "KK-27041-DEV",
   experience: "Early Career",
-  bio: "Software engineer and Computer Science student building reliable full-stack, AI/ML, Android, and IoT products from concept to deployment.",
-  aboutHeading: "Intelligent Digital Products",
-  aboutDescription: "I am pursuing a B.E. in Computer Science at Thapar Institute of Engineering and Technology, with hands-on experience building full-stack platforms, machine-learning pipelines, native Android applications, and connected IoT systems. I focus on turning complex technical requirements into secure, maintainable, and user-centered products.",
+  bio: "CSE student and multidisciplinary developer building secure full-stack platforms, native Android applications, AI-powered search and vision systems, and connected IoT solutions. I turn complex problems into practical products by combining software engineering, cybersecurity, machine learning, and cloud-connected architecture.",
+  aboutHeading: "Secure, Intelligent Products",
+  aboutDescription: "I am pursuing a B.E. in Computer Science at Thapar Institute of Engineering and Technology. My projects span secure full-stack platforms, offline-first Android systems, multimodal AI search, computer vision, and IoT telemetry using technologies such as FastAPI, PostgreSQL, PyTorch, Kotlin, Docker, and AWS. I enjoy owning the full engineering lifecycle: understanding the problem, designing the architecture, implementing resilient software, testing security assumptions, and refining the user experience.",
 };
 
 export const stats = [
@@ -29,16 +30,17 @@ export const technologies = [
   { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
   { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
   { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
-  { name: "Svelte", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/svelte/svelte-original.svg" },
+  { name: "Kotlin", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" },
+  { name: "Java", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" },
+  { name: "C++", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg" },
   { name: "FastAPI", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg" },
   { name: "PyTorch", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg" },
   { name: "Tailwind CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
   { name: "Git", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" },
-  { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
   { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg" },
+  { name: "MySQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" },
   { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg" },
-  { name: "HTML5", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" },
-  { name: "CSS3", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" },
+  { name: "OpenCV", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opencv/opencv-original.svg" },
   { name: "Linux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" },
 ];
 
@@ -64,18 +66,18 @@ export const services = [
 export const projects = [
   {
     id: 1,
-    title: "Portfolio Website",
-    subtitle: "Personal portfolio built with React, TypeScript & Framer Motion",
-    link: "https://github.com/kashnordeen/portfolio",
-    image: "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    title: "GramFlow Web",
+    subtitle: "Full-stack precision inventory and FIFO ledger platform with real-time financial analytics",
+    link: "https://github.com/kashnordeen/GramFlow",
+    image: "/projects/gramflow.jpg",
     gridClass: "md:col-span-7 h-[420px]",
   },
   {
     id: 2,
-    title: "GramFlow",
-    subtitle: "Precision inventory & FIFO ledger suite with Next.js web terminal and Android native app",
-    link: "https://github.com/kashnordeen/GramFlow",
-    image: "/projects/gramflow.jpg",
+    title: "GramFlow Android",
+    subtitle: "Offline-first native inventory, FIFO batch and customer ledger app built with Kotlin, Jetpack Compose & Room",
+    link: "https://github.com/kashnordeen/GramFlow_Android",
+    image: "/projects/gramflow-android.svg",
     gridClass: "md:col-span-5 h-[420px]",
   },
   {
@@ -211,27 +213,49 @@ export const certifications = [
   },
 ];
 
-export const technicalSkills = [
-  { name: "JavaScript / TypeScript", level: 85 },
-  { name: "React / Next.js", level: 80 },
-  { name: "Python / FastAPI", level: 80 },
-  { name: "AI / ML with PyTorch", level: 75 },
-  { name: "PostgreSQL / pgvector", level: 75 },
+export const technicalSkillGroups = [
+  {
+    name: "Cybersecurity",
+    skills: ["Web Application Security Testing", "Vulnerability Assessment", "Network Reconnaissance", "DNS Enumeration", "Security Scanning", "Network Security", "Threat Management", "Secure Network Configuration"],
+  },
+  {
+    name: "Security Tools",
+    skills: ["Nmap", "OWASP ZAP", "Nikto", "Wapiti", "WafW00f", "DNS Enumeration Tools", "Vulnerability Scanning"],
+  },
+  {
+    name: "Languages",
+    skills: ["Python", "C++", "C", "Java", "Kotlin", "JavaScript", "TypeScript", "SQL"],
+  },
+  {
+    name: "Systems & Networking",
+    skills: ["Linux", "Docker", "MQTT (TLS)", "RESTful APIs", "TCP/IP", "DNS", "DHCP", "Operating Systems", "Networking Concepts"],
+  },
+  {
+    name: "Application, Cloud & Databases",
+    skills: ["JWT", "RBAC", "Authentication & Authorization", "AWS IoT Core", "AWS", "FastAPI", "Node.js", "Express.js", "PostgreSQL", "MySQL", "SQLAlchemy", "Git/GitHub"],
+  },
+  {
+    name: "AI/ML & Computer Vision",
+    skills: ["PyTorch", "XGBoost", "Scikit-learn", "Transformers", "CLIP", "Sentence-Transformers", "NLP", "Computer Vision (OpenCV)"],
+  },
 ];
 
 export const softSkills = [
-  { name: "Problem Solving" },
-  { name: "Quick Learner" },
-  { name: "Team Collaboration" },
-  { name: "Analytical Thinking" },
-  { name: "Self-Motivated" },
-  { name: "Adaptable" },
+  { name: "Security-First Mindset" },
+  { name: "Systems Thinking" },
+  { name: "Analytical Problem Solving" },
+  { name: "Cross-Platform Engineering" },
+  { name: "Collaborative Delivery" },
+  { name: "Ownership & Adaptability" },
 ];
 
+export const professionalSummary =
+  "I approach projects as complete systems—balancing product usability, application security, data integrity, performance, and maintainability from architecture through delivery.";
+
 export const morphingTexts = [
-  "Software Engineer",
+  "CSE Student",
   "Full-Stack Developer",
-  "Problem Solver",
-  "Tech Enthusiast",
+  "AI & IoT Builder",
+  "Cybersecurity Learner",
   "Keshav Karn",
 ];

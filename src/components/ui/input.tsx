@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { motion, type HTMLMotionProps } from "framer-motion";
 
-export interface InputProps extends Omit<HTMLMotionProps<"input">, "ref"> {}
+export type InputProps = Omit<HTMLMotionProps<"input">, "ref">;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
   const [isFocused, setIsFocused] = React.useState(false);

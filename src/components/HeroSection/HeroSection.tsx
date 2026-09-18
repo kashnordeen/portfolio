@@ -50,7 +50,7 @@ export const HeroSection = () => {
             
             {/* Theme-Aware Seamless Gradient Text */}
             <span className="bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 dark:from-cyan-400 dark:via-purple-400 dark:to-sky-300 bg-clip-text text-transparent font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none dark:drop-shadow-[0_0_35px_rgba(168,85,247,0.3)]">
-              Keshav Kumar Karn
+              {profile.name}
             </span>
           </motion.div>
 
@@ -151,7 +151,7 @@ export const HeroSection = () => {
                 <div className="grid grid-cols-2 gap-2.5 w-full text-left bg-muted/40 p-3 rounded-xl border border-border/50">
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Specialty</span>
-                    <span className="font-bold text-foreground text-xs">Web, AI & IoT</span>
+                    <span className="font-bold text-foreground text-xs">{profile.specialty}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Location</span>
