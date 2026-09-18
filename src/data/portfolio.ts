@@ -1,5 +1,3 @@
-import { Code2, Globe2, Layout, Users, Palette, Cpu, Layers, Server, Database, Cloud, Brain, Workflow, Lightbulb, Rocket, Crown, HeartHandshake } from "lucide-react";
-
 export const profile = {
   name: "Keshav Kumar Karn",
   initials: "KK",
@@ -9,15 +7,16 @@ export const profile = {
   phone: "+91 7700895535",
   github: "https://github.com/kashnordeen",
   linkedin: "https://www.linkedin.com/in/keshav-karn-933910352/",
+  resume: "",
   badgeId: "KK-27041-DEV",
-  experience: "Newbie",
-  bio: "I build robust, scalable applications across Full-Stack Web, Native Android, AI/ML models, and IoT devices. Currently pursuing my B.Tech at Thapar Institute of Engineering and Technology, I engineer intelligent systems from embedded hardware to modern user interfaces.",
-  aboutHeading: "Building Intelligent Digital Systems",
-  aboutDescription: "I'm a software engineering student at Thapar Institute of Engineering and Technology. Beyond full-stack web applications, my work spans machine learning architectures, native Android apps, and IoT embedded hardware. I'm passionate about connecting intelligent algorithms and physical telemetry into cohesive, high-performance products.",
+  experience: "Early Career",
+  bio: "Software engineer and Computer Science student building reliable full-stack, AI/ML, Android, and IoT products from concept to deployment.",
+  aboutHeading: "Intelligent Digital Products",
+  aboutDescription: "I am pursuing a B.E. in Computer Science at Thapar Institute of Engineering and Technology, with hands-on experience building full-stack platforms, machine-learning pipelines, native Android applications, and connected IoT systems. I focus on turning complex technical requirements into secure, maintainable, and user-centered products.",
 };
 
 export const stats = [
-  { label: "Experience", value: "Newbie" },
+  { label: "Experience", value: "Early Career" },
   { label: "Projects Built", value: "4+" },
   { label: "Technologies Used", value: "15+" },
   { label: "Expected Graduation", value: "2027" },
@@ -30,6 +29,9 @@ export const technologies = [
   { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
   { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" },
   { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
+  { name: "Svelte", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/svelte/svelte-original.svg" },
+  { name: "FastAPI", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg" },
+  { name: "PyTorch", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/pytorch/pytorch-original.svg" },
   { name: "Tailwind CSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg" },
   { name: "Git", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg" },
   { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
@@ -38,7 +40,6 @@ export const technologies = [
   { name: "HTML5", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg" },
   { name: "CSS3", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" },
   { name: "Linux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg" },
-  { name: "VS Code", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vscode/vscode-original.svg" },
 ];
 
 export const services = [
@@ -87,26 +88,26 @@ export const projects = [
   },
   {
     id: 4,
-    title: "API Dashboard",
-    subtitle: "Real-time analytics dashboard for monitoring API performance",
-    link: "https://github.com/kashnordeen",
-    image: "https://images.pexels.com/photos/669615/pexels-photo-669615.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    title: "FINDORA",
+    subtitle: "AI-powered campus lost-and-found platform with multimodal matching, secure contact escrow & admin analytics",
+    link: "https://github.com/kashnordeen/FINDORA",
+    image: "/projects/findora.svg",
     gridClass: "md:col-span-7 h-[360px]",
   },
 ];
 
 export const careerEvents = [
   {
-    year: "2024 – Present",
-    title: "B.Tech Computer Science",
-    subtitle: "Thapar Institute of Engineering and Technology",
-    description: "Pursuing Bachelor of Engineering in Computer Science. Building full-stack projects, exploring modern web technologies, and deepening expertise in algorithms and system design.",
+    year: "2025 – Present",
+    title: "Full-Stack & AI Project Development",
+    subtitle: "Independent & Academic Projects",
+    description: "Building production-oriented web, mobile, AI/ML, and IoT projects, including multimodal search, vector retrieval, telemetry pipelines, and secure full-stack applications.",
   },
   {
-    year: "2023 – 2024",
-    title: "Started University & Serious Development",
-    subtitle: "Thapar Institute, Patiala",
-    description: "Began formal computer science education. Started building real-world projects with React, Node.js, and databases. Participated in coding competitions and hackathons.",
+    year: "2023 – Present",
+    title: "B.E. Computer Science",
+    subtitle: "Thapar Institute of Engineering and Technology",
+    description: "Developing a strong foundation in data structures, algorithms, databases, computer networks, and system design while applying those concepts to end-to-end software projects.",
   },
   {
     year: "2022 – 2023",
@@ -178,19 +179,44 @@ export const certifications = [
       "PKI & Data Protection",
       "Cloud Security",
     ],
-    certificatePdf: "/certificates/cisco-network-defense-certificate.pdf",
-    completionPdf: "/certificates/cisco-network-defense-completion.pdf",
     certificateImage: "/certificates/cisco-network-defense-certificate.png",
-    completionImage: "/certificates/cisco-network-defense-completion.png",
+  },
+  {
+    id: 2,
+    title: "Cyber Threat Management",
+    issuer: "Cisco Networking Academy",
+    institution: "Thapar Institute of Engineering and Technology",
+    instructor: "Gurpal Singh Chhabra",
+    issueDate: "September 2026",
+    badge: "Verified Credential",
+    badgeColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+    description:
+      "Cisco Networking Academy course completion focused on cybersecurity governance and practical threat management, including vulnerability assessment, organizational risk, policy, compliance, and incident response.",
+    competencies: [
+      "Assessing networks for vulnerabilities",
+      "Managing organizational cybersecurity risk",
+      "Responding to security incidents",
+      "Developing cybersecurity policies",
+      "Applying ethical, legal & regulatory frameworks",
+    ],
+    skills: [
+      "Threat Management",
+      "Vulnerability Assessment",
+      "Risk Management",
+      "Incident Response",
+      "Security Governance",
+      "Policy & Compliance",
+    ],
+    certificateImage: "/certificates/cisco-cyber-threat-management-certificate.png",
   },
 ];
 
 export const technicalSkills = [
   { name: "JavaScript / TypeScript", level: 85 },
   { name: "React / Next.js", level: 80 },
-  { name: "Python", level: 75 },
-  { name: "Node.js / Express", level: 70 },
-  { name: "Git & GitHub", level: 85 },
+  { name: "Python / FastAPI", level: 80 },
+  { name: "AI / ML with PyTorch", level: 75 },
+  { name: "PostgreSQL / pgvector", level: 75 },
 ];
 
 export const softSkills = [

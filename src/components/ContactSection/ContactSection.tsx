@@ -103,9 +103,12 @@ export const ContactSection = () => {
           <div className="flex-1 glass-panel p-8 rounded-[2rem] border border-foreground/10 relative">
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1.5">Your Name</label>
+                <label htmlFor="contact-name" className="block text-sm font-medium text-muted-foreground mb-1.5">Your Name</label>
                 <Input 
+                  id="contact-name"
+                  name="name"
                   type="text" 
+                  autoComplete="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
@@ -115,9 +118,12 @@ export const ContactSection = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1.5">Your Email</label>
+                <label htmlFor="contact-email" className="block text-sm font-medium text-muted-foreground mb-1.5">Your Email</label>
                 <Input 
+                  id="contact-email"
+                  name="email"
                   type="email" 
+                  autoComplete="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -127,8 +133,10 @@ export const ContactSection = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1.5">Message</label>
+                <label htmlFor="contact-message" className="block text-sm font-medium text-muted-foreground mb-1.5">Message</label>
                 <Textarea 
+                  id="contact-message"
+                  name="message"
                   rows={4}
                   required
                   value={formData.message}

@@ -22,7 +22,7 @@ export const AboutSection = () => {
         <div className="flex-1 space-y-8">
           <div>
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-              Passionate about <span className="text-gradient-primary">Building Digital Experiences</span>
+              Engineering <span className="text-gradient-primary">{profile.aboutHeading}</span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
               {profile.aboutDescription}

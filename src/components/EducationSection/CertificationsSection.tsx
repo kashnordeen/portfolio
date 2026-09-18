@@ -1,8 +1,7 @@
 ﻿import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Award, ExternalLink, Eye, CheckCircle2, X, Calendar, Building2 } from "lucide-react";
+import { ShieldCheck, Award, Eye, CheckCircle2, X, Calendar, Building2 } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
-import { Button } from "@/components/ui/button";
 import { certifications } from "@/data/portfolio";
 
 export const CertificationsSection = () => {
@@ -10,12 +9,10 @@ export const CertificationsSection = () => {
     isOpen: boolean;
     image: string;
     title: string;
-    pdfUrl: string;
   }>({
     isOpen: false,
     image: "",
     title: "",
-    pdfUrl: "",
   });
 
   return (
@@ -66,7 +63,6 @@ export const CertificationsSection = () => {
                         isOpen: true,
                         image: cert.certificateImage,
                         title: `${cert.title} — ${cert.issuer}`,
-                        pdfUrl: cert.certificatePdf,
                       })
                     }
                     className="group relative rounded-2xl overflow-hidden border border-border/80 shadow-lg cursor-pointer bg-muted/40 aspect-[4/3] flex items-center justify-center"
@@ -84,24 +80,10 @@ export const CertificationsSection = () => {
                     </div>
                   </div>
 
-                  {/* Secondary credential quick-toggle hint */}
-                  <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
+                  <div className="flex items-center text-xs text-muted-foreground px-1">
                     <span className="flex items-center gap-1">
                       <Award className="w-3.5 h-3.5 text-emerald-400" /> Cisco Verified Credential
                     </span>
-                    <button
-                      onClick={() =>
-                        setActivePreview({
-                          isOpen: true,
-                          image: cert.completionImage,
-                          title: `${cert.title} (Course Completion Transcript) — ${cert.issuer}`,
-                          pdfUrl: cert.completionPdf,
-                        })
-                      }
-                      className="text-primary hover:underline font-medium cursor-pointer"
-                    >
-                      View Transcript →
-                    </button>
                   </div>
                 </div>
 
@@ -163,28 +145,6 @@ export const CertificationsSection = () => {
                     ))}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
-                    <Button
-                      asChild
-                      size="sm"
-                      className="rounded-xl gap-2 font-semibold shadow-md shadow-primary/20"
-                    >
-                      <a href={cert.certificatePdf} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4" /> View Certificate PDF
-                      </a>
-                    </Button>
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl gap-2 font-semibold glass-panel border-foreground/10"
-                    >
-                      <a href={cert.completionPdf} target="_blank" rel="noopener noreferrer">
-                        <Award className="w-4 h-4 text-emerald-400" /> Completion Transcript
-                      </a>
-                    </Button>
-                  </div>
                 </div>
               </div>
             </MagicCard>
@@ -214,19 +174,13 @@ export const CertificationsSection = () => {
                 <h4 className="font-bold text-foreground text-sm md:text-base line-clamp-1">
                   {activePreview.title}
                 </h4>
-                <div className="flex items-center gap-2">
-                  <Button asChild size="sm" variant="ghost" className="h-8 gap-1.5 text-xs">
-                    <a href={activePreview.pdfUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-3.5 h-3.5" /> Open Full PDF
-                    </a>
-                  </Button>
-                  <button
-                    onClick={() => setActivePreview((prev) => ({ ...prev, isOpen: false }))}
-                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setActivePreview((prev) => ({ ...prev, isOpen: false }))}
+                  aria-label="Close certificate preview"
+                  className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
               {/* Modal Body */}

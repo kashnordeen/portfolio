@@ -4,7 +4,6 @@ import {
   Server,
   Code2,
   Database,
-  Cloud,
   Brain,
   Workflow,
   HeartHandshake,
@@ -19,9 +18,9 @@ export default function ProfessionalProfile() {
   const technicalSkills = [
     { name: portTechSkills[0].name, level: portTechSkills[0].level, icon: Code2, color: "text-blue-400" },
     { name: portTechSkills[1].name, level: portTechSkills[1].level, icon: Atom, color: "text-cyan-400" },
-    { name: portTechSkills[2].name, level: portTechSkills[2].level, icon: Database, color: "text-amber-400" },
-    { name: portTechSkills[3].name, level: portTechSkills[3].level, icon: Server, color: "text-emerald-400" },
-    { name: portTechSkills[4].name, level: portTechSkills[4].level, icon: Cloud, color: "text-purple-400" },
+    { name: portTechSkills[2].name, level: portTechSkills[2].level, icon: Server, color: "text-amber-400" },
+    { name: portTechSkills[3].name, level: portTechSkills[3].level, icon: Brain, color: "text-emerald-400" },
+    { name: portTechSkills[4].name, level: portTechSkills[4].level, icon: Database, color: "text-purple-400" },
   ];
 
   const softSkills = [

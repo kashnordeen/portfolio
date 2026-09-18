@@ -72,9 +72,13 @@ export const HeroSection = () => {
             <Button size="lg" onClick={() => {document.getElementById('projects')?.scrollIntoView({behavior: 'smooth'})}} className="rounded-full px-7 h-12 bg-primary text-primary-foreground font-semibold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-1">
               View Work <ArrowRight className="w-4 h-4" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => alert("Resume coming soon!")} className="rounded-full px-7 h-12 glass-panel text-foreground font-semibold flex items-center gap-2 hover:bg-foreground/10 transition-all hover:-translate-y-1 border-foreground/10">
-              Resume <Download className="w-4 h-4" />
-            </Button>
+            {profile.resume && (
+              <Button size="lg" variant="outline" asChild className="rounded-full px-7 h-12 glass-panel text-foreground font-semibold flex items-center gap-2 hover:bg-foreground/10 transition-all hover:-translate-y-1 border-foreground/10">
+                <a href={profile.resume} target="_blank" rel="noopener noreferrer">
+                  Resume <Download className="w-4 h-4" />
+                </a>
+              </Button>
+            )}
           </motion.div>
 
           {/* Social Links */}
@@ -84,13 +88,13 @@ export const HeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            <a href="https://github.com/kashnordeen" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
               <Github className="w-5 h-5" />
             </a>
-            <a href="https://www.linkedin.com/in/keshav-karn-933910352/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
               <Linkedin className="w-5 h-5" />
             </a>
-            <a href="mailto:kash.nordeen@gmail.com" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={`mailto:${profile.email}`} aria-label="Email" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
               <Mail className="w-5 h-5" />
             </a>
           </motion.div>
@@ -104,9 +108,9 @@ export const HeroSection = () => {
           transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
           <HangingIdCard
-            name="Keshav Kumar Karn"
-            role="Software Engineer"
-            badgeId="KK-27041-DEV"
+            name={profile.name}
+            role={profile.role}
+            badgeId={profile.badgeId}
             accentColor="#8b5cf6"
             ropeLength={75}
             ropeColor="#27272a"
@@ -135,9 +139,9 @@ export const HeroSection = () => {
               {/* Card Body */}
               <div className="p-5 flex flex-col items-center text-center bg-card text-card-foreground flex-1 gap-3">
                 <div>
-                  <h3 className="text-xl font-extrabold tracking-tight text-foreground">Keshav Kumar Karn</h3>
+                  <h3 className="text-xl font-extrabold tracking-tight text-foreground">{profile.name}</h3>
                   <div className="inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold">
-                    <span>Software Engineer</span>
+                    <span>{profile.role}</span>
                   </div>
                 </div>
 
@@ -155,7 +159,7 @@ export const HeroSection = () => {
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Experience</span>
-                    <span className="font-bold text-foreground text-xs">Newbie</span>
+                    <span className="font-bold text-foreground text-xs">{profile.experience}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Status</span>
@@ -181,7 +185,7 @@ export const HeroSection = () => {
                   </div>
                   <div className="flex items-center justify-between w-full px-1 text-[10px]">
                     <span className="font-mono font-bold tracking-widest text-primary">
-                      KK-27041-DEV
+                      {profile.badgeId}
                     </span>
                     <span className="text-muted-foreground font-semibold text-[9px] uppercase tracking-wider">
                       DEVELOPER ID

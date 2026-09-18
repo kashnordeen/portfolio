@@ -8,9 +8,10 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 const navItems = [
   { name: "Home", href: "#hero" },
   { name: "About", href: "#about" },
-  { name: "Education", href: "#education" },
-  { name: "Career", href: "#career" },
   { name: "Projects", href: "#projects" },
+  { name: "Career", href: "#career" },
+  { name: "Education", href: "#education" },
+  { name: "Contact", href: "#contact" },
 ];
 
 export default function Header() {
@@ -75,7 +76,11 @@ export default function Header() {
           <div className="glass-panel w-full max-w-7xl rounded-[2rem] flex items-center justify-between px-6 py-4 shadow-xl">
             {/* Logo */}
             <a
-              onClick={() => handleScrollTo("#hero")}
+              href="#hero"
+              onClick={(event) => {
+                event.preventDefault();
+                handleScrollTo("#hero");
+              }}
               className="cursor-pointer font-extrabold text-lg flex items-center gap-3 group select-none"
             >
               <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-primary to-sky-400 p-[1px] shadow-lg group-hover:scale-105 transition-transform duration-300">
@@ -100,7 +105,14 @@ export default function Header() {
               <ul className="flex space-x-8">
                 {navItems.map((item) => (
                   <motion.li key={item.name} className="relative group text-sm font-medium text-muted-foreground transition-colors">
-                    <a onClick={() => handleScrollTo(item.href)} className="cursor-pointer hover:text-foreground">
+                    <a
+                      href={item.href}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleScrollTo(item.href);
+                      }}
+                      className="cursor-pointer hover:text-foreground"
+                    >
                       {item.name}
                     </a>
                     <motion.span
@@ -121,6 +133,7 @@ export default function Header() {
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
+                aria-label="Open navigation menu"
                 className="md:hidden text-foreground hover:text-primary transition-colors p-2"
               >
                 <Menu size={24} />
@@ -142,6 +155,7 @@ export default function Header() {
               >
                 <motion.button
                   onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close navigation menu"
                   className="absolute top-8 right-8 text-foreground"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -158,7 +172,11 @@ export default function Header() {
                   {navItems.map((item) => (
                     <motion.li key={item.name} {...({ variants: itemVariants } as MotionProps)}>
                       <a
-                        onClick={() => handleScrollTo(item.href)}
+                        href={item.href}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          handleScrollTo(item.href);
+                        }}
                         className="text-4xl font-bold text-muted-foreground hover:text-primary hover:tracking-wider transition-all cursor-pointer"
                       >
                         {item.name}
