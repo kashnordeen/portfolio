@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0] - 2026-09-18
+
+### Added
+
+- Official Cisco Credly badge artwork and public verification links for Network Defense and Cyber Threat Management.
+
+### Updated
+
+- Certification cards now present certificate previews and independently verifiable digital badges together.
+- Portfolio package version to 1.3.0.
+
+### Fixed
+
+- Replaced sign-in-dependent Credly earner links with shareable public credential URLs.
+
 ## [1.2.0] - 2026-09-18
 
 ### Added

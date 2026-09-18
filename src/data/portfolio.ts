@@ -182,6 +182,8 @@ export const certifications = [
       "Cloud Security",
     ],
     certificateImage: "/certificates/cisco-network-defense-certificate.png",
+    credlyBadgeImage: "/certificates/credly-network-defense.png",
+    credlyUrl: "https://www.credly.com/badges/657183b7-480b-4c78-8638-5fa400758c4d/public_url",
   },
   {
     id: 2,
@@ -210,6 +212,8 @@ export const certifications = [
       "Policy & Compliance",
     ],
     certificateImage: "/certificates/cisco-cyber-threat-management-certificate.png",
+    credlyBadgeImage: "/certificates/credly-cyber-threat-management.png",
+    credlyUrl: "https://www.credly.com/badges/ff5f66f1-99af-4605-a28f-fdbc541d64b8/public_url",
   },
 ];
 

@@ -1,6 +1,6 @@
 ﻿import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Award, Eye, CheckCircle2, X, Calendar, Building2 } from "lucide-react";
+import { ShieldCheck, Award, Eye, CheckCircle2, X, Calendar, Building2, ExternalLink } from "lucide-react";
 import { MagicCard } from "@/components/ui/magic-card";
 import { certifications } from "@/data/portfolio";
 
@@ -80,11 +80,30 @@ export const CertificationsSection = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center text-xs text-muted-foreground px-1">
-                    <span className="flex items-center gap-1">
-                      <Award className="w-3.5 h-3.5 text-emerald-400" /> Cisco Verified Credential
+                  <a
+                    href={cert.credlyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Verify ${cert.title} badge on Credly`}
+                    className="group/badge flex items-center gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-colors"
+                  >
+                    <img
+                      src={cert.credlyBadgeImage}
+                      alt={`${cert.title} Credly badge`}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-16 h-16 shrink-0 object-contain drop-shadow-md"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold text-emerald-400">
+                        <Award className="w-3.5 h-3.5" /> Digital Badge
+                      </span>
+                      <strong className="block mt-1 text-sm text-foreground">Verified on Credly</strong>
+                      <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground group-hover/badge:text-foreground transition-colors">
+                        View public credential <ExternalLink className="w-3 h-3" />
+                      </span>
                     </span>
-                  </div>
+                  </a>
                 </div>
 
                 {/* Information Column */}
