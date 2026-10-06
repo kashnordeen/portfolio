@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, type Variants, type MotionProps } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion, type Variants, type MotionProps } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useLenis } from "lenis/react";
 
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { profile } from "@/data/portfolio";
 
 const navItems = [
   { name: "Home", href: "#hero" },
@@ -18,6 +19,7 @@ export default function Header() {
   const [showHeader, setShowHeader] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const lenis = useLenis();
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -37,24 +39,26 @@ export default function Header() {
 
   const handleScrollTo = (id: string) => {
     if (lenis) {
-      lenis.scrollTo(id);
+      lenis.scrollTo(id, { immediate: !!reduceMotion });
+    } else {
+      document.querySelector(id)?.scrollIntoView({ behavior: reduceMotion ? "instant" : "smooth" });
     }
     setIsMobileMenuOpen(false);
   };
 
   const menuVariants: Variants = {
     open: {
-      clipPath: "circle(1500px at 90% 5%)",
-      transition: { type: "spring", stiffness: 20, restDelta: 2 },
+      opacity: 1,
+      transition: { duration: 0.18 },
     },
     closed: {
-      clipPath: "circle(0px at 90% 5%)",
-      transition: { type: "spring", stiffness: 400, damping: 40 },
+      opacity: 0,
+      transition: { duration: 0.12 },
     },
   };
 
   const listVariants: Variants = {
-    open: { transition: { staggerChildren: 0.07, delayChildren: 0.2 } },
+    open: { transition: { staggerChildren: 0.035 } },
     closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
   };
 
@@ -65,7 +69,7 @@ export default function Header() {
 
   return (
     <AnimatePresence>
-      {showHeader && (
+      {(showHeader || isMobileMenuOpen) && (
         <motion.header
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -84,11 +88,7 @@ export default function Header() {
               className="cursor-pointer font-extrabold text-lg flex items-center gap-3 group select-none"
             >
               <div className="relative w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-primary to-sky-400 p-[1px] shadow-lg group-hover:scale-105 transition-transform duration-300">
-                <div className="w-full h-full bg-background rounded-[11px] flex items-center justify-center">
-                  <span className="font-extrabold text-xs tracking-tighter bg-gradient-to-r from-purple-500 to-sky-400 bg-clip-text text-transparent">
-                    KK
-                  </span>
-                </div>
+                <img src={profile.avatar} alt="" width={36} height={36} className="w-full h-full bg-background rounded-[11px] object-cover object-top" />
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-extrabold tracking-tight text-foreground text-sm leading-none group-hover:text-primary transition-colors">
@@ -101,7 +101,7 @@ export default function Header() {
             </a>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex flex-1 justify-center">
+            <nav className="hidden lg:flex flex-1 justify-center">
               <ul className="flex space-x-8">
                 {navItems.map((item) => (
                   <motion.li key={item.name} className="relative group text-sm font-medium text-muted-foreground transition-colors">
@@ -128,13 +128,15 @@ export default function Header() {
 
             {/* Actions: Theme & Mobile Toggle */}
             <div className="flex items-center gap-2">
-              <ThemeToggle />
+              <ThemeToggle animationType="circle-spread" />
 
               {/* Mobile Menu Toggle */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
                 aria-label="Open navigation menu"
-                className="md:hidden text-foreground hover:text-primary transition-colors p-2"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
+                className="lg:hidden min-h-11 min-w-11 text-foreground hover:text-primary transition-colors p-2"
               >
                 <Menu size={24} />
               </button>
@@ -144,19 +146,24 @@ export default function Header() {
           {/* Mobile Sidebar */}
           <AnimatePresence>
             {isMobileMenuOpen && (
-              <motion.div
+              <motion.dialog
+                id="mobile-navigation"
+                ref={dialog => { if (dialog && !dialog.open) dialog.showModal(); }}
+                aria-label="Navigation"
+                data-lenis-prevent
+                onCancel={() => setIsMobileMenuOpen(false)}
                 {...({
                   initial: "closed",
                   animate: "open",
                   exit: "closed",
                   variants: menuVariants,
                 } as MotionProps)}
-                className="fixed inset-0 z-40 bg-background/95 backdrop-blur-2xl md:hidden flex flex-col items-center justify-center"
+                className="fixed inset-0 m-0 h-dvh w-full max-w-none max-h-none border-0 z-40 bg-background text-foreground flex flex-col items-center justify-center"
               >
                 <motion.button
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-label="Close navigation menu"
-                  className="absolute top-8 right-8 text-foreground"
+                  className="absolute top-6 right-6 min-h-11 min-w-11 flex items-center justify-center text-foreground"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0, opacity: 0 }}
@@ -167,7 +174,7 @@ export default function Header() {
 
                 <motion.ul
                   {...({ variants: listVariants } as MotionProps)}
-                  className="flex flex-col items-center justify-center h-full space-y-10"
+                  className="flex flex-col items-center justify-center h-full gap-4 py-20 overflow-y-auto"
                 >
                   {navItems.map((item) => (
                     <motion.li key={item.name} {...({ variants: itemVariants } as MotionProps)}>
@@ -177,14 +184,14 @@ export default function Header() {
                           event.preventDefault();
                           handleScrollTo(item.href);
                         }}
-                        className="text-4xl font-bold text-muted-foreground hover:text-primary hover:tracking-wider transition-all cursor-pointer"
+                        className="inline-flex min-h-11 items-center text-3xl font-bold text-foreground hover:text-primary transition-colors cursor-pointer"
                       >
                         {item.name}
                       </a>
                     </motion.li>
                   ))}
                 </motion.ul>
-              </motion.div>
+              </motion.dialog>
             )}
           </AnimatePresence>
         </motion.header>

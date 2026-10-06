@@ -1,73 +1,111 @@
-import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
-import { projects } from "@/data/portfolio";
+import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { ArrowUpRight, ChevronDown, Download, Github } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import { projects, organizerDownloads, organizerDownloadBase, organizerRelease } from "@/data/portfolio";
 
-export const ProjectsSection = () => {
+function OrganizerDownload() {
+  const platforms = [
+    { name: "Windows", icon: "windows11/windows11-original.svg" },
+    { name: "macOS", icon: "apple/apple-original.svg" },
+    { name: "Linux", icon: "linux/linux-original.svg" },
+  ];
   return (
-    <section id="projects" className="w-full max-w-7xl mx-auto px-6 py-24">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 0.8 }}
-        className="mb-12 md:mb-16"
-      >
-        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-center md:text-left">
-          Selected <span className="text-gradient-primary">Works</span>
-        </h2>
-        <p className="text-muted-foreground text-center md:text-left max-w-2xl text-lg">
-          A showcase of projects I've built — from full-stack applications to interactive web experiences.
-        </p>
-      </motion.div>
-
-      {/* 12-Column Full-Width Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
-        {projects.map((project, i) => (
-          <motion.a
-            key={project.id}
-            href={project.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`group relative overflow-hidden rounded-[2.25rem] block shadow-xl border border-foreground/10 ${project.gridClass}`}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.6 }}
-            viewport={{ once: true, amount: 0.1 }}
-          >
-            {/* Background Image Container */}
-            <div className="absolute inset-0 bg-neutral-950">
-              <img 
-                src={project.image} 
-                alt={project.title}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100 transform-gpu"
-              />
-              {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none" />
+    <div className="mt-5 space-y-3 border-t border-border pt-5">
+      <p className="text-sm font-semibold">Download for your device</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-start">
+        {platforms.map(platform => (
+          <details key={platform.name} name="organizer-platform" className="group/os rounded-xl border border-border bg-background open:border-primary/60">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center gap-2 p-3 text-sm font-semibold hover:bg-muted rounded-xl [&::-webkit-details-marker]:hidden">
+              <img src={`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${platform.icon}`} alt="" width={22} height={22}
+                loading="lazy" className={`h-5 w-5 object-contain ${platform.name === "macOS" ? "dark:invert" : ""}`} />
+              {platform.name}
+              <ChevronDown aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 transition-transform group-open/os:rotate-180" />
+            </summary>
+            <div className="border-t border-border p-1">
+              {organizerDownloads.filter(item => item.platform === platform.name).map(item => (
+                <a key={item.file} href={`${organizerDownloadBase}${item.file}`} aria-label={`Download ${platform.name} ${item.label}`}
+                  className="flex min-h-12 items-center gap-2 rounded-lg p-2 text-xs font-medium hover:bg-muted hover:text-primary">
+                  <Download aria-hidden="true" className="h-4 w-4 shrink-0" /> {item.label}
+                </a>
+              ))}
             </div>
-
-            {/* Content Overlay */}
-            <div className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none">
-              <div className="flex items-end justify-between gap-4 translate-y-2 group-hover:translate-y-0 transition-transform duration-300 transform-gpu">
-                <div className="z-10 max-w-lg">
-                  <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2 tracking-tight drop-shadow-md">
-                    {project.title}
-                  </h3>
-                  <p className="text-sm md:text-base font-medium text-white/80 opacity-90 group-hover:opacity-100 transition-opacity duration-300">
-                    {project.subtitle}
-                  </p>
-                </div>
-                
-                {/* Arrow Action Icon */}
-                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shrink-0 opacity-80 group-hover:opacity-100 group-hover:bg-white group-hover:text-black transition-all duration-300 rotate-45 group-hover:rotate-0 z-10 shadow-lg">
-                  <ArrowUpRight className="w-6 h-6 text-white group-hover:text-black transition-colors" />
-                </div>
-              </div>
-            </div>
-          </motion.a>
+          </details>
         ))}
       </div>
-    </section>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        v1.0.0. Windows is unsigned; macOS is not notarized. Your OS may warn or block installation.{' '}
+        <a href={organizerRelease} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">Release notes & checksums</a>
+      </p>
+    </div>
+  );
+}
+
+function ProjectCard({ project, featured }: { project: typeof projects[number]; featured: boolean }) {
+  const wide = featured || project.downloads;
+  const reduceMotion = useReducedMotion();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useSpring(y, { stiffness: 160, damping: 25 });
+  const rotateY = useSpring(x, { stiffness: 160, damping: 25 });
+  return (
+    <motion.article
+      initial={reduceMotion ? false : { opacity: 0, y: 35 }}
+      whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.12 }}
+      transition={{ duration: 0.55 }}
+      className={`group overflow-hidden rounded-[2rem] border border-foreground/10 bg-card shadow-sm ${wide ? "md:col-span-12 md:grid md:grid-cols-12" : "md:col-span-6 lg:col-span-4"}`}
+    >
+      <figure className={`overflow-hidden bg-muted/50 p-4 sm:p-5 [perspective:1000px] ${wide ? "md:col-span-6 md:self-center" : ""}`}
+        onPointerMove={event => {
+          if (reduceMotion || event.pointerType !== "mouse") return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          x.set(((event.clientX - rect.left) / rect.width - 0.5) * 5);
+          y.set(-((event.clientY - rect.top) / rect.height - 0.5) * 5);
+        }} onPointerLeave={() => { x.set(0); y.set(0); }}>
+        <motion.img src={project.image} alt={`${project.title}: ${project.visualLabel}`} loading="lazy" decoding="async"
+          width={960} height={600} style={reduceMotion ? {} : { rotateX, rotateY }}
+          className={`w-full rounded-2xl object-top ${wide ? "aspect-video object-contain" : "aspect-[16/10] object-cover"}`} />
+        <figcaption className="mt-3 text-xs text-muted-foreground">{project.visualLabel}</figcaption>
+      </figure>
+      <div className={`flex flex-col p-6 ${wide ? "md:col-span-6 md:justify-center" : ""}`}>
+        <p className="mb-3 text-sm font-medium text-muted-foreground">{project.category}</p>
+        <h3 className={`font-bold tracking-tight ${featured ? "text-3xl lg:text-4xl" : "text-2xl"}`}>{project.title}</h3>
+        <p className="mt-3 max-w-lg text-sm sm:text-base leading-relaxed text-muted-foreground">{project.subtitle}</p>
+        <p className="mt-3 text-xs font-medium text-primary">{project.status}</p>
+        <ul className="my-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-foreground/80" aria-label="Project technologies">
+          {project.tags.map(tag => <li key={tag}>{tag}</li>)}
+        </ul>
+        <div className={`${featured ? "mt-2" : "mt-auto"} flex flex-wrap items-center gap-3`}>
+          {project.website && <a href={project.website} target="_blank" rel="noopener noreferrer"
+            className={buttonVariants({ className: "h-11 rounded-full bg-violet-700 hover:bg-violet-800 text-white" })}>
+            Go to website <ArrowUpRight aria-hidden="true" />
+          </a>}
+          <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={`${project.title} on GitHub`}
+            className={buttonVariants({ variant: "outline", className: "h-11 rounded-full bg-transparent hover:bg-muted" })}>
+            <Github aria-hidden="true" /> GitHub <ArrowUpRight aria-hidden="true" />
+          </a>
+        </div>
+        <details className="mt-4 border-t border-border">
+          <summary className="min-h-11 w-fit cursor-pointer py-3 text-sm font-semibold text-primary">Engineering notes</summary>
+          <dl className="space-y-3 text-sm leading-relaxed">
+            <div><dt className="font-semibold">Problem</dt><dd className="mt-1 text-muted-foreground">{project.problem}</dd></div>
+            <div><dt className="font-semibold">Implementation</dt><dd className="mt-1 text-muted-foreground">{project.decision}</dd></div>
+          </dl>
+          <p className="mt-3 pb-3 text-xs text-muted-foreground">Implementation details are documented in the linked repository.</p>
+        </details>
+        {project.downloads && <OrganizerDownload />}
+      </div>
+    </motion.article>
   );
 };
+
+export const ProjectsSection = () => (
+  <section id="projects" className="w-full max-w-7xl mx-auto px-6 py-16">
+    <div className="mb-8 md:mb-12">
+      <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Ideas made <span className="text-gradient-primary">real.</span></h2>
+      <p className="mt-4 max-w-xl text-muted-foreground text-lg">Explore the product. Try the app. Look under the hood.</p>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-12 items-start gap-5 md:gap-6">
+      {projects.map((project, index) => <ProjectCard key={project.id} project={project} featured={index === 0} />)}
+    </div>
+  </section>
+);

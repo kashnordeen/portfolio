@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import {
   BrainCircuit,
+  ChevronDown,
   CloudCog,
   Code2,
   Network,
-  Rocket,
   ShieldCheck,
   Wrench,
 } from "lucide-react";
@@ -12,25 +12,20 @@ import {
   professionalSummary,
   softSkills,
   technicalSkillGroups,
+  technologies,
 } from "@/data/portfolio";
 
 const categoryStyles = [
-  { icon: ShieldCheck, color: "text-rose-400", surface: "bg-rose-500/10 border-rose-500/20" },
-  { icon: Wrench, color: "text-amber-400", surface: "bg-amber-500/10 border-amber-500/20" },
-  { icon: Code2, color: "text-sky-400", surface: "bg-sky-500/10 border-sky-500/20" },
-  { icon: Network, color: "text-emerald-400", surface: "bg-emerald-500/10 border-emerald-500/20" },
-  { icon: CloudCog, color: "text-violet-400", surface: "bg-violet-500/10 border-violet-500/20" },
-  { icon: BrainCircuit, color: "text-fuchsia-400", surface: "bg-fuchsia-500/10 border-fuchsia-500/20" },
+  { icon: ShieldCheck, description: "Assess vulnerabilities. Protect applications and networks." },
+  { icon: Wrench, description: "Reconnaissance, enumeration, and security testing." },
+  { icon: Code2, description: "From systems programming to web and native apps." },
+  { icon: Network, description: "Connected systems, containers, and secure communication." },
+  { icon: CloudCog, description: "Authentication, APIs, cloud services, and reliable data." },
+  { icon: BrainCircuit, description: "Models that understand language, images, and context." },
 ];
+const featuredTools = ["React", "TypeScript", "Python", "Kotlin", "FastAPI", "PyTorch", "PostgreSQL", "Docker"];
 
-const traitStyles = [
-  "text-purple-400 border-purple-500/30 bg-purple-500/10",
-  "text-sky-400 border-sky-500/30 bg-sky-500/10",
-  "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
-  "text-amber-400 border-amber-500/30 bg-amber-500/10",
-  "text-rose-400 border-rose-500/30 bg-rose-500/10",
-  "text-cyan-400 border-cyan-500/30 bg-cyan-500/10",
-];
+const strengthIcons = [ShieldCheck, Network, Wrench, Code2];
 
 export default function ProfessionalProfile() {
   return (
@@ -45,20 +40,25 @@ export default function ProfessionalProfile() {
         <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
           <Code2 className="w-5 h-5" />
         </div>
-        <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight">Expertise & Skills</h3>
+        <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">Expertise & Skills</h2>
       </div>
 
-      <div className="glass-panel p-5 md:p-8 rounded-[2rem] border border-foreground/15 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-7 pb-4 border-b border-border/60">
-          <h4 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <BrainCircuit className="w-5 h-5 text-primary" /> Technical Toolkit
-          </h4>
-          <span className="w-fit text-xs font-bold uppercase tracking-wider text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/50">
-            6 Core Areas
-          </span>
+      <div className="rounded-[2rem] border border-border bg-card overflow-hidden">
+        <div className="p-6 md:p-8 border-b border-border bg-primary/5">
+          <h3 className="text-xl font-bold tracking-tight">The tools behind the build.</h3>
+          <p className="mt-3 text-muted-foreground max-w-xl">Software, security, and intelligent systems. A toolkit shaped by hands-on projects.</p>
+          <ul aria-label="Selected technologies" className="mt-7 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5">
+            {featuredTools.map(name => {
+              const tool = technologies.find(item => item.name === name)!;
+              return <li key={name} className="flex items-center gap-3 text-sm font-semibold">
+                <img src={tool.icon} alt="" width={28} height={28} loading="lazy" decoding="async" className="h-7 w-7 object-contain" />
+                {name}
+              </li>;
+            })}
+          </ul>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 px-6 md:px-8">
           {technicalSkillGroups.map((category, index) => {
             const style = categoryStyles[index];
             const Icon = style.icon;
@@ -69,65 +69,48 @@ export default function ProfessionalProfile() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: index * 0.06 }}
                 viewport={{ once: true }}
-                className="rounded-2xl border border-border/60 bg-muted/25 p-4 md:p-5 hover:border-primary/30 hover:bg-muted/40 transition-colors"
+                className="py-4 border-b border-border last:border-b-0 md:[&:nth-last-child(2)]:border-b-0"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-2 rounded-xl border ${style.surface}`}>
-                    <Icon className={`w-4 h-4 ${style.color}`} />
-                  </div>
-                  <h5 className="font-bold text-sm leading-snug text-foreground">{category.name}</h5>
+                <div className="flex items-center gap-3">
+                  <Icon aria-hidden="true" className="w-5 h-5 shrink-0 text-primary" />
+                  <h4 className="font-bold text-base tracking-tight">{category.name}</h4>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2.5 py-1.5 rounded-lg bg-background/70 border border-border/60 text-xs font-medium text-muted-foreground leading-tight"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+                <ul aria-label={`${category.name} highlights`} className="mt-4 flex flex-wrap gap-2">
+                  {category.skills.slice(0, 3).map(skill => <li key={skill} className="rounded-lg bg-muted px-2.5 py-1.5 text-xs font-medium">{skill}</li>)}
+                </ul>
+                <details className="group/tools mt-3">
+                  <summary className="flex min-h-11 w-fit cursor-pointer list-none items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
+                    More {category.name.toLowerCase()} skills <ChevronDown aria-hidden="true" className="h-4 w-4 transition-transform group-open/tools:rotate-180" />
+                  </summary>
+                  <ul className="flex flex-wrap gap-2 pb-1">
+                    {category.skills.slice(3).map(skill => <li key={skill} className="rounded-lg border border-border px-2.5 py-1.5 text-xs text-foreground/80">{skill}</li>)}
+                  </ul>
+                </details>
               </motion.article>
             );
           })}
         </div>
       </div>
 
-      <div className="glass-panel p-5 md:p-8 rounded-[2rem] border border-foreground/15 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-7 pb-4 border-b border-border/60">
-          <h4 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-primary" /> Professional Strengths
-          </h4>
-          <span className="w-fit text-xs font-bold uppercase tracking-wider text-muted-foreground bg-muted/60 px-3 py-1 rounded-full border border-border/50">
-            How I Work
-          </span>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {softSkills.map((skill, index) => (
-            <motion.div
-              key={skill.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ type: "spring", stiffness: 180, damping: 16, delay: index * 0.06 }}
-              viewport={{ once: true }}
-              className={`px-4 py-2.5 rounded-2xl border text-sm font-semibold shadow-sm ${traitStyles[index]}`}
-            >
-              {skill.name}
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-border/60">
-          <div className="p-4 md:p-5 rounded-2xl bg-gradient-to-r from-primary/10 via-purple-500/5 to-transparent border border-primary/20 flex items-start gap-3.5 shadow-sm">
-            <div className="p-2 rounded-xl bg-primary/20 text-primary shrink-0 mt-0.5">
-              <Rocket className="w-5 h-5" />
-            </div>
-            <div>
-              <strong className="text-foreground font-bold text-sm block mb-1">Product-Minded Engineering</strong>
-              <p className="text-sm text-muted-foreground leading-relaxed">{professionalSummary}</p>
-            </div>
-          </div>
+      <div className="pt-4">
+        <h3 className="text-xl font-semibold">Professional Strengths</h3>
+        <p className="mt-2 mb-5 text-sm text-muted-foreground">{professionalSummary}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
+          {softSkills.map((skill, index) => {
+            const Icon = strengthIcons[index];
+            return (
+              <motion.article key={skill.name} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                viewport={{ once: true }} transition={{ duration: 0.4, delay: index * 0.08 }}
+                className="group flex gap-4 border-t border-border py-6">
+                <Icon aria-hidden="true" className="mt-1 h-6 w-6 shrink-0 text-primary transition-transform group-hover:-translate-y-1" />
+                <div>
+                  <h4 className="text-lg font-bold tracking-tight">{skill.name}</h4>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{skill.description}</p>
+                  <p className="mt-3 text-xs font-medium text-foreground/75">{skill.evidence}</p>
+                </div>
+              </motion.article>
+            );
+          })}
         </div>
       </div>
     </motion.section>

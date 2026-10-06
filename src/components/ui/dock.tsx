@@ -14,7 +14,7 @@ function useDockItemSize(
   baseItemSize: number,
   magnification: number,
   distance: number,
-  ref: React.RefObject<HTMLDivElement | null>,
+  ref: React.RefObject<HTMLButtonElement | null>,
   spring: { mass: number; stiffness: number; damping: number }
 ) {
   const mouseDistance = useTransform(mouseX, (val) => {
@@ -74,7 +74,7 @@ function DockItem({
   labelBackground,
   labelTextColor,
 }: DockItemProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLButtonElement>(null);
   const isHovered = useMotionValue(0);
   const size = useDockItemSize(mouseX, baseItemSize, magnification, distance, ref, spring);
   const [showLabel, setShowLabel] = useState(false);
@@ -92,7 +92,9 @@ function DockItem({
       : { bottom: "calc(100% + 8px)", top: "auto" };
 
   return (
-    <motion.div
+    <motion.button
+      type="button"
+      aria-label={label}
       ref={ref}
       style={{ width: size, height: size }}
       onHoverStart={() => isHovered.set(1)}
@@ -106,11 +108,8 @@ function DockItem({
         itemBackground ?? "bg-background",
         itemBorderColor ? `border-2 ${itemBorderColor}` : ""
       )}
-      tabIndex={0}
-      role="button"
-      aria-haspopup="true"
     >
-      <div className="flex items-center justify-center">{icon}</div>
+      <span aria-hidden="true" className="flex items-center justify-center">{icon}</span>
 
       {/* Badge */}
       {badgeCount !== undefined && badgeCount > 0 && (
@@ -146,7 +145,7 @@ function DockItem({
           )}
         </AnimatePresence>
       )}
-    </motion.div>
+    </motion.button>
   );
 }
 
@@ -263,7 +262,7 @@ export default function Dock({
         )}
         style={{ height: panelHeight }}
         role="toolbar"
-        aria-label="Application dock"
+        aria-label="Section navigation"
       >
         <div
           className={cn(

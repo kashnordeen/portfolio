@@ -1,86 +1,52 @@
-import { motion } from "framer-motion";
-import { Code2, Palette, Cpu, Layers } from "lucide-react";
-import { MagicCard } from "@/components/ui/magic-card";
-import { services as portfolioServices } from "@/data/portfolio";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, BrainCircuit, Code2, ShieldCheck, Smartphone } from "lucide-react";
+import { useLenis } from "lenis/react";
+import { services } from "@/data/portfolio";
 
-const services = [
-  {
-    icon: Code2,
-    title: portfolioServices[0].title,
-    description: portfolioServices[0].description,
-  },
-  {
-    icon: Palette,
-    title: portfolioServices[1].title,
-    description: portfolioServices[1].description,
-  },
-  {
-    icon: Cpu,
-    title: portfolioServices[2].title,
-    description: portfolioServices[2].description,
-  },
-  {
-    icon: Layers,
-    title: portfolioServices[3].title,
-    description: portfolioServices[3].description,
-  }
-];
+const icons = [Smartphone, ShieldCheck, BrainCircuit];
+const examples = ["GramFlow Android + Downloads Organizer", "FINDORA", "FINDORA + De-Insure"];
 
 export const ServicesSection = () => {
+  const reduceMotion = useReducedMotion();
+  const lenis = useLenis();
   return (
-    <section id="services" className="max-w-7xl mx-auto px-6 py-24">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.1 }}
-        transition={{ duration: 0.8 }}
-        className="mb-16 text-center"
-      >
-        <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-gradient-primary">
-          What I Do
-        </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-          Delivering comprehensive digital solutions that cover the entire lifecycle of professional product engineering.
-        </p>
-      </motion.div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {services.map((service, i) => {
-          const Icon = service.icon;
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              viewport={{ once: true, amount: 0.1 }}
-            >
-              <MagicCard
-                className="h-full p-8 rounded-[2rem] border border-border/80 bg-card/80"
-                gradientSize={280}
-                gradientColor="rgba(139, 92, 246, 0.12)"
-                gradientFrom="#8b5cf6"
-                gradientTo="#38bdf8"
-              >
-                <div className="flex flex-col h-full justify-between gap-6">
-                  <div>
-                    {/* Consistent Icon Styling with signature primary color */}
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/25 text-primary flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-300">
-                      <Icon className="w-7 h-7 text-primary" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3 text-foreground tracking-tight">
-                      {service.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed text-base">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-              </MagicCard>
-            </motion.div>
-          );
-        })}
+    <section id="services" className="w-full max-w-7xl mx-auto px-6 py-16">
+      <div className="mb-10">
+        <h2 className="text-3xl font-bold tracking-tight">What I <span className="text-gradient-primary">build.</span></h2>
+        <p className="mt-4 max-w-xl text-lg text-muted-foreground">Useful products, from interface to infrastructure.</p>
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10">
+        <motion.article initial={reduceMotion ? false : { opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }} className="lg:col-span-5 flex flex-col rounded-[2rem] border border-primary/20 bg-primary/5 p-6 md:p-8">
+          <Code2 aria-hidden="true" className="h-6 w-6 text-primary mb-5" />
+          <h3 className="text-2xl font-bold tracking-tight">{services[0].title}</h3>
+          <p className="mt-4 mb-8 text-muted-foreground leading-relaxed">{services[0].description}</p>
+          <div className="mt-auto border-t border-primary/20 pt-5">
+            <p className="text-sm font-semibold">GramFlow Web</p>
+            <p className="mt-2 text-xs text-muted-foreground">Inventory, FIFO ledgers, and financial insights.</p>
+          </div>
+        </motion.article>
+        <div className="lg:col-span-7 divide-y divide-border">
+          {services.slice(1).map((service, index) => {
+            const Icon = icons[index];
+            return <motion.article key={service.title} initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.08 }}
+              className="flex gap-4 py-6 first:pt-2 last:pb-2">
+              <Icon aria-hidden="true" className="mt-1 h-6 w-6 text-primary shrink-0" />
+              <div>
+                <h3 className="text-xl font-bold tracking-tight">{service.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-lg">{service.description}</p>
+                <p className="mt-3 text-xs font-medium">{examples[index]}</p>
+              </div>
+            </motion.article>;
+          })}
+        </div>
+      </div>
+      <a href="#projects" onClick={event => {
+        if (lenis) { event.preventDefault(); lenis.scrollTo('#projects', { immediate: !!reduceMotion }); }
+      }} className="mt-6 inline-flex min-h-11 items-center gap-2 font-semibold text-sm hover:text-primary transition-colors">
+        Explore the projects <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+      </a>
     </section>
   );
 };

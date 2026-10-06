@@ -9,15 +9,16 @@ import { EducationSection } from "./components/EducationSection/EducationSection
 import { CareerTimeline } from "./components/CareerSection/CareerTimeline";
 import { ContactSection } from "./components/ContactSection/ContactSection";
 import { Footer } from "./components/Footer/Footer";
-import ReactLenis from "lenis/react";
+import ReactLenis, { useLenis } from "lenis/react";
 import { Home, User, GraduationCap, Briefcase, FolderKanban, Send } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig, useReducedMotion } from "framer-motion";
 
 import Dock from "./components/ui/dock";
-import { SmoothCursor } from "./components/ui/smooth-cursor";
 
 function App() {
   const [showDock, setShowDock] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const lenis = useLenis();
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -42,26 +43,34 @@ function App() {
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (lenis) lenis.scrollTo(el, { immediate: !!reduceMotion });
+      else el.scrollIntoView({ behavior: reduceMotion ? "instant" : "smooth", block: "start" });
     }
   };
 
   const dockItems = [
     { icon: <Home size={20} />, label: "Home", onClick: () => scrollToSection("hero") },
     { icon: <User size={20} />, label: "About", onClick: () => scrollToSection("about") },
-    { icon: <Briefcase size={20} />, label: "Career", onClick: () => scrollToSection("career") },
     { icon: <FolderKanban size={20} />, label: "Projects", onClick: () => scrollToSection("projects") },
+    { icon: <Briefcase size={20} />, label: "Career", onClick: () => scrollToSection("career") },
     { icon: <GraduationCap size={20} />, label: "Education", onClick: () => scrollToSection("education") },
     { icon: <Send size={20} />, label: "Contact", onClick: () => scrollToSection("contact") },
   ];
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="bg-transparent min-h-screen relative overflow-x-hidden selection:bg-primary/30 selection:text-primary-foreground">
-      <SmoothCursor glowEffect showTrail trailLength={4} />
-      <ReactLenis root options={{ smoothWheel: true, duration: 1.2 }}>
+      <a href="#main-content" onClick={event => {
+        if (lenis) {
+          event.preventDefault();
+          lenis.scrollTo('#main-content', { immediate: true });
+          document.getElementById('main-content')?.focus({ preventScroll: true });
+        }
+      }} className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1001] focus:rounded-lg focus:bg-card focus:p-3">Skip to content</a>
+      <ReactLenis root options={{ smoothWheel: !reduceMotion, duration: reduceMotion ? 0 : 1.2 }}>
         <Header />
 
-        <main className="w-full flex flex-col pt-10 border-none">
+        <main id="main-content" tabIndex={-1} className="w-full flex flex-col pt-10 border-none">
           <HeroSection />
           <AboutSection />
           <ServicesSection />
@@ -88,7 +97,7 @@ function App() {
                 items={dockItems}
                 panelHeight={56}
                 baseItemSize={44}
-                magnification={66}
+                magnification={reduceMotion ? 44 : 66}
                 distance={180}
                 multiBorder
               />
@@ -97,6 +106,7 @@ function App() {
         </AnimatePresence>
       </ReactLenis>
     </div>
+    </MotionConfig>
   );
 }
 

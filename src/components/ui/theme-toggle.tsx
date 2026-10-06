@@ -53,10 +53,7 @@ export function ThemeToggle({
 }: ToggleThemeProps) {
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return (
-        document.documentElement.classList.contains("dark") ||
-        localStorage.getItem("theme") === "dark"
-      );
+      return document.documentElement.classList.contains("dark");
     }
     return true;
   });
@@ -105,15 +102,19 @@ export function ThemeToggle({
     const newTheme = !isDark;
     const viewTransitionDocument = document as ViewTransitionDocument;
 
-    // Fallback for browsers that do not support View Transitions
-    if (!viewTransitionDocument.startViewTransition) {
+    const saveTheme = () => {
+      try { localStorage.setItem("theme", newTheme ? "dark" : "light"); } catch { /* Theme still works when storage is unavailable. */ }
+    };
+
+    // Native fallback also respects the user's motion preference.
+    if (!viewTransitionDocument.startViewTransition || animationType === "none" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setIsDark(newTheme);
       if (newTheme) {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
       }
-      localStorage.setItem("theme", newTheme ? "dark" : "light");
+      saveTheme();
       return;
     }
 
@@ -125,7 +126,7 @@ export function ThemeToggle({
         } else {
           document.documentElement.classList.remove("dark");
         }
-        localStorage.setItem("theme", newTheme ? "dark" : "light");
+        saveTheme();
       });
     });
 
@@ -342,10 +343,10 @@ export function ThemeToggle({
       ref={buttonRef}
       onClick={toggleTheme}
       className={cn(
-        "p-2.5 rounded-full glass-panel border border-foreground/10 hover:border-primary/40 text-foreground transition-all shadow-md flex items-center justify-center cursor-pointer hover:scale-105 active:scale-95",
+        "min-h-11 min-w-11 p-2.5 rounded-full glass-panel border border-foreground/10 hover:border-primary/40 text-foreground transition-colors flex items-center justify-center cursor-pointer",
         className
       )}
-      aria-label="Toggle Theme"
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       {...props}
     >
       {isDark ? (

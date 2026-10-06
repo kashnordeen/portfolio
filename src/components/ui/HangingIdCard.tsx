@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 // ─── Physics constants ────────────────────────────────────────────────────────
@@ -180,8 +181,10 @@ export const HangingIdCard = ({
   const prevAngleRef = useRef<number>(0);
   const isDraggingRef= useRef(false);
 
-  const [angle, setAngle] = useState(0);
-  const [, setIsDragState] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const angle = useMotionValue(0);
+  const rotate = useTransform(angle, value => value * (180 / Math.PI));
+  const tilt = useSpring(0, { stiffness: 130, damping: 20 });
   const dragStartX   = useRef(0);
   const dragAngle0   = useRef(0);
 
@@ -203,14 +206,14 @@ export const HangingIdCard = ({
       s.vel   += torque * dt;
       s.angle += s.vel  * dt;
 
-      setAngle(s.angle);
+      angle.set(s.angle);
 
       if (Math.abs(s.angle) > 0.001 || Math.abs(s.vel) > 0.001) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
         // settled perfectly at bottom
         s.angle = 0; s.vel = 0;
-        setAngle(0);
+        angle.set(0);
       }
     } else {
       // Track velocity while dragging so we can "flick" it
@@ -220,7 +223,7 @@ export const HangingIdCard = ({
       prevAngleRef.current = s.angle;
       rafRef.current = requestAnimationFrame(tick);
     }
-  }, [ropeLength]);
+  }, [ropeLength, angle]);
 
   const startPhysics = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -230,49 +233,55 @@ export const HangingIdCard = ({
 
   // ── Pointer events ──────────────────────────────────────────────────────────
   const onPointerDown = useCallback((e: React.PointerEvent) => {
+    if (reduceMotion || e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     isDraggingRef.current = true;
-    setIsDragState(true);
+    tilt.set(0);
     dragStartX.current   = e.clientX;
     dragAngle0.current   = physRef.current.angle;
     prevAngleRef.current = physRef.current.angle;
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     prevTimeRef.current = null;
     rafRef.current = requestAnimationFrame(tick);
-  }, [tick]);
+  }, [tick, reduceMotion, tilt]);
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDraggingRef.current) return;
+    if (reduceMotion) return;
+    if (!isDraggingRef.current) {
+      if (e.pointerType === "mouse") {
+        const bounds = e.currentTarget.getBoundingClientRect();
+        tilt.set(((e.clientX - bounds.left) / bounds.width - 0.5) * 14);
+      }
+      return;
+    }
     const dx = e.clientX - dragStartX.current;
     const L = ropeLength + 100; 
     const newAngle = dragAngle0.current - dx / L;
     const clamped  = Math.max(-1.4, Math.min(1.4, newAngle));
     physRef.current.angle = clamped;
-    setAngle(clamped);
-  }, [ropeLength]);
+    angle.set(clamped);
+  }, [ropeLength, angle, reduceMotion, tilt]);
 
   const onPointerUp = useCallback((e: React.PointerEvent) => {
-    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     isDraggingRef.current = false;
-    setIsDragState(false);
   }, []);
 
   // ── Click impulse (tap) ─────────────────────────────────────────────────────
   const onCardClick = useCallback(() => {
+    if (reduceMotion) return;
     if (Math.abs(physRef.current.vel) < 0.1 && Math.abs(physRef.current.angle) < 0.05) {
       physRef.current.vel = 4.0; // Give it a satisfying push
       startPhysics();
     }
-  }, [startPhysics]);
+  }, [startPhysics, reduceMotion]);
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
-
-  const cardRotateDeg = angle * (180 / Math.PI);
 
   return (
     <div
       className={cn("flex flex-col items-center select-none", className)}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "pan-y" }}
     >
       {/* Ceiling anchor pin */}
       <div
@@ -280,14 +289,24 @@ export const HangingIdCard = ({
       />
 
       {/* The Pendulum Assembly (Rope + Lock Clip + Card) */}
-      <div 
-        className="flex flex-col items-center cursor-grab active:cursor-grabbing"
+      <motion.div
+        role="button"
+        tabIndex={reduceMotion ? -1 : 0}
+        aria-label={`Interactive ID card for ${name}. Press Enter to swing.`}
+        onKeyDown={event => {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onCardClick(); }
+        }}
+        className="flex flex-col items-center cursor-grab active:cursor-grabbing rounded-3xl"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onPointerLeave={() => tilt.set(0)}
         onClick={onCardClick}
         style={{
-          transform: `rotate(${cardRotateDeg}deg)`,
+          rotate: reduceMotion ? 0 : rotate,
+          rotateY: reduceMotion ? 0 : tilt,
+          transformPerspective: 900,
           transformOrigin: "top center",
           willChange: "transform",
           marginTop: "-6px"
@@ -375,11 +394,11 @@ export const HangingIdCard = ({
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Drag hint */}
-      <p className="mt-8 text-[11px] text-zinc-400 dark:text-zinc-600 font-medium select-none pointer-events-none">
-        Drag or click the card
+      <p className="mt-5 text-xs text-muted-foreground font-medium select-none pointer-events-none">
+        {reduceMotion ? "" : "Move your pointer. Drag to give it a swing."}
       </p>
     </div>
   );

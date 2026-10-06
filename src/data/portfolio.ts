@@ -1,24 +1,26 @@
 export const profile = {
   name: "Keshav Karn",
   initials: "KK",
+  avatar: "/images/keshav-avatar.webp",
   role: "CSE Student",
-  specialty: "AI, Security & IoT",
+  specialty: "Web, Android & Applied AI",
   location: "Patiala, Punjab, India",
   email: "kash.nordeen@gmail.com",
   phone: "+91 7700895535",
   github: "https://github.com/kashnordeen",
   linkedin: "https://www.linkedin.com/in/keshav-karn-933910352/",
-  resume: "",
+  resume: "/resume/keshav-karn-resume.pdf",
   badgeId: "KK-27041-DEV",
   experience: "Early Career",
-  bio: "CSE student and multidisciplinary developer building secure full-stack platforms, native Android applications, AI-powered search and vision systems, and connected IoT solutions. I turn complex problems into practical products by combining software engineering, cybersecurity, machine learning, and cloud-connected architecture.",
+  bio: "Computer Science student focused on software engineering. I build secure web platforms, offline-first apps, and applied AI systems, from the first idea to a working product.",
   aboutHeading: "Secure, Intelligent Products",
-  aboutDescription: "I am pursuing a B.E. in Computer Science at Thapar Institute of Engineering and Technology. My projects span secure full-stack platforms, offline-first Android systems, multimodal AI search, computer vision, and IoT telemetry using technologies such as FastAPI, PostgreSQL, PyTorch, Kotlin, Docker, and AWS. I enjoy owning the full engineering lifecycle: understanding the problem, designing the architecture, implementing resilient software, testing security assumptions, and refining the user experience.",
+  aboutSummary: "Studying Computer Science at Thapar. Building across web, Android, AI, and IoT, with security and data integrity at the center of every project.",
+  aboutDescription: "I am pursuing a B.Tech in Computer Science and Engineering at Thapar Institute of Engineering and Technology, with graduation expected in May 2027. My foundation is in data structures, algorithms, object-oriented programming, and database systems. I apply it through projects in native Android, full-stack development, multimodal search, computer vision, and cloud-connected IoT. I enjoy understanding a problem, choosing an architecture, implementing it, and testing how it behaves when things go wrong.",
 };
 
 export const stats = [
   { label: "Experience", value: "Early Career" },
-  { label: "Projects Built", value: "4+" },
+  { label: "Selected Projects", value: "5" },
   { label: "Technologies Used", value: "15+" },
   { label: "Expected Graduation", value: "2027" },
 ];
@@ -46,55 +48,105 @@ export const technologies = [
 
 export const services = [
   {
-    title: "Full-Stack Development",
-    description: "Building end-to-end web applications with modern frameworks, REST APIs, and database integration.",
+    title: "Full-stack platforms",
+    description: "Connected interfaces, APIs, and databases that turn complex workflows into usable products.",
   },
   {
-    title: "Frontend Engineering",
-    description: "Crafting responsive, accessible, and visually polished interfaces with React, TypeScript, and Tailwind CSS.",
+    title: "Android & desktop apps",
+    description: "Offline-first experiences with local storage, practical automation, and safe recovery.",
   },
   {
-    title: "Backend Development",
-    description: "Designing scalable server-side architectures, APIs, and database schemas for robust applications.",
+    title: "Secure backends",
+    description: "Clear API contracts, protected access, and reliable data handling.",
   },
   {
-    title: "Problem Solving & DSA",
-    description: "Applying data structures and algorithmic thinking to build efficient, optimized software solutions.",
+    title: "Applied AI & IoT",
+    description: "Multimodal search, predictive models, and connected telemetry for real-world problems.",
   },
 ];
 
-export const projects = [
+export const organizerDownloads = [
+  { platform: "Windows", label: "Setup (x64)", file: "DownloadsOrganizer-1.0.0-windows-x64-setup.exe" },
+  { platform: "Windows", label: "Portable (x64)", file: "DownloadsOrganizer-1.0.0-windows-x64-portable.zip" },
+  { platform: "macOS", label: "Apple Silicon", file: "DownloadsOrganizer-1.0.0-macos-arm64-unsigned.dmg" },
+  { platform: "macOS", label: "Intel", file: "DownloadsOrganizer-1.0.0-macos-x64-unsigned.dmg" },
+  { platform: "Linux", label: "Debian / Ubuntu (x64)", file: "DownloadsOrganizer-1.0.0-linux-x64.deb" },
+  { platform: "Linux", label: "Portable (x64)", file: "DownloadsOrganizer-1.0.0-linux-x64-portable.tar.gz" },
+];
+export const organizerRelease = "https://github.com/kashnordeen/downloads-organizer/releases/tag/v1.0.0";
+export const organizerDownloadBase = "https://github.com/kashnordeen/downloads-organizer/releases/download/v1.0.0/";
+
+export const projects: {
+  id: number; title: string; subtitle: string; link: string; image: string;
+  category: string; tags: string[]; website?: string; downloads?: boolean;
+  status: string; visualLabel: string; problem: string; decision: string;
+}[] = [
   {
     id: 1,
     title: "GramFlow Web",
-    subtitle: "Full-stack precision inventory and FIFO ledger platform with real-time financial analytics",
+    subtitle: "Inventory, FIFO ledgers, and financial insights. One connected workspace for the entire business.",
     link: "https://github.com/kashnordeen/GramFlow",
-    image: "/projects/gramflow.jpg",
-    gridClass: "md:col-span-7 h-[420px]",
+    image: "/projects/gramflow-live.webp",
+    category: "Full-stack platform",
+    tags: ["Next.js", "TypeScript", "PostgreSQL"],
+    website: "https://gramflow-ochre.vercel.app/",
+    status: "Live web app · Sign-in required",
+    visualLabel: "Actual app UI · Sign-in screen",
+    problem: "Keep batch inventory, sales, receivables, and accounting consistent as stock changes.",
+    decision: "FIFO allocations, journals, and audit events share a database transaction. Server-side permissions protect business operations.",
+  },
+  {
+    id: 5,
+    title: "Downloads Organizer",
+    subtitle: "A calmer downloads folder. Preview moves, automate your rules, and undo safely. Your files stay on your device.",
+    link: "https://github.com/kashnordeen/downloads-organizer",
+    image: "/projects/downloads-organizer.png",
+    category: "Local-first desktop app",
+    tags: ["Python", "Qt", "SQLite"],
+    downloads: true,
+    status: "Desktop release · v1.0.0",
+    visualLabel: "Actual app UI · Demonstration files",
+    problem: "Organize downloaded files without overwriting existing files or losing track of moves.",
+    decision: "Preview before moving. SQLite records move history, while collision checks and verified copies support recovery and safe undo.",
   },
   {
     id: 2,
     title: "GramFlow Android",
-    subtitle: "Offline-first native inventory, FIFO batch and customer ledger app built with Kotlin, Jetpack Compose & Room",
+    subtitle: "Inventory that keeps working offline. Native Android tools for FIFO batches and customer ledgers.",
     link: "https://github.com/kashnordeen/GramFlow_Android",
     image: "/projects/gramflow-android.svg",
-    gridClass: "md:col-span-5 h-[420px]",
+    category: "Native Android",
+    tags: ["Kotlin", "Jetpack Compose", "Room"],
+    status: "Android app · Source available",
+    visualLabel: "App concept illustration",
+    problem: "Track inventory batches and customer balances when there is no network connection.",
+    decision: "Room persists local data. MVVM and reactive flows connect inventory, FIFO allocation, and customer ledgers to the Compose interface.",
   },
   {
     id: 3,
     title: "De-Insure",
-    subtitle: "Autonomous cold chain parametric insurance framework with IoT telemetry, PyTorch ML & EVM smart contracts",
+    subtitle: "From sensor to settlement. Cold-chain telemetry meets predictive models and parametric insurance.",
     link: "https://github.com/kashnordeen/De-Insure-A-Parametric-Insurance-Framework-for-Cold-Chain-Logistics",
     image: "/projects/deinsure.jpg",
-    gridClass: "md:col-span-5 h-[360px]",
+    category: "IoT & machine learning",
+    tags: ["PyTorch", "AWS IoT Core", "Solidity"],
+    status: "Research prototype · Source available",
+    visualLabel: "Architecture concept illustration",
+    problem: "Connect cold-chain condition monitoring to a verifiable insurance decision.",
+    decision: "Signed ESP32 telemetry travels over MQTT/TLS. Separate oracle workers validate data, evaluate spoilage, and apply excursion policy before contract consensus.",
   },
   {
     id: 4,
     title: "FINDORA",
-    subtitle: "AI-powered campus lost-and-found platform with multimodal matching, secure contact escrow & admin analytics",
+    subtitle: "Find what matters. Multimodal AI matches lost items while keeping contact details protected.",
     link: "https://github.com/kashnordeen/FINDORA",
     image: "/projects/findora.svg",
-    gridClass: "md:col-span-7 h-[360px]",
+    category: "Applied AI",
+    tags: ["FastAPI", "SvelteKit", "pgvector"],
+    status: "Campus project · Source available",
+    visualLabel: "Product concept illustration",
+    problem: "Match campus lost-and-found reports without publishing personal contact details.",
+    decision: "CLIP and text embeddings retrieve candidates through pgvector. Match approval gates contact sharing, with background scoring and archival.",
   },
 ];
 
@@ -107,7 +159,7 @@ export const careerEvents = [
   },
   {
     year: "2023 – Present",
-    title: "B.E. Computer Science",
+    title: "Computer Science & Engineering",
     subtitle: "Thapar Institute of Engineering and Technology",
     description: "Developing a strong foundation in data structures, algorithms, databases, computer networks, and system design while applying those concepts to end-to-end software projects.",
   },
@@ -127,13 +179,13 @@ export const careerEvents = [
 
 export const education = [
   {
-    degree: "B.E./B.Tech in Computer Science",
+    degree: "B.Tech in Computer Science & Engineering",
     school: "Thapar Institute of Engineering and Technology",
     year: "2023 – 2027",
     badge: "Currently Pursuing",
     badgeColor: "text-primary bg-primary/10 border-primary/30",
     details: [
-      "Pursuing Bachelor of Engineering in Computer Science & Engineering",
+      "Pursuing Bachelor of Technology in Computer Science & Engineering; expected May 2027",
       "Building proficiency in Data Structures, Algorithms & System Design",
       "Developing full-stack web applications as personal and academic projects",
       "Actively participating in coding competitions and tech communities",
@@ -228,15 +280,15 @@ export const technicalSkillGroups = [
   },
   {
     name: "Languages",
-    skills: ["Python", "C++", "C", "Java", "Kotlin", "JavaScript", "TypeScript", "SQL"],
+    skills: ["Python", "TypeScript", "Kotlin", "JavaScript", "SQL", "Java", "C++", "C"],
   },
   {
     name: "Systems & Networking",
-    skills: ["Linux", "Docker", "MQTT (TLS)", "RESTful APIs", "TCP/IP", "DNS", "DHCP", "Operating Systems", "Networking Concepts"],
+    skills: ["Linux", "Docker", "MQTT (TLS)", "RESTful APIs", "TCP/IP", "DNS", "DHCP", "Operating Systems", "Networking Concepts", "Data Structures & Algorithms", "Object-Oriented Programming", "Database Management Systems"],
   },
   {
     name: "Application, Cloud & Databases",
-    skills: ["JWT", "RBAC", "Authentication & Authorization", "AWS IoT Core", "AWS", "FastAPI", "Node.js", "Express.js", "PostgreSQL", "MySQL", "SQLAlchemy", "Git/GitHub"],
+    skills: ["FastAPI", "PostgreSQL", "Next.js", "React", "Svelte/SvelteKit", "Node.js", "Express.js", "MySQL", "SQLAlchemy", "pgvector", "AWS IoT Core", "AWS", "Git/GitHub", "JWT", "RBAC", "Authentication & Authorization"],
   },
   {
     name: "AI/ML & Computer Vision",
@@ -245,16 +297,14 @@ export const technicalSkillGroups = [
 ];
 
 export const softSkills = [
-  { name: "Security-First Mindset" },
-  { name: "Systems Thinking" },
-  { name: "Analytical Problem Solving" },
-  { name: "Cross-Platform Engineering" },
-  { name: "Collaborative Delivery" },
-  { name: "Ownership & Adaptability" },
+  { name: "Security by design", description: "Protect access. Validate inputs. Keep personal data private.", evidence: "FINDORA's protected contact sharing" },
+  { name: "Systems thinking", description: "Connect interfaces, data, and infrastructure into a coherent product.", evidence: "De-Insure's sensor-to-contract pipeline" },
+  { name: "Resilient engineering", description: "Plan for offline use, interrupted work, and safe recovery.", evidence: "GramFlow Android & Downloads Organizer" },
+  { name: "End-to-end ownership", description: "Take an idea through implementation, testing, and release.", evidence: "Live web apps & cross-platform installers" },
 ];
 
 export const professionalSummary =
-  "I approach projects as complete systems—balancing product usability, application security, data integrity, performance, and maintainability from architecture through delivery.";
+  "Build with intent. Ship with care.";
 
 export const morphingTexts = [
   "CSE Student",

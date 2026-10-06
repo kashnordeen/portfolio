@@ -1,17 +1,20 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Download, Github, Linkedin, Mail } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Download, Github, Linkedin, Mail, ScanLine } from "lucide-react";
 import TechStackSection from "../TechStackSection/TechStackSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { HangingIdCard } from "@/components/ui/HangingIdCard";
 import { DotPattern } from "@/components/ui/dot-pattern";
 import { profile } from "@/data/portfolio";
+import { useLenis } from "lenis/react";
 
 export const HeroSection = () => {
+  const lenis = useLenis();
+  const reduceMotion = useReducedMotion();
   return (
-    <section id="hero" className="relative min-h-[100vh] flex flex-col pt-12 md:pt-16 overflow-hidden bg-background">
+    <section id="hero" className="relative min-h-[100dvh] flex flex-col pt-20 md:pt-16 overflow-hidden bg-background">
       {/* Background Dot Pattern with Radial Vignette Shade */}
-      <DotPattern width={16} height={16} cx={1} cy={1} cr={1} glow />
+      <DotPattern width={16} height={16} cx={1} cy={1} cr={1} />
       
       {/* Main Content Area */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 w-full flex-1 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 pb-12">
@@ -19,19 +22,18 @@ export const HeroSection = () => {
         {/* Left Content */}
         <motion.div 
           className="flex-1 flex flex-col items-center md:items-start text-center md:text-left pt-0"
-          initial={{ opacity: 0, y: 30 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
             className="mb-6"
           >
             <Badge variant="outline" size="lg" className="gap-2.5 py-1.5 px-4 glass-panel border-foreground/10">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
               <span className="text-xs font-medium text-muted-foreground">Open to Opportunities</span>
@@ -39,24 +41,24 @@ export const HeroSection = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             className="mb-4 text-center md:text-left"
           >
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2">
               Hi, I'm
-            </h1>
             
             {/* Theme-Aware Seamless Gradient Text */}
-            <span className="bg-gradient-to-r from-violet-600 via-sky-500 via-purple-600 to-indigo-600 dark:from-cyan-400 dark:via-purple-400 dark:to-sky-300 bg-clip-text text-transparent font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none dark:drop-shadow-[0_0_35px_rgba(168,85,247,0.3)]">
+            <span className="text-gradient-primary font-extrabold text-[clamp(3rem,6.5vw,5.5rem)] leading-none tracking-tight block pb-2 select-none">
               {profile.name}
             </span>
+            </h1>
           </motion.div>
 
           <motion.p 
             className="text-lg md:text-xl text-muted-foreground max-w-xl mb-8 leading-relaxed w-full"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
           >
@@ -65,11 +67,14 @@ export const HeroSection = () => {
 
           <motion.div 
             className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-10 w-full md:w-auto"
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            <Button size="lg" onClick={() => {document.getElementById('projects')?.scrollIntoView({behavior: 'smooth'})}} className="rounded-full px-7 h-12 bg-primary text-primary-foreground font-semibold flex items-center gap-2 hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_30px_rgba(139,92,246,0.5)] hover:-translate-y-1">
+            <Button size="lg" onClick={() => {
+              if (lenis) lenis.scrollTo('#projects', { immediate: !!reduceMotion });
+              else document.getElementById('projects')?.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth' });
+            }} className="rounded-full px-7 h-12 bg-primary text-primary-foreground font-semibold flex items-center gap-2 hover:bg-primary/90 transition-colors">
               View Work <ArrowRight className="w-4 h-4" />
             </Button>
             {profile.resume && (
@@ -84,17 +89,17 @@ export const HeroSection = () => {
           {/* Social Links */}
           <motion.div 
             className="flex items-center gap-5 justify-center md:justify-start w-full md:w-auto"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={profile.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <Github className="w-5 h-5" />
             </a>
-            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <Linkedin className="w-5 h-5" />
             </a>
-            <a href={`mailto:${profile.email}`} aria-label="Email" className="text-muted-foreground hover:text-foreground transition-colors hover:-translate-y-1 transform duration-200">
+            <a href={`mailto:${profile.email}`} aria-label="Email" className="inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <Mail className="w-5 h-5" />
             </a>
           </motion.div>
@@ -103,8 +108,8 @@ export const HeroSection = () => {
         {/* Right Content - Visual Hanging ID Card */}
         <motion.div 
           className="flex-1 w-full max-w-md relative flex justify-center items-center py-2"
-          initial={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          initial={false}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
           <HangingIdCard
@@ -114,83 +119,46 @@ export const HeroSection = () => {
             accentColor="#8b5cf6"
             ropeLength={75}
             ropeColor="#27272a"
-            cardWidth="w-72 sm:w-80 md:w-84"
+            cardWidth="w-[min(18rem,calc(100vw-3rem))] sm:w-80 md:w-84"
           >
             <div className="flex flex-col h-full bg-card w-full">
-              {/* Card Header Banner with Avatar */}
-              <div className="relative px-5 pt-7 pb-6 flex flex-col items-center bg-gradient-to-br from-purple-700 via-primary to-indigo-950 text-white overflow-hidden">
-                {/* Circuit background overlay */}
-                <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
-
-                {/* Profile Photo with Dual Glowing Ring */}
-                <div className="mt-1 relative w-28 h-28 rounded-full p-1 bg-gradient-to-tr from-cyan-400 via-primary to-purple-400 backdrop-blur-md shadow-2xl border border-white/50 overflow-hidden group flex items-center justify-center">
-                  <svg
-                    className="w-full h-full text-white/80 p-2 object-cover rounded-full"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                  <div className="absolute bottom-1 right-2 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-md" />
-                </div>
+              {/* Portrait panel */}
+              <div className="relative h-52 flex flex-col items-center bg-slate-950 text-white overflow-hidden">
+                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-transparent to-cyan-500/10" />
+                <ScanLine aria-hidden="true" className="absolute top-6 left-5 h-5 w-5 text-slate-400" />
+                <div aria-hidden="true" className="absolute top-8 w-40 h-40 rounded-full border border-white/15" />
+                <img src={profile.avatar} alt="Keshav Karn's voxel avatar" width={1254} height={1254}
+                  fetchPriority="high" className="relative h-60 w-60 mt-3 object-contain" />
               </div>
 
               {/* Card Body */}
-              <div className="p-5 flex flex-col items-center text-center bg-card text-card-foreground flex-1 gap-3">
-                <div>
-                  <h3 className="text-xl font-extrabold tracking-tight text-foreground">{profile.name}</h3>
-                  <div className="inline-flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold">
-                    <span>{profile.role}</span>
+              <div className="p-5 flex flex-col bg-card text-card-foreground gap-4">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h3 className="text-2xl font-bold tracking-tight">{profile.name}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{profile.role}</p>
                   </div>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Active
+                  </span>
                 </div>
-
-                <div className="w-full border-t border-border/60 my-0.5" />
-
-                {/* Details 2x2 Grid */}
-                <div className="grid grid-cols-2 gap-2.5 w-full text-left bg-muted/40 p-3 rounded-xl border border-border/50">
-                  <div>
-                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Specialty</span>
-                    <span className="font-bold text-foreground text-xs">{profile.specialty}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Location</span>
-                    <span className="font-bold text-foreground text-xs">Patiala, India</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Experience</span>
-                    <span className="font-bold text-foreground text-xs">{profile.experience}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground block text-[9px] uppercase tracking-widest font-bold">Status</span>
-                    <span className="font-bold text-emerald-500 text-xs flex items-center gap-1">
-                      ● Active
-                    </span>
-                  </div>
+                <div className="rounded-xl border border-primary/20 bg-primary/5 p-3">
+                  <p className="text-xs font-medium text-muted-foreground">Specialty</p>
+                  <p className="mt-1 text-sm font-bold">{profile.specialty}</p>
                 </div>
-
-                {/* HD Barcode & Auth Tag */}
-                <div className="flex flex-col items-center mt-1 w-full gap-1">
-                  <div className="flex gap-[2.5px] items-end h-7 px-3 py-0.5 bg-white/90 dark:bg-black/40 rounded-lg border border-border/40 w-full justify-center">
-                    {Array.from({ length: 36 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="bg-foreground rounded-[1px]"
-                        style={{
-                          width: i % 4 === 0 ? "3.5px" : i % 2 === 0 ? "2px" : "1px",
-                          height: `${50 + Math.sin(i * 1.4) * 45}%`,
-                        }}
-                      />
-                    ))}
+                <dl className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <dt className="text-muted-foreground">Location</dt>
+                    <dd className="mt-1 font-semibold">Patiala, India</dd>
                   </div>
-                  <div className="flex items-center justify-between w-full px-1 text-[10px]">
-                    <span className="font-mono font-bold tracking-widest text-primary">
-                      {profile.badgeId}
-                    </span>
-                    <span className="text-muted-foreground font-semibold text-[9px] uppercase tracking-wider">
-                      DEVELOPER ID
-                    </span>
+                  <div>
+                    <dt className="text-muted-foreground">Experience</dt>
+                    <dd className="mt-1 font-semibold">{profile.experience}</dd>
                   </div>
+                </dl>
+                <div className="flex items-center justify-between border-t border-border pt-3 text-[10px]">
+                  <span className="text-muted-foreground">Developer ID</span>
+                  <span className="font-mono font-semibold tracking-wide">{profile.badgeId}</span>
                 </div>
               </div>
             </div>

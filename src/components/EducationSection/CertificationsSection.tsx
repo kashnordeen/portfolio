@@ -1,7 +1,6 @@
 ﻿import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Award, Eye, CheckCircle2, X, Calendar, Building2, ExternalLink } from "lucide-react";
-import { MagicCard } from "@/components/ui/magic-card";
+import { Eye, X, ExternalLink } from "lucide-react";
 import { certifications } from "@/data/portfolio";
 
 export const CertificationsSection = () => {
@@ -16,170 +15,62 @@ export const CertificationsSection = () => {
   });
 
   return (
-    <div id="certifications" className="space-y-10">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ once: true }}
-      >
-        <div className="flex items-center gap-4 mb-3">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/25 flex items-center justify-center text-primary shadow-md">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight">
-            Licenses & <span className="text-gradient-primary">Certifications</span>
-          </h2>
-        </div>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Industry credentials and verified academy training validating technical knowledge and hands-on competencies.
-        </p>
-      </motion.div>
-
-      {/* Certifications Grid */}
-      <div className="grid grid-cols-1 gap-8">
-        {certifications.map((cert, index) => (
-          <motion.div
-            key={cert.id}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <MagicCard
-              className="p-6 md:p-8 rounded-[2.25rem] border border-border/80 bg-card/80 shadow-xl overflow-hidden"
-              gradientSize={350}
-              gradientColor="rgba(139, 92, 246, 0.12)"
-              gradientFrom="#8b5cf6"
-              gradientTo="#38bdf8"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                {/* Certificate Visual Preview Column */}
-                <div className="lg:col-span-5 flex flex-col gap-3">
-                  <div
-                    onClick={() =>
-                      setActivePreview({
-                        isOpen: true,
-                        image: cert.certificateImage,
-                        title: `${cert.title} — ${cert.issuer}`,
-                      })
-                    }
-                    className="group relative rounded-2xl overflow-hidden border border-border/80 shadow-lg cursor-pointer bg-muted/40 aspect-[4/3] flex items-center justify-center"
-                  >
-                    <img
-                      src={cert.certificateImage}
-                      alt={cert.title}
-                      className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
-                      <span className="text-white text-xs font-semibold flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
-                        <Eye className="w-3.5 h-3.5 text-primary" /> Click to Expand Preview
-                      </span>
-                    </div>
-                  </div>
-
-                  <a
-                    href={cert.credlyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Verify ${cert.title} badge on Credly`}
-                    className="group/badge flex items-center gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-colors"
-                  >
-                    <img
-                      src={cert.credlyBadgeImage}
-                      alt={`${cert.title} Credly badge`}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-16 h-16 shrink-0 object-contain drop-shadow-md"
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold text-emerald-400">
-                        <Award className="w-3.5 h-3.5" /> Digital Badge
-                      </span>
-                      <strong className="block mt-1 text-sm text-foreground">Verified on Credly</strong>
-                      <span className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground group-hover/badge:text-foreground transition-colors">
-                        View public credential <ExternalLink className="w-3 h-3" />
-                      </span>
-                    </span>
-                  </a>
-                </div>
-
-                {/* Information Column */}
-                <div className="lg:col-span-7 flex flex-col gap-4">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold border text-primary bg-primary/10 border-primary/30">
-                        {cert.issuer}
-                      </span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold border ${cert.badgeColor}`}>
-                        {cert.badge}
-                      </span>
-                    </div>
-
-                    <h3 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
-                      {cert.title}
-                    </h3>
-
-                    <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-muted-foreground mt-2 pb-3 border-b border-border/60">
-                      <span className="flex items-center gap-1.5 text-foreground font-bold">
-                        <Building2 className="w-3.5 h-3.5 text-primary" /> {cert.institution}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1.5 font-mono text-primary font-bold">
-                        <Calendar className="w-3.5 h-3.5" /> {cert.issueDate}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {cert.description}
-                  </p>
-
-                  {/* Competencies */}
-                  <div className="space-y-2">
-                    <span className="text-xs uppercase tracking-wider font-bold text-foreground block">
-                      Core Competencies Mastered:
-                    </span>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {cert.competencies.map((comp, idx) => (
-                        <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{comp}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Skills Tags */}
-                  <div className="flex flex-wrap gap-1.5 pt-2">
-                    {cert.skills.map((skill, sIdx) => (
-                      <span
-                        key={sIdx}
-                        className="px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[11px] font-semibold text-foreground/90"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-
-                </div>
+    <div id="certifications" className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Certifications</h2>
+        <p className="mt-3 text-sm text-muted-foreground">Cisco Networking Academy training, with public credentials on Credly.</p>
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 items-start">
+        {certifications.map(cert => (
+          <article key={cert.id} className="rounded-2xl border border-border bg-card p-6">
+            <div className="flex items-start gap-4">
+              <img src={cert.credlyBadgeImage} alt="" width={72} height={72} loading="lazy" decoding="async" className="h-18 w-18 shrink-0 object-contain" />
+              <div>
+                <p className="text-xs text-muted-foreground">{cert.issuer} · {cert.issueDate}</p>
+                <h3 className="mt-2 text-xl font-bold tracking-tight">{cert.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{cert.institution}</p>
               </div>
-            </MagicCard>
-          </motion.div>
+            </div>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{cert.description}</p>
+            <div className="mt-4 flex flex-wrap gap-x-5">
+              <a href={cert.credlyUrl} target="_blank" rel="noopener noreferrer"
+                aria-label={`Verify ${cert.title} on Credly`}
+                className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                Verify on Credly <ExternalLink aria-hidden="true" size={15} />
+              </a>
+              <button type="button"
+                aria-label={`Expand ${cert.title} certificate preview`}
+                onClick={() => setActivePreview({ isOpen: true, image: cert.certificateImage, title: `${cert.title} - ${cert.issuer}` })}
+                className="inline-flex min-h-11 items-center gap-2 text-sm font-medium hover:text-primary">
+                <Eye aria-hidden="true" size={16} /> View certificate
+              </button>
+            </div>
+            <details className="mt-2 border-t border-border">
+              <summary className="min-h-11 w-fit cursor-pointer py-3 text-sm font-medium text-muted-foreground hover:text-foreground">Topics covered</summary>
+              <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
+                {cert.competencies.map(topic => <li key={topic}>{topic}</li>)}
+              </ul>
+              <ul aria-label="Certificate skills" className="mt-4 flex flex-wrap gap-2">
+                {cert.skills.map(skill => <li key={skill} className="rounded-lg bg-muted px-2 py-1 text-xs">{skill}</li>)}
+              </ul>
+            </details>
+          </article>
         ))}
       </div>
 
       {/* Modal Preview */}
       <AnimatePresence>
         {activePreview.isOpen && (
-          <motion.div
+          <motion.dialog
+            ref={dialog => { if (dialog && !dialog.open) dialog.showModal(); }}
+            aria-labelledby="certificate-preview-title"
+            data-lenis-prevent
+            onCancel={() => setActivePreview(prev => ({ ...prev, isOpen: false }))}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setActivePreview((prev) => ({ ...prev, isOpen: false }))}
-            className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+            className="fixed inset-0 z-[1000] m-0 w-full h-full max-w-none max-h-none bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -190,13 +81,13 @@ export const CertificationsSection = () => {
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-border/60 bg-muted/30">
-                <h4 className="font-bold text-foreground text-sm md:text-base line-clamp-1">
+                <h4 id="certificate-preview-title" className="font-bold text-foreground text-sm md:text-base line-clamp-1">
                   {activePreview.title}
                 </h4>
                 <button
                   onClick={() => setActivePreview((prev) => ({ ...prev, isOpen: false }))}
                   aria-label="Close certificate preview"
-                  className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                  className="min-h-11 min-w-11 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -211,7 +102,7 @@ export const CertificationsSection = () => {
                 />
               </div>
             </motion.div>
-          </motion.div>
+          </motion.dialog>
         )}
       </AnimatePresence>
     </div>

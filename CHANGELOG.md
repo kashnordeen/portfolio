@@ -1,5 +1,43 @@
 # Changelog
 
+## [1.4.0] - 2026-10-06
+
+### Added
+
+- Voxel avatar in the header and a generated transparent portrait on the interactive ID card.
+- Downloads Organizer with its real app screenshot, GitHub link, and six verified Windows, macOS, and Linux download options.
+- GramFlow Web live website action and project technology summaries.
+- Repository-backed engineering notes, project status, real GramFlow sign-in screenshot, and explicit concept-artwork labels.
+- Resume PDF linked unchanged with the owner's approval, and social sharing image metadata.
+
+### Updated
+
+- Redesigned project cards with readable copy, separate actions, mouse depth, and scroll reveals.
+- Shorter hero and About summaries, with full About information available on demand.
+- Professional strengths with concise keywords and evidence from actual projects.
+- Logo-led technical toolkit with expandable skill lists, a project-backed capabilities section, and a cleaner contact form layout.
+- Rebuilt avatar ID-card design; specialty updated to Web, Android & Applied AI with remaining personal details preserved.
+- Windows, macOS, and Linux logo menus with platform-specific download choices.
+- Portfolio package version to 1.4.0.
+- Compact career milestones, education, certification cards, skills, and footer; full details remain available on demand.
+- Degree and CS fundamentals aligned with the resume; selected technologies now prioritize the project stack.
+- Displayed avatar optimized from 1.37 MB PNG to 84 KB WebP; removed the global cursor trail and animated footer banner.
+
+### Fixed
+
+- ID-card animation avoids React renders every frame and supports keyboard interaction and vertical touch scrolling.
+- Reduced-motion handling, visible keyboard focus, and anchor spacing.
+- Tablet navigation and narrow-screen ID-card sizing.
+- Unified navigation buttons with the existing smooth-scroll engine to avoid competing scroll animations.
+- Removed cursor spotlight and glowing borders from both certificate cards without changing full previews or Credly verification.
+- Keyboard-accessible certificate preview buttons, native focus-trapped previews with Escape support, and screen-reader announcements for contact form results.
+- Added runnable checks for platform download mappings, toolkit logos, and image-only certificate previews.
+- Native keyboard-operable, named dock buttons and focus-trapped mobile navigation with Escape support.
+- Higher-contrast primary colors and light-theme headings, a skip link, and larger social touch targets.
+- System-aware, storage-safe theme initialization and reduced-motion theme changes.
+- Contact validation for whitespace-only messages and field lengths, HTTP/timeout handling, and persistent result announcements.
+- Resume button styles apply to the actual link, with a regression check; technology motion can be paused, and decorative duplicates are hidden from screen readers.
+
 ## [1.3.0] - 2026-09-18
 
 ### Added

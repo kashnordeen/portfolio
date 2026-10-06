@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { technologies } from "@/data/portfolio";
 
 const TechStackSection = () => {
+  const [paused, setPaused] = useState(false);
   return (
     <div className="w-full py-6 border-t border-b border-foreground/10 bg-foreground/[0.02] flex flex-col items-center justify-center overflow-hidden">
       <motion.div 
@@ -16,15 +18,16 @@ const TechStackSection = () => {
         <div className="absolute right-0 w-32 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
         
         {/* Marquee Animation */}
-        <div className="flex w-max animate-[marquee_35s_linear_infinite] whitespace-nowrap items-center hover:[animation-play-state:paused] py-1">
+        <div style={{ animationPlayState: paused ? "paused" : "running" }} className="flex w-max animate-[marquee_35s_linear_infinite] whitespace-nowrap items-center hover:[animation-play-state:paused] py-1">
           {[...technologies, ...technologies].map((tech, i) => (
             <div 
               key={i} 
+              aria-hidden={i >= technologies.length}
               className="mx-3 px-5 py-2.5 rounded-full border border-foreground/10 bg-background/80 text-foreground font-medium text-sm flex items-center gap-3 transition-all hover:scale-105 hover:border-primary/50 hover:bg-foreground/5 cursor-default shadow-sm group shrink-0"
             >
               <img 
                 src={tech.icon} 
-                alt={tech.name} 
+                alt=""
                 className="w-5 h-5 object-contain group-hover:scale-110 transition-transform duration-300 dark:invert-0" 
                 loading="lazy"
                 decoding="async" 
@@ -34,6 +37,9 @@ const TechStackSection = () => {
           ))}
         </div>
       </motion.div>
+      <button type="button" aria-pressed={paused} onClick={() => setPaused(!paused)} className="mt-2 min-h-11 px-3 text-xs font-medium text-muted-foreground hover:text-foreground">
+        {paused ? "Resume technology animation" : "Pause technology animation"}
+      </button>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes marquee {

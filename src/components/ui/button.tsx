@@ -31,7 +31,7 @@ export function buttonVariants(options: ButtonOptions = {}) {
     `inline-flex items-center justify-center gap-2 whitespace-nowrap 
     rounded-md text-sm font-medium ring-offset-background 
     transition-colors focus-visible:outline-none focus-visible:ring-2 
-    focus-visible:ring-ring focus-visible:ring-offset-2 
+    focus-visible:ring-primary focus-visible:ring-offset-2
     disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none 
     [&_svg]:size-4 [&_svg]:shrink-0`,
     buttonStyles.variant[variant],
@@ -47,29 +47,20 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = "default", size = "default", asChild = false, ...props }, ref) => {
+  ({ className, variant = "default", size = "default", asChild = false, children, ...props }, ref) => {
     if (asChild) {
-      return (
-        <>
-          {React.Children.map(props.children, (child) => {
-            if (React.isValidElement(child)) {
-              return (
-                <span className={buttonVariants({ variant, size, className })}>
-                  {child}
-                </span>
-              );
-            }
-            return child;
-          })}
-        </>
-      );
+      const child = React.Children.only(children) as React.ReactElement<{ className?: string }>;
+      return React.cloneElement(child, {
+        ...props,
+        className: buttonVariants({ variant, size, className: cn(className, child.props.className) }),
+      });
     }
     return (
       <button
         className={buttonVariants({ variant, size, className })}
         ref={ref}
         {...props}
-      />
+      >{children}</button>
     );
   }
 );
