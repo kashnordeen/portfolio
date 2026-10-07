@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.0] - 2026-10-07
+
+### Added
+
+- Downloads Organizer menus check GitHub's latest stable release on page load and use its actual installer assets without requiring portfolio redeployment.
+- Loading and fallback status announcements, unavailable-build labels, and release metadata/error regression checks.
+
+### Updated
+
+- Download version and release notes now follow the detected release; verified v1.0.0 links remain an explicitly labeled fallback.
+- Portfolio package version to 1.5.0; existing platform logo menus and styling preserved.
+
+### Fixed
+
+- Removed the fixed desktop release version from the project card.
+- Missing, incomplete, or unexpected installer links are not guessed or mixed with older release assets.
+- GitHub errors, invalid responses, and eight-second request timeouts retain usable fallback downloads.
+
 ## [1.4.0] - 2026-10-06
 
 ### Added

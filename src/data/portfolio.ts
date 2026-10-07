@@ -65,17 +65,6 @@ export const services = [
   },
 ];
 
-export const organizerDownloads = [
-  { platform: "Windows", label: "Setup (x64)", file: "DownloadsOrganizer-1.0.0-windows-x64-setup.exe" },
-  { platform: "Windows", label: "Portable (x64)", file: "DownloadsOrganizer-1.0.0-windows-x64-portable.zip" },
-  { platform: "macOS", label: "Apple Silicon", file: "DownloadsOrganizer-1.0.0-macos-arm64-unsigned.dmg" },
-  { platform: "macOS", label: "Intel", file: "DownloadsOrganizer-1.0.0-macos-x64-unsigned.dmg" },
-  { platform: "Linux", label: "Debian / Ubuntu (x64)", file: "DownloadsOrganizer-1.0.0-linux-x64.deb" },
-  { platform: "Linux", label: "Portable (x64)", file: "DownloadsOrganizer-1.0.0-linux-x64-portable.tar.gz" },
-];
-export const organizerRelease = "https://github.com/kashnordeen/downloads-organizer/releases/tag/v1.0.0";
-export const organizerDownloadBase = "https://github.com/kashnordeen/downloads-organizer/releases/download/v1.0.0/";
-
 export const projects: {
   id: number; title: string; subtitle: string; link: string; image: string;
   category: string; tags: string[]; website?: string; downloads?: boolean;
@@ -104,7 +93,7 @@ export const projects: {
     category: "Local-first desktop app",
     tags: ["Python", "Qt", "SQLite"],
     downloads: true,
-    status: "Desktop release · v1.0.0",
+    status: "Desktop app · Windows, macOS & Linux",
     visualLabel: "Actual app UI · Demonstration files",
     problem: "Organize downloaded files without overwriting existing files or losing track of moves.",
     decision: "Preview before moving. SQLite records move history, while collision checks and verified copies support recovery and safe undo.",

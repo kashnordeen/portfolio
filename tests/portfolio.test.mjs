@@ -5,21 +5,74 @@ import ts from "typescript";
 
 const source = await readFile(new URL("../src/data/portfolio.ts", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
-const { certifications, organizerDownloads, organizerDownloadBase, technologies, technicalSkillGroups, projects, profile, education } =
+const { certifications, technologies, technicalSkillGroups, projects, profile, education } =
   await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
 
-test("platform downloads keep all six release assets in the correct menus", () => {
-  assert.equal(new Set(organizerDownloads.map(item => item.file)).size, 6);
+const releaseSource = await readFile(new URL("../src/lib/organizer-release.ts", import.meta.url), "utf8");
+const releaseCompiled = ts.transpileModule(releaseSource, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const { fallbackOrganizerRelease, parseOrganizerRelease, fetchOrganizerRelease } =
+  await import(`data:text/javascript;base64,${Buffer.from(releaseCompiled).toString("base64")}`);
+const repository = "https://github.com/kashnordeen/downloads-organizer";
+const latest = {
+  tag_name: "v1.1.0", html_url: `${repository}/releases/tag/v1.1.0`, draft: false, prerelease: false,
+  assets: fallbackOrganizerRelease.downloads.map(download => ({
+    name: download.url.split("/").at(-1).replace("1.0.0", "1.1.0"),
+    browser_download_url: download.url.replaceAll("1.0.0", "1.1.0"), state: "uploaded", size: 100,
+  })),
+};
+
+test("fallback keeps all six verified release assets in the correct menus", () => {
+  assert.equal(new Set(fallbackOrganizerRelease.downloads.map(item => item.url)).size, 6);
   for (const [platform, fileMarker] of [["Windows", "windows-x64"], ["macOS", "macos-"], ["Linux", "linux-x64"]]) {
-    const options = organizerDownloads.filter(item => item.platform === platform);
+    const options = fallbackOrganizerRelease.downloads.filter(item => item.platform === platform);
     assert.equal(options.length, 2);
     for (const option of options) {
-      assert.ok(option.file.includes(fileMarker));
-      const url = new URL(`${organizerDownloadBase}${option.file}`);
+      const url = new URL(option.url);
+      assert.ok(url.pathname.includes(fileMarker));
       assert.equal(url.hostname, "github.com");
       assert.ok(url.pathname.includes("/releases/download/v1.0.0/"));
     }
   }
+});
+
+test("a newer stable release updates version and all actual installer URLs", () => {
+  const result = parseOrganizerRelease(latest);
+  assert.equal(result.version, "v1.1.0");
+  assert.equal(result.url, latest.html_url);
+  assert.equal(result.status, "latest");
+  assert.deepEqual(result.downloads.map(item => item.url), latest.assets.map(asset => asset.browser_download_url));
+});
+
+test("missing, incomplete, or foreign builds are unavailable, not guessed or mixed with old files", () => {
+  const assets = latest.assets.slice(1).map(asset => ({ ...asset }));
+  assets[0].browser_download_url = "https://example.com/installer.dmg";
+  assets[1].state = "new";
+  assets.push({ name: "SHA256SUMS.txt", browser_download_url: `${repository}/releases/download/v1.1.0/SHA256SUMS.txt`, state: "uploaded", size: 100 });
+  const result = parseOrganizerRelease({ ...latest, assets });
+  assert.deepEqual(result.downloads.slice(0, 3).map(item => item.url), [null, null, null]);
+  assert.equal(result.downloads.filter(item => item.url).length, 3);
+  assert.equal(parseOrganizerRelease({ ...latest, assets: [] }).downloads.filter(item => item.url).length, 0);
+});
+
+test("drafts, prereleases, and malformed or foreign release metadata are rejected", () => {
+  for (const invalid of [null, {}, { ...latest, draft: true }, { ...latest, prerelease: true },
+    { ...latest, html_url: "https://example.com/release" }, { ...latest, assets: null }]) {
+    assert.throws(() => parseOrganizerRelease(invalid));
+  }
+});
+
+test("GitHub failures and timeouts return explicitly labeled fallback downloads", async t => {
+  for (const failure of [new Response("rate limited", { status: 403 }), new Response("bad json"),
+    Response.json({ ...latest, prerelease: true }), new DOMException("Timed out", "TimeoutError")]) {
+    const stub = t.mock.method(globalThis, "fetch", async () => {
+      if (failure instanceof Error) throw failure;
+      return failure;
+    });
+    assert.deepEqual(await fetchOrganizerRelease(), fallbackOrganizerRelease);
+    stub.mock.restore();
+  }
+  t.mock.method(globalThis, "fetch", async () => Response.json(latest));
+  assert.equal((await fetchOrganizerRelease()).version, "v1.1.0");
 });
 
 test("toolkit logos resolve and credentials remain image-only public previews", () => {

@@ -1,9 +1,17 @@
+import { useEffect, useState } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowUpRight, ChevronDown, Download, Github } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { projects, organizerDownloads, organizerDownloadBase, organizerRelease } from "@/data/portfolio";
+import { projects } from "@/data/portfolio";
+import { fallbackOrganizerRelease, fetchOrganizerRelease, type OrganizerRelease } from "@/lib/organizer-release";
 
 function OrganizerDownload() {
+  const [release, setRelease] = useState<OrganizerRelease>({ ...fallbackOrganizerRelease, status: "checking" });
+  useEffect(() => {
+    let active = true;
+    void fetchOrganizerRelease().then(result => { if (active) setRelease(result); });
+    return () => { active = false; };
+  }, []);
   const platforms = [
     { name: "Windows", icon: "windows11/windows11-original.svg" },
     { name: "macOS", icon: "apple/apple-original.svg" },
@@ -12,6 +20,11 @@ function OrganizerDownload() {
   return (
     <div className="mt-5 space-y-3 border-t border-border pt-5">
       <p className="text-sm font-semibold">Download for your device</p>
+      <p role="status" className="text-xs text-muted-foreground">
+        {release.status === "checking" ? `Checking the latest release. Showing ${release.version} fallback downloads.`
+          : release.status === "latest" ? `Latest stable release: ${release.version}`
+          : `Couldn't verify the latest release. Showing ${release.version} fallback downloads.`}
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-start">
         {platforms.map(platform => (
           <details key={platform.name} name="organizer-platform" className="group/os rounded-xl border border-border bg-background open:border-primary/60">
@@ -22,19 +35,19 @@ function OrganizerDownload() {
               <ChevronDown aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 transition-transform group-open/os:rotate-180" />
             </summary>
             <div className="border-t border-border p-1">
-              {organizerDownloads.filter(item => item.platform === platform.name).map(item => (
-                <a key={item.file} href={`${organizerDownloadBase}${item.file}`} aria-label={`Download ${platform.name} ${item.label}`}
+              {release.downloads.filter(item => item.platform === platform.name).map(item => item.url ? (
+                <a key={item.label} href={item.url} aria-label={`Download ${platform.name} ${item.label} (${release.version})`}
                   className="flex min-h-12 items-center gap-2 rounded-lg p-2 text-xs font-medium hover:bg-muted hover:text-primary">
                   <Download aria-hidden="true" className="h-4 w-4 shrink-0" /> {item.label}
                 </a>
-              ))}
+              ) : <p key={item.label} className="flex min-h-12 items-center p-2 text-xs text-muted-foreground">{item.label} · Unavailable</p>)}
             </div>
           </details>
         ))}
       </div>
       <p className="text-xs leading-relaxed text-muted-foreground">
-        v1.0.0. Windows is unsigned; macOS is not notarized. Your OS may warn or block installation.{' '}
-        <a href={organizerRelease} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">Release notes & checksums</a>
+        Your OS may warn about unsigned Windows installers or macOS apps that are not notarized. Check the release notes before installing.{' '}
+        <a href={release.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 hover:text-foreground">Release notes & checksums</a>
       </p>
     </div>
   );
