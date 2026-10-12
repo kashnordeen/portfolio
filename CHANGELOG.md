@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.5.1] - 2026-10-12
+
+### Updated
+
+- Portfolio identity now consistently uses the full name Keshav Kumar Karn.
+- Social sharing assets now use the canonical `https://kkarn.vercel.app` deployment URL.
+
+### Changed
+
+- Project links, installer downloads, Credly verification links, and contact social links are temporarily hidden behind policy visibility flags for straightforward restoration.
+
 ## [1.5.0] - 2026-10-07
 
 ### Added
