@@ -92,7 +92,7 @@ export default function Header() {
               </div>
               <div className="flex flex-col text-left">
                 <span className="font-extrabold tracking-tight text-foreground text-sm leading-none group-hover:text-primary transition-colors">
-                  Keshav Karn
+                  Keshav Kumar Karn
                 </span>
                 <span className="text-[9px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">
                   Portfolio

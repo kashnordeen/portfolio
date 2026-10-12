@@ -127,7 +127,7 @@ export const HeroSection = () => {
                 <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-violet-500/20 via-transparent to-cyan-500/10" />
                 <ScanLine aria-hidden="true" className="absolute top-6 left-5 h-5 w-5 text-slate-400" />
                 <div aria-hidden="true" className="absolute top-8 w-40 h-40 rounded-full border border-white/15" />
-                <img src={profile.avatar} alt="Keshav Karn's voxel avatar" width={1254} height={1254}
+                <img src={profile.avatar} alt="Keshav Kumar Karn's voxel avatar" width={1254} height={1254}
                   fetchPriority="high" className="relative h-60 w-60 mt-3 object-contain" />
               </div>
 
@@ -135,7 +135,7 @@ export const HeroSection = () => {
               <div className="p-5 flex flex-col bg-card text-card-foreground gap-4">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <h3 className="text-2xl font-bold tracking-tight">{profile.name}</h3>
+                    <h3 className="text-xl font-bold leading-tight tracking-tight">{profile.name}</h3>
                     <p className="mt-1 text-sm text-muted-foreground">{profile.role}</p>
                   </div>
                   <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">

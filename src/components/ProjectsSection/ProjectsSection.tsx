@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowUpRight, ChevronDown, Download, Github } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { projects } from "@/data/portfolio";
+import { policyVisibility, projects } from "@/data/portfolio";
 import { fallbackOrganizerRelease, fetchOrganizerRelease, type OrganizerRelease } from "@/lib/organizer-release";
 
 function OrganizerDownload() {
@@ -87,16 +87,18 @@ function ProjectCard({ project, featured }: { project: typeof projects[number]; 
         <ul className="my-5 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-foreground/80" aria-label="Project technologies">
           {project.tags.map(tag => <li key={tag}>{tag}</li>)}
         </ul>
-        <div className={`${featured ? "mt-2" : "mt-auto"} flex flex-wrap items-center gap-3`}>
-          {project.website && <a href={project.website} target="_blank" rel="noopener noreferrer"
-            className={buttonVariants({ className: "h-11 rounded-full bg-violet-700 hover:bg-violet-800 text-white" })}>
-            Go to website <ArrowUpRight aria-hidden="true" />
-          </a>}
-          <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={`${project.title} on GitHub`}
-            className={buttonVariants({ variant: "outline", className: "h-11 rounded-full bg-transparent hover:bg-muted" })}>
-            <Github aria-hidden="true" /> GitHub <ArrowUpRight aria-hidden="true" />
-          </a>
-        </div>
+        {policyVisibility.projectLinks && (
+          <div className={`${featured ? "mt-2" : "mt-auto"} flex flex-wrap items-center gap-3`}>
+            {project.website && <a href={project.website} target="_blank" rel="noopener noreferrer"
+              className={buttonVariants({ className: "h-11 rounded-full bg-violet-700 hover:bg-violet-800 text-white" })}>
+              Go to website <ArrowUpRight aria-hidden="true" />
+            </a>}
+            <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={`${project.title} on GitHub`}
+              className={buttonVariants({ variant: "outline", className: "h-11 rounded-full bg-transparent hover:bg-muted" })}>
+              <Github aria-hidden="true" /> GitHub <ArrowUpRight aria-hidden="true" />
+            </a>
+          </div>
+        )}
         <details className="mt-4 border-t border-border">
           <summary className="min-h-11 w-fit cursor-pointer py-3 text-sm font-semibold text-primary">Engineering notes</summary>
           <dl className="space-y-3 text-sm leading-relaxed">
@@ -105,7 +107,7 @@ function ProjectCard({ project, featured }: { project: typeof projects[number]; 
           </dl>
           <p className="mt-3 pb-3 text-xs text-muted-foreground">Implementation details are documented in the linked repository.</p>
         </details>
-        {project.downloads && <OrganizerDownload />}
+        {policyVisibility.projectDownloads && project.downloads && <OrganizerDownload />}
       </div>
     </motion.article>
   );

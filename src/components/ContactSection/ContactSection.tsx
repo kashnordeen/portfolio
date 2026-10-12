@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { profile } from "@/data/portfolio";
+import { policyVisibility, profile } from "@/data/portfolio";
 
 export const ContactSection = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +31,7 @@ export const ContactSection = () => {
           access_key: "53d7fa2e-64c5-4a4a-a0a5-49e08397f453",
           ...message,
           subject: `New Portfolio Message from ${message.name}`,
-          from_name: "Keshav Karn Portfolio",
+          from_name: "Keshav Kumar Karn Portfolio",
         }),
       });
 
@@ -84,10 +84,12 @@ export const ContactSection = () => {
                 {profile.location}
               </div>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium hover:bg-muted"><Github aria-hidden="true" className="h-4 w-4" /> GitHub <ArrowUpRight aria-hidden="true" className="h-4 w-4" /></a>
-              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium hover:bg-muted"><Linkedin aria-hidden="true" className="h-4 w-4" /> LinkedIn <ArrowUpRight aria-hidden="true" className="h-4 w-4" /></a>
-            </div>
+            {policyVisibility.contactSocialLinks && (
+              <div className="flex flex-wrap gap-3">
+                <a href={profile.github} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium hover:bg-muted"><Github aria-hidden="true" className="h-4 w-4" /> GitHub <ArrowUpRight aria-hidden="true" className="h-4 w-4" /></a>
+                <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border px-4 text-sm font-medium hover:bg-muted"><Linkedin aria-hidden="true" className="h-4 w-4" /> LinkedIn <ArrowUpRight aria-hidden="true" className="h-4 w-4" /></a>
+              </div>
+            )}
           </div>
 
           {/* Form */}

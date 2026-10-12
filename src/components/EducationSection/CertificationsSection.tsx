@@ -1,7 +1,7 @@
 ﻿import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, X, ExternalLink } from "lucide-react";
-import { certifications } from "@/data/portfolio";
+import { certifications, policyVisibility } from "@/data/portfolio";
 
 export const CertificationsSection = () => {
   const [activePreview, setActivePreview] = useState<{
@@ -18,7 +18,7 @@ export const CertificationsSection = () => {
     <div id="certifications" className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Certifications</h2>
-        <p className="mt-3 text-sm text-muted-foreground">Cisco Networking Academy training, with public credentials on Credly.</p>
+        <p className="mt-3 text-sm text-muted-foreground">Cisco Networking Academy training with certificate previews.</p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 items-start">
         {certifications.map(cert => (
@@ -33,11 +33,13 @@ export const CertificationsSection = () => {
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{cert.description}</p>
             <div className="mt-4 flex flex-wrap gap-x-5">
-              <a href={cert.credlyUrl} target="_blank" rel="noopener noreferrer"
-                aria-label={`Verify ${cert.title} on Credly`}
-                className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary hover:underline">
-                Verify on Credly <ExternalLink aria-hidden="true" size={15} />
-              </a>
+              {policyVisibility.credlyLinks && (
+                <a href={cert.credlyUrl} target="_blank" rel="noopener noreferrer"
+                  aria-label={`Verify ${cert.title} on Credly`}
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-primary hover:underline">
+                  Verify on Credly <ExternalLink aria-hidden="true" size={15} />
+                </a>
+              )}
               <button type="button"
                 aria-label={`Expand ${cert.title} certificate preview`}
                 onClick={() => setActivePreview({ isOpen: true, image: cert.certificateImage, title: `${cert.title} - ${cert.issuer}` })}
