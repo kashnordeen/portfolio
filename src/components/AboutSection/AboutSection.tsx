@@ -27,6 +27,9 @@ export const AboutSection = () => {
             <p className="text-lg text-muted-foreground leading-relaxed">
               {profile.aboutSummary}
             </p>
+            <p className="mt-4 text-sm font-semibold text-foreground">
+              Registration charges: <span className="text-primary">{profile.registrationCharge}</span>
+            </p>
             <details className="mt-5 text-sm text-muted-foreground">
               <summary className="min-h-11 w-fit cursor-pointer py-3 font-semibold text-foreground hover:text-primary">More about me</summary>
               <p className="mt-4 leading-relaxed">{profile.aboutDescription}</p>

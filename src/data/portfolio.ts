@@ -15,6 +15,7 @@ export const profile = {
   bio: "Computer Science student focused on software engineering. I build secure web platforms, offline-first apps, and applied AI systems, from the first idea to a working product.",
   aboutHeading: "Secure, Intelligent Products",
   aboutSummary: "Studying Computer Science at Thapar. Building across web, Android, AI, and IoT, with security and data integrity at the center of every project.",
+  registrationCharge: "₹699/-",
   aboutDescription: "I am pursuing a B.Tech in Computer Science and Engineering at Thapar Institute of Engineering and Technology, with graduation expected in May 2027. My foundation is in data structures, algorithms, object-oriented programming, and database systems. I apply it through projects in native Android, full-stack development, multimodal search, computer vision, and cloud-connected IoT. I enjoy understanding a problem, choosing an architecture, implementing it, and testing how it behaves when things go wrong.",
 };
 
