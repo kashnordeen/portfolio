@@ -23,6 +23,7 @@ export function loadConfig(env: Record<string, string | undefined>) {
   const enabled = env.PAYMENTS_ENABLED === 'true' && env.PAYMENT_RELEASE_APPROVED === 'true';
   return {
     environment, origin: origin.origin, sessionSecret, workerSecret,
+    jobsEnabled: env.PAYMENT_JOBS_ENABLED === 'true',
     databaseUrl: required('DATABASE_URL'), databaseCa: env.DATABASE_CA_CERT,
     clientId: required('PHONEPE_CLIENT_ID'), clientSecret: required('PHONEPE_CLIENT_SECRET'),
     clientVersion: required('PHONEPE_CLIENT_VERSION'), merchantId: required('PHONEPE_MERCHANT_ID'),

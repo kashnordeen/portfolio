@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { PaymentConfig } from './config.ts';
 import { PaymentError, equalSecret, sha256 } from './security.ts';
 import type { ProviderStatus } from './phonepe.ts';
+import { createJobStore, paymentJob, type JobRow } from './job-store.ts';
 
 export type Order = {
   id: string; idempotency_key: string; merchant_order_id: string; purpose: string;
@@ -49,7 +50,15 @@ export function createStore(config: PaymentConfig) {
   const sql = postgres(url.href, { ssl: { rejectUnauthorized: true, ...(config.databaseCa ? { ca: config.databaseCa } : {}) },
     max: 2, prepare: false, idle_timeout: 20, connect_timeout: 5,
     connection: { statement_timeout: 3000, application_name: 'portfolio-payments' } });
+  const jobs = createJobStore(sql, config);
+  const finishManaged = async (order: Order, status: ProviderStatus | null) => {
+    if (!order.reconcile_lease_id) return;
+    const [job] = await sql`SELECT j.id FROM private_payments.reconciliation_jobs j JOIN private_payments.orders o ON o.id=j.order_id
+      WHERE o.id=${order.id} AND o.environment=${config.environment} AND j.generation=o.job_generation AND j.state='PENDING'`;
+    if (job) await jobs.finishJob(job.id,order.reconcile_lease_id,status);
+  };
   return {
+    ...jobs,
     async rate(bucket: string, limit: number, seconds: number) {
       const start = Math.floor(Date.now() / (seconds * 1000)) * seconds;
       const [row] = await sql`INSERT INTO private_payments.rate_limits(bucket_hash, window_start, requests)
@@ -67,9 +76,15 @@ export function createStore(config: PaymentConfig) {
         const [order] = inserted.length ? inserted : await tx<Order[]>`SELECT * FROM private_payments.orders WHERE idempotency_key = ${idempotency} FOR UPDATE`;
         if (!order || !sameTerms(order, input, session, config.environment)) throw new PaymentError(409, 'This request is already bound to another payment.');
         // A durable claim prevents simultaneous submissions and ambiguous provider failures being retried.
-        if (!inserted.length) return { order, initiate: false };
+        if (config.jobsEnabled) {
+          if (inserted.length) await tx`SELECT private_payments.new_payment_job(${id},now()+interval '25 seconds')`;
+          const [job] = await tx<JobRow[]>`SELECT * FROM private_payments.reconciliation_jobs
+            WHERE order_id=${order.id} AND state='PENDING' ORDER BY generation DESC LIMIT 1`;
+          return { order, initiate: Boolean(inserted.length), job: job ? paymentJob(job) : null };
+        }
+        if (!inserted.length) return { order, initiate: false, job: null };
         const [claimed] = await tx<Order[]>`UPDATE private_payments.orders SET checkout_attempted_at = now() WHERE id = ${id} RETURNING *`;
-        return { order: claimed, initiate: true };
+        return { order: claimed, initiate: true, job: null };
       });
     },
     async checkout(id: string, result: { orderId: string; expires: Date; url: string }) {
@@ -87,14 +102,16 @@ export function createStore(config: PaymentConfig) {
       return order;
     },
     async recordEvent(merchantOrderId: string, event: string, digest: string) {
-      await sql.begin(async tx => {
+      return sql.begin(async tx => {
         const [order] = await tx<Order[]>`SELECT * FROM private_payments.orders WHERE merchant_order_id = ${merchantOrderId} AND environment = ${config.environment} FOR UPDATE`;
         if (!order) throw new PaymentError(404, 'Payment was not found.');
-        await tx`INSERT INTO private_payments.events(id, order_id, deduplication_hash, event_name)
-          VALUES (${randomUUID()}, ${order.id}, ${digest}, ${event}) ON CONFLICT (deduplication_hash) DO NOTHING`;
-        if (order.state !== 'COMPLETED' && order.state !== 'REVIEW') {
-          await tx`UPDATE private_payments.orders SET next_reconcile_at = now() WHERE id = ${order.id}`;
+        const inserted = await tx`INSERT INTO private_payments.events(id, order_id, deduplication_hash, event_name)
+          VALUES (${randomUUID()}, ${order.id}, ${digest}, ${event}) ON CONFLICT (deduplication_hash) DO NOTHING RETURNING id`;
+        if (inserted.length && order.state !== 'COMPLETED' && order.state !== 'REVIEW') {
+          if (config.jobsEnabled) await tx`SELECT private_payments.new_payment_job(${order.id},now())`;
+          else await tx`UPDATE private_payments.orders SET next_reconcile_at = now() WHERE id = ${order.id}`;
         }
+        return order.id;
       });
     },
     async claimDue() {
@@ -106,11 +123,12 @@ export function createStore(config: PaymentConfig) {
           ORDER BY next_reconcile_at FOR UPDATE SKIP LOCKED LIMIT 3) RETURNING *`;
     },
     async applyStatus(order: Order, status: ProviderStatus) {
+      if (config.jobsEnabled) return finishManaged(order,status);
       await sql.begin(async tx => {
         const [current] = await tx<Order[]>`SELECT * FROM private_payments.orders WHERE id = ${order.id} FOR UPDATE`;
         if (!current || current.state === 'COMPLETED' || current.state === 'REVIEW' || current.reconcile_lease_id !== order.reconcile_lease_id) return;
         const state = verifiedState(current, status);
-        const delay = reconciliationDelay(current.created_at);
+        const delay = reconciliationDelay(current.checkout_attempted_at ?? current.created_at);
         await tx`UPDATE private_payments.orders SET state = ${state},
           phonepe_order_id = COALESCE(phonepe_order_id, ${status.orderId}),
           paid_at = CASE WHEN ${state} = 'COMPLETED' THEN COALESCE(paid_at, now()) ELSE paid_at END,
@@ -120,9 +138,11 @@ export function createStore(config: PaymentConfig) {
           await tx`INSERT INTO private_payments.fulfilments(order_id) VALUES (${order.id}) ON CONFLICT (order_id) DO NOTHING`;
         }
         await tx`UPDATE private_payments.events SET processed_at = now() WHERE order_id = ${order.id} AND processed_at IS NULL`;
+        if (config.jobsEnabled && state === 'PENDING') await tx`SELECT private_payments.new_payment_job(${order.id},now()+(${delay} * interval '1 second'))`;
       });
     },
     async retryLater(order: Order) {
+      if (config.jobsEnabled) return finishManaged(order,null);
       // Expiry or API failure is never treated as payment failure. Escalate unresolved orders for manual review.
       const review = Date.now() - order.created_at.getTime() > 86400000;
       const delay = reconciliationDelay(order.created_at);
