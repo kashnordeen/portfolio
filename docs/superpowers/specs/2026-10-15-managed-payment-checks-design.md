@@ -1,13 +1,14 @@
-# Managed payment checks — proposed design, awaiting owner approval
+# Managed payment checks — approved for local implementation
 
-Fresh builder review completed: nothing important left. Owner approval remains pending.
+Fresh builder review completed: nothing important left. The owner's 2026-10-15 request to
+continue after the design-approval question authorizes the local scope below. No external actions approved.
 
 ## Intent and recommendation
 
 Make the portfolio's PhonePe integration reliable without asking its owner to operate a server.
 Keep the existing Vite/React portfolio, Vercel functions and restricted Supabase database.
 Use Upstash QStash for delayed, signed HTTP jobs; Vercel performs the actual PhonePe status checks.
-This is the assistant's recommended implementation choice, not an owner-approved architecture yet.
+This is the assistant's recommended implementation choice, now approved for the local scope only.
 One capability is in scope: durable payment-status reconciliation and its recovery path.
 
 ## Owner requirements and current constraints
