@@ -61,20 +61,33 @@ export const AboutSection = () => {
                   viewport={{ once: true }}
                 >
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Projects &amp; software</p>
-                  <p className="mt-1 text-base font-bold text-foreground">Starts from {profile.projectStartingRange}</p>
+                  <div className="mt-2 space-y-1 text-sm text-foreground">
+                    <p><span className="font-semibold">Basic:</span> {profile.projectPricing.basic}</p>
+                    <p><span className="font-semibold">Medium:</span> {profile.projectPricing.medium}</p>
+                  </div>
+                  <p className="mt-2 text-xs font-medium text-muted-foreground">{profile.projectPricing.note}</p>
                 </motion.div>
               </div>
+            </motion.div>
+            <div className="mt-4 flex justify-center">
               <motion.a
                 href="#contact"
-                className="group relative mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-primary/30 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group relative isolate inline-flex min-h-11 items-center gap-2 overflow-hidden rounded-full border border-primary/40 bg-background px-6 py-2.5 text-sm font-semibold text-primary shadow-lg shadow-primary/10 transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                animate={prefersReducedMotion ? undefined : { y: [0, -4, 0] }}
                 whileHover={prefersReducedMotion ? undefined : { scale: 1.04 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
-                transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                transition={prefersReducedMotion ? undefined : { y: { duration: 2.4, repeat: Infinity, ease: "easeInOut" }, scale: { type: "spring", stiffness: 380, damping: 24 } }}
               >
+                <motion.span
+                  aria-hidden="true"
+                  className="absolute inset-0 -z-10 rounded-full bg-primary/15"
+                  animate={prefersReducedMotion ? undefined : { opacity: [0.2, 0.55, 0.2], scale: [0.92, 1.06, 0.92] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                />
                 Contact for details
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" aria-hidden="true" />
               </motion.a>
-            </motion.div>
+            </div>
             <details className="mt-5 text-sm text-muted-foreground">
               <summary className="min-h-11 w-fit cursor-pointer py-3 font-semibold text-foreground hover:text-primary">More about me</summary>
               <p className="mt-4 leading-relaxed">{profile.aboutDescription}</p>
