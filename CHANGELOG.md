@@ -10,6 +10,8 @@
 - A server environment template, restricted database-role migration and automated security/contract checks.
 - Applied the backend database migration with a non-login, non-inheriting role and verified real PostgreSQL order-integrity checks; all synthetic records were rolled back.
 - Added a human-run private credential setup recipe; it generates no literal passwords in the saved query text and cannot be invoked through the public payment portal.
+- Prepared an inactive, administrator-only background dispatcher with due-order filtering, overlap protection, fixed HTTPS target and failure pausing; installation, HTTP and database runtime testing are still required.
+- Prepared a separate human-run worker-secret/Vault recipe that does not rotate the database password or unrelated credentials; it has not been executed.
 
 ### Changed
 

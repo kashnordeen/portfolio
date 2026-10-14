@@ -37,7 +37,7 @@ On 2026-10-14 the following Config variables were saved with Production-only sco
 `PAYMENT_SITE_ORIGIN=https://kkarn.vercel.app`, `PROJECT_MIN_PAISE=20000`,
 `PROJECT_MAX_PAISE=5000000`, `PAYMENT_RELEASE_APPROVED=false`, `COMMUNITY_PAYMENTS_ENABLED=false`.
 The dashboard confirmed creation and requires a new deployment to apply them. No redeploy was triggered.
-`PHONEPE_MERCHANT_ID` is missing; a blank Secret/Production form is prepared in Chrome for owner entry.
+The owner saved `PHONEPE_MERCHANT_ID`; Secret/Production-only metadata was verified without opening its value.
 No real PhonePe API call or payment was made. The existing public portfolio actions are unchanged.
 
 ### Locally implemented
@@ -85,7 +85,9 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    and Vault 0.3.1 is installed. [Supabase Cron](https://supabase.com/docs/guides/cron) supports sub-minute schedules,
    so a database-driven dispatcher is an option without another worker service. It must check for due orders before
    dispatching, protect its secret in Vault, prevent overlapping requests, and monitor failure/latency/usage.
-   It must stay inactive until the endpoint is deployed and verified. No job or outgoing HTTP request has been created.
+   Local preparation is now in `database/payment-worker.sql`; see `docs/payment-worker.md` for safeguards,
+   private worker-secret replacement and installation/runtime-test requirements. No extension, job or
+   outgoing HTTP request has been created. The worker must stay inactive until the endpoint is deployed and verified.
 6. Complete database concurrency/RLS integration tests, sandbox/UAT, authenticated webhook delivery checks,
    duplicate/out-of-order/timeout tests, and a deployment smoke test. Sandbox credentials are still missing.
 7. Define terms/privacy/refunds, manual support/review/receipt procedures, monitoring and backups.
@@ -103,8 +105,10 @@ and the above Vercel configuration saves have been completed externally; the own
 The owner enabled **User can login** for `portfolio_payments_api`; role creation, database creation, RLS bypass,
 replication, superuser and inherited privileges remain off. The owner reported private credential setup complete;
 verified-TLS application authentication is still required. The agent must not enter/confirm/submit a new
-authentication credential through the browser. The current handoff is only the missing PhonePe Merchant ID,
-not another run of the database recipe. Enter it privately as `PHONEPE_MERCHANT_ID` (not `PHONEPE_CLIENT_ID`).
+authentication credential through the browser. Merchant ID storage metadata is now verified.
+The owner did not retain the worker secret: a separate human-only recipe is prepared in
+`database/manual-worker-secret.sql`, but must not be run before the disabled worker installation is verified.
+It replaces only `PAYMENT_RECONCILIATION_SECRET`, not the database password or other secrets.
 Do not change the existing `postgres` account or reuse its password. Never paste a database password into chat.
 
 `database/manual-payment-secrets.sql` is a **human-run-only** setup recipe, NOT a migration. It has not been executed
