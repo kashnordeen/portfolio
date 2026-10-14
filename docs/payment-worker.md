@@ -1,7 +1,8 @@
 # Background payment verification — local preparation
 
-Status: **not installed, not activated and not runtime-tested**. No extension was enabled,
-HTTP request made, Vault secret generated or payment-integration deployment performed.
+Status: **locally SQL-tested; not installed or activated in Supabase**. PGlite 0.5.10 executes
+the worker functions in disposable PostgreSQL 18.6 with fake Cron, HTTP and Vault interfaces.
+No real extension was enabled, HTTP request made, Vault secret generated or payment-integration deployment performed.
 The existing `/api/payments/reconcile` handler remains responsible for authenticated PhonePe
 status checks, amount/reference verification, leases and atomic order updates.
 
@@ -11,6 +12,16 @@ status checks, amount/reference verification, leases and atomic order updates.
 - `database/verify-payment-worker.sql`: post-install checks while both worker gates are off.
 - `database/manual-worker-secret.sql`: **human-run-only**, one-time replacement of only the worker secret.
 - `tests/payment-worker.test.mjs`: static SQL contract checks, not a PostgreSQL or HTTP simulation.
+- `tests/payment-worker-runtime.test.mjs`: thirteen executable database scenarios using the existing order/backend
+  migrations and worker SQL. Only the separately tested extension-presence preflight is removed to use mocks.
+- `tests/fixtures/worker-extension-mocks.sql`: local-only extension interfaces, synthetic data, no HTTP transport.
+
+Run `npm test` with Node 24. PGlite is pinned as a **development-only** dependency and uses an in-memory
+database that is closed after testing; it has no Supabase connection or production credentials. Tests cover
+disabled installation/verification, actual role permission denials, due-order filtering, missing/malformed/duplicate
+secret fixtures, single in-flight dispatch, valid and invalid response handling, backoff, authentication failure,
+stuck requests, column-level grant detection and rollback after enqueue failure. The human-only private
+secret-generation recipe is never executed by these tests.
 
 The dispatcher locks its singleton state with `FOR UPDATE SKIP LOCKED`, checks for due production
 orders and ignores orders with an active reconciliation lease. It only POSTs an empty body to
@@ -26,10 +37,11 @@ not that any individual payment succeeded. Deferred orders continue to be verifi
 
 ## Required before installation
 
-1. Validate the SQL on an isolated PostgreSQL instance with mocked extension interfaces, then test the
-   actual Cron/pg_net versions, locking, restart recovery, outage handling and delivery timing in UAT.
+1. Local function execution now passes in embedded PostgreSQL **18.6**, not the deployed **17**.
+   Verify the target version and actual Cron/pg_net interfaces, multi-session locking, restart recovery,
+   outage handling and delivery timing in UAT. PGlite is single-connection and the extensions are mocks;
+   these tests do not prove cross-session concurrency, real network dispatch, TLS or Vault encryption.
    This preparation targets the project's previously observed PostgreSQL 17, pg_cron 1.6.4 and pg_net 0.20.4.
-   No local PostgreSQL/psql or Docker executable was found during preparation; SQL execution is unverified.
 2. Review enabling Cron and pg_net in the dedicated payment project. Installation script deliberately
    does not enable extensions or modify shared extension permissions. [pg_net is beta](https://supabase.com/docs/guides/database/extensions/pg_net).
 3. Audit table, column, function and inherited grants to Vault and the `net` schema.
@@ -81,5 +93,6 @@ so keep scheduling inactive during replacement and deploy only with explicit app
 - If disabling new checkout after launch, continue to reconcile existing orders. Do not erase an in-flight
   request ID to force retries: review its queue/response metadata and the order leases first.
 
-The installation verification only checks the disabled path and permissions. It does not prove that
-real HTTP dispatch, secret matching, TLS, concurrency or UAT timing works. Those remain release blockers.
+The installation verification only checks the disabled path and permissions. Local tests execute the
+SQL branches but do not prove target-version behavior, real HTTP dispatch, actual secret matching,
+TLS, multi-session concurrency or UAT timing. Those remain release blockers.

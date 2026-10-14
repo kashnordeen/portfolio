@@ -86,7 +86,9 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    so a database-driven dispatcher is an option without another worker service. It must check for due orders before
    dispatching, protect its secret in Vault, prevent overlapping requests, and monitor failure/latency/usage.
    Local preparation is now in `database/payment-worker.sql`; see `docs/payment-worker.md` for safeguards,
-   private worker-secret replacement and installation/runtime-test requirements. No extension, job or
+   private worker-secret replacement and installation/runtime-test requirements. Local function tests pass
+   in embedded PostgreSQL 18.6 with mocked extensions; the deployed PostgreSQL 17 and actual HTTP/secret/timing
+   behavior are still untested. No extension, job or
    outgoing HTTP request has been created. The worker must stay inactive until the endpoint is deployed and verified.
 6. Complete database concurrency/RLS integration tests, sandbox/UAT, authenticated webhook delivery checks,
    duplicate/out-of-order/timeout tests, and a deployment smoke test. Sandbox credentials are still missing.

@@ -12,6 +12,7 @@
 - Added a human-run private credential setup recipe; it generates no literal passwords in the saved query text and cannot be invoked through the public payment portal.
 - Prepared an inactive, administrator-only background dispatcher with due-order filtering, overlap protection, fixed HTTPS target and failure pausing; installation, HTTP and database runtime testing are still required.
 - Prepared a separate human-run worker-secret/Vault recipe that does not rotate the database password or unrelated credentials; it has not been executed.
+- Added disposable local PostgreSQL function tests for worker gates, permission denials, filtering, malformed responses, backoff and rollback using a pinned development-only PGlite runtime and fake extension interfaces. Supabase PostgreSQL 17, real HTTP/TLS and scheduler timing still require testing.
 
 ### Changed
 
