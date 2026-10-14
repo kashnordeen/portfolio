@@ -8,6 +8,7 @@
 - Portal API connection and honest pending/failed/review/verified states, with no automatic second payment after ambiguous errors.
 - Independent community and production release gates. Payments remain disabled; no deployment or real payment test has been made.
 - A server environment template, restricted database-role migration and automated security/contract checks.
+- Applied the backend database migration with a non-login, non-inheriting role and verified real PostgreSQL order-integrity checks; all synthetic records were rolled back.
 
 ## [1.6.0] - 2026-10-14
 

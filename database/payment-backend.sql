@@ -1,4 +1,4 @@
--- Local migration only: not applied to Supabase yet.
+-- Versioned backend migration; application status is tracked in docs/phonepe-integration.md.
 BEGIN;
 ALTER TABLE private_payments.orders
   ADD COLUMN IF NOT EXISTS checkout_attempted_at timestamptz,
@@ -23,7 +23,7 @@ REVOKE ALL ON private_payments.rate_limits FROM PUBLIC;
 -- Provision credentials separately. This role cannot log in until deliberately enabled.
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'portfolio_payments_api') THEN
-    CREATE ROLE portfolio_payments_api NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+    CREATE ROLE portfolio_payments_api NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
   END IF;
 END $$;
 GRANT USAGE ON SCHEMA private_payments TO portfolio_payments_api;

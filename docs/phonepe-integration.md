@@ -10,10 +10,18 @@ The Supabase database was provisioned on 2026-10-14:
 - Dashboard: https://supabase.com/dashboard/project/ghseaquzqlnpmiltsyqy
 - Data API and automatic table exposure were disabled at project creation; automatic RLS was enabled.
 - Migration `create_private_payment_store` was applied from `database/payment-orders.sql`.
-- Tables: `private_payments.orders`, `private_payments.events`, `private_payments.fulfilments`.
-- All three tables have RLS enabled; `anon` and `authenticated` roles have no schema usage or table-read privileges.
+- Migration `prepare_private_payment_backend` was applied from `database/payment-backend.sql` on 2026-10-14.
+- Tables: `private_payments.orders`, `private_payments.events`, `private_payments.fulfilments`, `private_payments.rate_limits`.
+- All four tables have RLS enabled. Policies target only `portfolio_payments_api`; browser roles `anon` and `authenticated` still have no schema usage.
+- `portfolio_payments_api` has NOLOGIN, NOINHERIT, NOSUPERUSER, NOCREATEDB, NOCREATEROLE and NOBYPASSRLS. It inherits no other role.
+- Real database checks in `database/verify-payment-backend.sql` passed: role restrictions, duplicate reservations/events/fulfilments,
+  worker leases, immutable amounts, completed-state protection, and refusal to delete orders. These are database-level
+  smoke checks, not a concurrent-load test or a driver/TLS connection test.
+- Synthetic test records were rolled back. Counts in all four payment tables remain zero.
+- The administrator's temporary SET-role permission was rolled back and verified restored (SET=false, INHERIT=false).
 - The integrity checks in `database/verify-payment-orders.sql` passed, and all synthetic test data was rolled back.
-- Supabase security advisors reported only the informational [RLS Enabled No Policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) notices. No browser-access policies are intentional for this backend-only store.
+- Before the backend migration, Supabase security advisors reported only the informational [RLS Enabled No Policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) notices. Backend-only policies are now present; there are still no browser-access policies.
+- The security advisor was rerun after the backend migration and returned no findings.
 
 The local checkout interface is available at `/?payment=community` and `/?payment=project`.
 The server implementation and portal API wiring are now prepared locally, but have NOT been deployed.
@@ -41,8 +49,8 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
 
 ### Still required before deployment/go-live
 
-1. Apply `database/payment-backend.sql` to add worker metadata/rate-limit tables and the restricted **NOLOGIN** role.
-   This migration is local only and has NOT been applied. Enable role login with a strong password privately,
+1. The backend migration is now applied. The restricted role still has **NOLOGIN** and no application connection is configured.
+   Enable role login with a strong password privately,
    and store its connection string in Vercel as `DATABASE_URL` (Secret), not an administrative connection string.
 2. Configure the remaining values in `.env.example` directly in Vercel. Keep production secrets out of Preview.
    `DATABASE_URL` must have no `ssl`/`sslmode`/certificate query options; the driver enforces verified TLS.
@@ -53,10 +61,15 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
 4. Provide the real merchant ID as `PHONEPE_MERCHANT_ID` and choose `PROJECT_MIN_PAISE`/`PROJECT_MAX_PAISE`.
    Marketing price tiers are not hardcoded invoice/payment limits. Invoice matching remains manual;
    paying an arbitrary reference does not settle a full invoice.
-5. Provision a durable external worker that calls `/api/payments/reconcile` with
+5. Provision a durable worker outside the browser that calls `/api/payments/reconcile` with
    `Authorization: Bearer <PAYMENT_RECONCILIATION_SECRET>` at the required short intervals and continues
    when the browser closes. No scheduler is installed. A daily or once-minute Vercel cron is not sufficient
    for the initial short-interval checks. Worker endpoint runs small batches; capacity/load testing is required.
+   The current Supabase project offers `pg_cron` 1.6.4 and `pg_net` 0.20.4 (neither enabled yet),
+   and Vault 0.3.1 is installed. [Supabase Cron](https://supabase.com/docs/guides/cron) supports sub-minute schedules,
+   so a database-driven dispatcher is an option without another worker service. It must check for due orders before
+   dispatching, protect its secret in Vault, prevent overlapping requests, and monitor failure/latency/usage.
+   It must stay inactive until the endpoint is deployed and verified. No job or outgoing HTTP request has been created.
 6. Complete database concurrency/RLS integration tests, sandbox/UAT, authenticated webhook delivery checks,
    duplicate/out-of-order/timeout tests, and a deployment smoke test. Sandbox credentials are still missing.
 7. Define terms/privacy/refunds, manual support/review/receipt procedures, monitoring and backups.
@@ -65,7 +78,17 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    and `PAYMENTS_ENABLED=true`. Community additionally needs `COMMUNITY_PAYMENTS_ENABLED=true`.
    These are release gates, not proof that the worker or business procedures are configured.
 
-No push, deployment, database-role provisioning, credential generation, worker subscription or live payment is part of this local implementation.
+No push, deployment, credential generation, worker subscription, scheduler activation or live payment has been made.
+Only the private database migration and rolled-back smoke tests have now been executed externally.
+
+### Current private-credential handoff
+
+Chrome is open to the project's [database roles](https://supabase.com/dashboard/project/ghseaquzqlnpmiltsyqy/database/roles),
+filtered to `portfolio_payments_api`. Its permissions panel shows every capability off. The only capability needed for
+the application connection is **User can login**. Keep role creation, database creation, RLS bypass, replication and
+superuser capabilities off. A strong private password and verified-TLS connection configuration are still required;
+the agent must not enter/confirm/submit a new authentication credential through the browser.
+Do not change the existing `postgres` account or reuse its password. Never paste a database password into chat.
 
 Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
 The production dependency audit reports no vulnerabilities. The full audit currently reports two existing high-severity
