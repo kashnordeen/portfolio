@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Code2, Globe2, Layout, Users } from "lucide-react";
+import { ArrowUpRight, Code2, Globe2, Layout, Users } from "lucide-react";
 import { profile, stats as portfolioStats } from "@/data/portfolio";
 
 const stats = [
@@ -27,9 +27,25 @@ export const AboutSection = () => {
             <p className="text-lg text-muted-foreground leading-relaxed">
               {profile.aboutSummary}
             </p>
-            <p className="mt-4 text-sm font-semibold text-foreground">
-              Registration charges: <span className="text-primary">{profile.registrationCharge}</span>
-            </p>
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:p-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Community registration</p>
+                  <p className="mt-1 text-xl font-bold text-primary">{profile.registrationCharge}</p>
+                </div>
+                <div className="border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Projects &amp; software</p>
+                  <p className="mt-1 text-base font-bold text-foreground">Starts from {profile.projectStartingRange}</p>
+                </div>
+              </div>
+              <a
+                href="#contact"
+                className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-primary/30 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                Contact for details
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
             <details className="mt-5 text-sm text-muted-foreground">
               <summary className="min-h-11 w-fit cursor-pointer py-3 font-semibold text-foreground hover:text-primary">More about me</summary>
               <p className="mt-4 leading-relaxed">{profile.aboutDescription}</p>
