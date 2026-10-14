@@ -1,4 +1,6 @@
 -- LOCAL PREPARATION ONLY: not applied, not an activation script.
+-- BLOCKED on this Supabase project: shared pg_net queue grants cannot isolate Bearer headers.
+-- See docs/payment-worker.md. Do not weaken access guards to install this draft.
 -- Requires reviewed pg_cron, pg_net and Vault installations in portfolio-payments.
 -- Does not enable extensions, create credentials, or activate a job.
 BEGIN;

@@ -6,6 +6,17 @@ import { readFile } from 'node:fs/promises';
 const worker = await readFile(new URL('../database/payment-worker.sql', import.meta.url), 'utf8');
 const recipe = await readFile(new URL('../database/manual-worker-secret.sql', import.meta.url), 'utf8');
 
+test('blocked extension preparation keeps HTTP and Cron privilege guards fail-closed', async () => {
+  const extensions = await readFile(new URL('../database/payment-worker-extensions.sql', import.meta.url), 'utf8');
+  assert.match(extensions, /BLOCKED preparation/);
+  assert.match(extensions, /e\.extname='http' OR \(e\.extname='pg_cron'/);
+  assert.match(extensions, /'schedule','schedule_in_database','alter_job','unschedule'/);
+  assert.match(extensions, /REVOKE ALL ON FUNCTION/);
+  assert.match(extensions, /has_function_privilege\(role_name,function_id,'EXECUTE'\)/);
+  assert.match(extensions, /RAISE EXCEPTION 'Extension access restriction failed/);
+  assert.doesNotMatch(extensions, /CREATE EXTENSION pg_net|cron\.schedule\(|vault\.create_secret|GRANT /);
+});
+
 test('worker preparation cannot enable extensions, credentials or active schedules', () => {
   assert.match(worker, /enabled boolean NOT NULL DEFAULT false/);
   assert.match(worker, /cron\.alter_job\(job_id := created_job, active := false\)/);

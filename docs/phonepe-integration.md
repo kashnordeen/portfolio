@@ -2,6 +2,24 @@
 
 ## Current status
 
+### Completion checkpoint — 2026-10-15
+
+- The owner explicitly declined deployment. No payment integration push, deployment, checkout activation
+  or real payment was performed. Keep all three payment release flags false.
+- A PhonePe webhook **draft only** was prepared in Chrome for
+  `https://kkarn.vercel.app/api/payments/webhook`, using SHA username/password and only
+  `checkout.order.completed` / `checkout.order.failed`. It was not submitted or registered.
+  Credential fields were not read or changed. They must privately match the existing Production
+  webhook secrets before registration; do not submit until the backend endpoint is deployed and verified.
+- The worker is blocked by platform-owned extension permissions; the restrictive attempts rolled back
+  and automatic security review rejected broader scheduling permissions. No worker/extension/job was
+  installed, and no worker secret was generated. See `docs/payment-worker.md` for the required design decision.
+- Still required: approved supported worker hosting/permissions, deployment approval, private credential
+  matching, database-driver/TLS verification, webhook delivery tests, and provider-approved UAT/go-live.
+  Community checkout additionally requires defined benefits, delivery and refund terms.
+
+The following records describe the existing preparation; this checkpoint takes precedence over older proposals.
+
 The Supabase database was provisioned on 2026-10-14:
 
 - Project: `portfolio-payments` (`ghseaquzqlnpmiltsyqy`), in `kashnordeen's Org`.
@@ -136,7 +154,7 @@ storing them in Vercel alone does not register a webhook or deploy an endpoint.
 
 Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
 The online npm audit on 2026-10-15 reports zero known vulnerabilities across production and development
-dependencies after targeted brace-expansion and source-map-js patches. All 62 tests, lint, type checks and
+dependencies after targeted brace-expansion and source-map-js patches. All 63 tests, lint, type checks and
 the local production build pass. This does not validate live credentials, TLS, webhook delivery or UAT.
 
 ## Before backend integration

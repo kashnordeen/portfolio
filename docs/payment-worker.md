@@ -1,14 +1,38 @@
 # Background payment verification — local preparation
 
-Status: **locally SQL-tested; not installed or activated in Supabase**. PGlite 0.5.10 executes
+Status (2026-10-15): **blocked; not installed or activated in Supabase**. PGlite 0.5.10 executes
 the worker functions in disposable PostgreSQL 18.6 with fake Cron, HTTP and Vault interfaces.
 No real extension was enabled, HTTP request made, Vault secret generated or payment-integration deployment performed.
 The existing `/api/payments/reconcile` handler remains responsible for authenticated PhonePe
 status checks, amount/reference verification, leases and atomic order updates.
 
+## Current blocker — supersedes the historical installation checklist below
+
+- The owner approved the supported Vault server-administrator trust model, but that guard change
+  has not been implemented. It would not resolve the separate shared transport/scheduler grants.
+- Supabase documents that project-specific pg_net grant changes are unsupported and database login
+  roles can read queued headers. Do not install the existing pg_net dispatcher with a Bearer credential
+  on this project, and do not weaken its access guard.
+- A synchronous HTTP alternative was investigated, not implemented. Restricted extension installation
+  attempts failed on platform-owned grants and rolled back. Automatic security review rejected a
+  retry that would leave public Cron scheduling permissions unrestricted. No extension, worker, job
+  or Vault credential was installed, and no HTTP request was sent by these attempts.
+- `database/payment-worker-extensions.sql` preserves strict checks for every HTTP function and
+  Cron scheduling mutator. It is a **blocked checkpoint**, not an installation instruction. Do not
+  remove checks, rerun a more permissive migration or switch tools to bypass the rejection.
+- Next: obtain a reviewed platform-supported restriction design, or separately approve a worker
+  host/design and its permissions. Broader database scheduling access requires explicit risk approval
+  and another security review; it is not approved by a general request to continue.
+- Do not run `manual-worker-secret.sql` until a supported disabled worker is installed and verified.
+  No secret was rotated. Deployment was explicitly declined; no push or deployment was performed.
+
+References: [Supabase pg_net grant limitation](https://supabase.com/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16),
+[Supabase inherited PUBLIC privileges](https://supabase.com/docs/guides/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c).
+
 ## Prepared files
 
-- `database/payment-worker.sql`: administrator-only production dispatcher and an inactive Cron job.
+- `database/payment-worker.sql`: blocked pg_net dispatcher draft; not installable under this project's intended isolation.
+- `database/payment-worker-extensions.sql`: blocked, fail-closed restricted-extension checkpoint.
 - `database/verify-payment-worker.sql`: post-install checks while both worker gates are off.
 - `database/manual-worker-secret.sql`: **human-run-only**, one-time replacement of only the worker secret.
 - `tests/payment-worker.test.mjs`: static SQL contract checks, not a PostgreSQL or HTTP simulation.
@@ -35,7 +59,7 @@ A successful HTTP response must be JSON with the handler's bounded `checked`/`de
 a portfolio HTML fallback is not accepted as success. These counters only confirm handler execution,
 not that any individual payment succeeded. Deferred orders continue to be verified by the handler.
 
-## Required before installation
+## Historical preflight — not installation instructions
 
 ### Read-only review — 2026-10-14
 
@@ -62,7 +86,7 @@ not that any individual payment succeeded. Deferred orders continue to be verifi
 See [Supabase Vault's privilege guidance](https://supabase.com/docs/guides/database/vault) and
 [PostgreSQL's grantor-specific REVOKE rules](https://www.postgresql.org/docs/17/sql-revoke.html).
 
-### Remaining checks
+### Original proposed checks (blocked; do not execute)
 
 1. Local function execution now passes in embedded PostgreSQL **18.6**, not the deployed **17**.
    Verify the target version and actual Cron/pg_net interfaces, multi-session locking, restart recovery,
