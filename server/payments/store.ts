@@ -152,7 +152,9 @@ export function createStore(config: PaymentConfig) {
         WHERE id = ${order.id} AND reconcile_lease_id = ${order.reconcile_lease_id} AND state NOT IN ('COMPLETED', 'REVIEW')`;
     },
     async cleanupRates() {
-      await sql`DELETE FROM private_payments.rate_limits WHERE window_start < extract(epoch FROM now() - interval '1 day')`;
+      await sql`DELETE FROM private_payments.rate_limits WHERE (bucket_hash,window_start) IN
+        (SELECT bucket_hash,window_start FROM private_payments.rate_limits
+          WHERE window_start < extract(epoch FROM now() - interval '1 day') ORDER BY window_start LIMIT 1000)`;
     },
   };
 }

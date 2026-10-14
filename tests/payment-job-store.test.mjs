@@ -14,6 +14,7 @@ test('durable payment job transitions execute in local PostgreSQL', async t => {
   await db.exec(await read('../database/payment-orders.sql'));
   await db.exec(await read('../database/payment-backend.sql'));
   await db.exec(migration);
+  await db.exec(await read('../database/verify-payment-jobs.sql'));
   const reserve = async () => {
     const { id } = await one(`INSERT INTO private_payments.orders(id,idempotency_key,merchant_order_id,purpose,customer_name,
       customer_email,project_reference,amount_paise,environment,session_token_hash)
@@ -132,6 +133,15 @@ test('durable payment job transitions execute in local PostgreSQL', async t => {
           has_function_privilege($1,'private_payments.new_payment_job(uuid,timestamp with time zone)','EXECUTE') AS calls`, [role]);
         assert.deepEqual(rights, { reads: false, calls: false });
       }
+    });
+    await scenario('cross-environment and expired lease results cannot apply',async()=>{
+      const row=await reserve();await initiate(row);await due(row.id);
+      const wrong=await one("SELECT private_payments.claim_payment_job($1,'sandbox') AS result",[row.job]);
+      assert.deepEqual(wrong.result,{kind:'STALE',orderId:null});
+      const claimed=await claim(row.job);
+      await db.query('UPDATE private_payments.orders SET reconcile_lease_until=now()-interval \'1 second\' WHERE id=$1',[row.id]);
+      assert.equal(await finish(row.job,claimed.leaseId),false);
+      const replacement=await claim(row.job);assert.equal(replacement.kind,'READY');assert.notEqual(replacement.leaseId,claimed.leaseId);
     });
     await scenario('accepted but overdue delivery recovers under a fresh generation', async () => {
       const row = await reserve(); await initiate(row); await due(row.id);

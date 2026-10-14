@@ -63,8 +63,9 @@ export function createJobStore(sql: Sql, config: PaymentConfig) {
       }
       return { ...result, order, job: { ...result.job, dueAt: new Date(result.job.dueAt) } };
     },
-    async finishJob(jobId: string, leaseId: string, status: ProviderStatus | null): Promise<void> {
-      await sql`SELECT private_payments.finish_payment_job(${jobId},${leaseId},${status?.state ?? null},${status?.amount ?? null},${status?.orderId ?? null})`;
+    async finishJob(jobId: string, leaseId: string, status: ProviderStatus | null): Promise<boolean> {
+      const [row] = await sql`SELECT private_payments.finish_payment_job(${jobId},${leaseId},${status?.state ?? null},${status?.amount ?? null},${status?.orderId ?? null}) AS applied`;
+      return row.applied;
     },
   };
 }

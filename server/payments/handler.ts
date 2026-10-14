@@ -98,6 +98,7 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
       // ACK only after durable recording, without waiting on the provider or granting access.
       return reply({ received: true });
     }
+    if (config.jobsEnabled) throw new PaymentError(403,'Use signed managed verification jobs.');
     if (!equalSecret(request.headers.get('authorization') ?? '', `Bearer ${config.workerSecret}`)) throw new PaymentError(401, 'Worker authentication failed.');
     const due = await store.claimDue();
     let checked = 0, deferred = 0;

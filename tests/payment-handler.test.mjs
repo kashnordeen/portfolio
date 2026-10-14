@@ -105,12 +105,16 @@ test('webhooks authenticate merchant and durably queue an event; never trust not
   assert.equal((await f.run('webhook', request(event, auth))).status, 503);
 });
 test('worker is authenticated, verifies via provider status, and retries transient failures', async () => {
-  const f = fixture(); assert.equal((await f.run('reconcile', request())).status, 401);
+  const f = fixture(); f.runtime.config.jobsEnabled=false; assert.equal((await f.run('reconcile', request())).status, 401);
   const auth = { authorization: `Bearer ${config.workerSecret}` };
   assert.deepEqual(await (await f.run('reconcile', request({}, auth))).json(), { checked: 1, deferred: 0 });
   f.provider.status = async () => { throw new Error('timeout'); };
   assert.deepEqual(await (await f.run('reconcile', request({}, auth))).json(), { checked: 0, deferred: 1 });
   assert.equal(f.calls.filter(call => call[0] === 'retry').length, 1);
+});
+test('managed mode rejects the old bearer scheduler without a provider call',async()=>{
+  const f=fixture();const response=await f.run('reconcile',request({},{authorization:`Bearer ${config.workerSecret}`}));
+  assert.equal(response.status,403);assert.equal(f.calls.length,0);
 });
 test('amount and provider-order mismatch require review; immutable terms include session identity', () => {
   assert.equal(verifiedState(baseOrder, { orderId: 'OMO_TEST', amount: 1, state: 'COMPLETED' }), 'REVIEW');
