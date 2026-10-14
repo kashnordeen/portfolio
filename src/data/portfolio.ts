@@ -14,18 +14,18 @@ export const profile = {
   experience: "Early Career",
   bio: "Computer Science student focused on software engineering. I build secure web platforms, offline-first apps, and applied AI systems, from the first idea to a working product.",
   aboutHeading: "Secure, Intelligent Products",
-  aboutSummary: "Studying Computer Science at Thapar. Building across web, Android, AI, and IoT, with security and data integrity at the center of every project.",
+  aboutSummary: "I’m Keshav, a Computer Science student at Thapar. I turn ideas into web, Android, and AI products, with security and reliability built in.",
   registrationCharge: "₹699/-",
   projectPricing: {
     starter: {
-      price: "₹10K–₹20K+",
-      description: "Focused websites, portfolios, and lean MVPs",
+      price: "₹10K-₹20K+",
+      description: "For a focused website, portfolio, or first version of your idea.",
     },
     growth: {
-      price: "₹50K–₹80K+",
-      description: "Feature-rich apps and custom business workflows",
+      price: "₹50K-₹80K+",
+      description: "For apps with more features and custom business workflows.",
     },
-    note: "Every build is tailored to your goals, features, and timeline.",
+    note: "Indicative ranges. Your final quote depends on features, scope, and timeline.",
   },
   aboutDescription: "I am pursuing a B.Tech in Computer Science and Engineering at Thapar Institute of Engineering and Technology, with graduation expected in May 2027. My foundation is in data structures, algorithms, object-oriented programming, and database systems. I apply it through projects in native Android, full-stack development, multimodal search, computer vision, and cloud-connected IoT. I enjoy understanding a problem, choosing an architecture, implementing it, and testing how it behaves when things go wrong.",
 };
