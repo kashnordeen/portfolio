@@ -14,6 +14,9 @@
 - The worker is blocked by platform-owned extension permissions; the restrictive attempts rolled back
   and automatic security review rejected broader scheduling permissions. No worker/extension/job was
   installed, and no worker secret was generated. See `docs/payment-worker.md` for the required design decision.
+- An isolated Node alternative is prepared locally with disabled gates, fixed-endpoint requests, durable
+  failure pausing and an exclusive instance lock; see `docs/isolated-payment-worker.md`. It is not deployed
+  or activated. It requires an approved host, private credential matching and real operational/UAT checks.
 - Still required: approved supported worker hosting/permissions, deployment approval, private credential
   matching, database-driver/TLS verification, webhook delivery tests, and provider-approved UAT/go-live.
   Community checkout additionally requires defined benefits, delivery and refund terms.
@@ -154,7 +157,7 @@ storing them in Vercel alone does not register a webhook or deploy an endpoint.
 
 Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
 The online npm audit on 2026-10-15 reports zero known vulnerabilities across production and development
-dependencies after targeted brace-expansion and source-map-js patches. All 63 tests, lint, type checks and
+dependencies after targeted brace-expansion and source-map-js patches. All 76 tests, lint, type checks and
 the local production build pass. This does not validate live credentials, TLS, webhook delivery or UAT.
 
 ## Before backend integration

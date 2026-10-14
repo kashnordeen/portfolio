@@ -8,6 +8,8 @@ status checks, amount/reference verification, leases and atomic order updates.
 
 ## Current blocker — supersedes the historical installation checklist below
 
+- A local isolated Node candidate is now prepared in `workers/`; see `docs/isolated-payment-worker.md`.
+  It avoids shared database scheduling/queue permissions but has not been hosted or activated.
 - The owner approved the supported Vault server-administrator trust model, but that guard change
   has not been implemented. It would not resolve the separate shared transport/scheduler grants.
 - Supabase documents that project-specific pg_net grant changes are unsupported and database login

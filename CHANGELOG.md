@@ -4,6 +4,7 @@
 
 ### Added
 
+- Prepared a disabled, isolated Node reconciliation worker candidate with no database/PhonePe credentials, bounded HTTP, durable pause markers and exclusive instance locking. Hosting, credentials, real transport/UAT and activation remain unapproved and untested.
 - Server-only PhonePe checkout preparation with immutable orders, session-owned status reads, authenticated webhook recording and worker-driven verification.
 - Portal API connection and honest pending/failed/review/verified states, with no automatic second payment after ambiguous errors.
 - Independent community and production release gates. Payments remain disabled; no deployment or real payment test has been made.
