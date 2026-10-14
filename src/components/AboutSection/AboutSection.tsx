@@ -43,15 +43,17 @@ export const AboutSection = () => {
                 animate={prefersReducedMotion ? undefined : { opacity: [0.25, 0.55, 0.25], scale: [1, 1.12, 1] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
               />
-              <div className="relative grid gap-4 sm:grid-cols-2">
+              <div className="relative grid gap-5 sm:grid-cols-[0.8fr_1.2fr] sm:gap-6">
                 <motion.div
+                  className="flex flex-col justify-center"
                   initial={prefersReducedMotion ? false : { opacity: 0, x: -12 }}
                   whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
                   transition={{ delay: 0.12, duration: 0.35 }}
                   viewport={{ once: true }}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Community registration</p>
-                  <p className="mt-1 text-xl font-bold text-primary">{profile.registrationCharge}</p>
+                  <p className="text-sm font-semibold text-foreground">Join the community</p>
+                  <p className="mt-2 text-3xl font-extrabold tracking-tight text-primary">{profile.registrationCharge}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">One-time registration</p>
                 </motion.div>
                 <motion.div
                   className="border-t border-border pt-4 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0"
@@ -60,12 +62,25 @@ export const AboutSection = () => {
                   transition={{ delay: 0.2, duration: 0.35 }}
                   viewport={{ once: true }}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Projects &amp; software</p>
-                  <div className="mt-2 space-y-1 text-sm text-foreground">
-                    <p><span className="font-semibold">Basic:</span> {profile.projectPricing.basic}</p>
-                    <p><span className="font-semibold">Medium:</span> {profile.projectPricing.medium}</p>
+                  <p className="text-sm font-semibold text-foreground">Custom projects &amp; software</p>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Flexible scopes for ideas at different stages.</p>
+                  <div className="mt-3 grid gap-2">
+                    <div className="rounded-xl border border-border/80 bg-background/70 px-3 py-2.5">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-xs font-semibold text-muted-foreground">Starter build</p>
+                        <p className="text-base font-extrabold tracking-tight text-foreground">{profile.projectPricing.starter.price}</p>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{profile.projectPricing.starter.description}</p>
+                    </div>
+                    <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <p className="text-xs font-semibold text-primary">Growth build</p>
+                        <p className="text-base font-extrabold tracking-tight text-foreground">{profile.projectPricing.growth.price}</p>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{profile.projectPricing.growth.description}</p>
+                    </div>
                   </div>
-                  <p className="mt-2 text-xs font-medium text-muted-foreground">{profile.projectPricing.note}</p>
+                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{profile.projectPricing.note}</p>
                 </motion.div>
               </div>
             </motion.div>

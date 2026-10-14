@@ -17,9 +17,15 @@ export const profile = {
   aboutSummary: "Studying Computer Science at Thapar. Building across web, Android, AI, and IoT, with security and data integrity at the center of every project.",
   registrationCharge: "₹699/-",
   projectPricing: {
-    basic: "₹10K–₹20K+",
-    medium: "₹50K–₹80K+",
-    note: "Software as per your needs",
+    starter: {
+      price: "₹10K–₹20K+",
+      description: "Focused websites, portfolios, and lean MVPs",
+    },
+    growth: {
+      price: "₹50K–₹80K+",
+      description: "Feature-rich apps and custom business workflows",
+    },
+    note: "Every build is tailored to your goals, features, and timeline.",
   },
   aboutDescription: "I am pursuing a B.Tech in Computer Science and Engineering at Thapar Institute of Engineering and Technology, with graduation expected in May 2027. My foundation is in data structures, algorithms, object-oriented programming, and database systems. I apply it through projects in native Android, full-stack development, multimodal search, computer vision, and cloud-connected IoT. I enjoy understanding a problem, choosing an architecture, implementing it, and testing how it behaves when things go wrong.",
 };
