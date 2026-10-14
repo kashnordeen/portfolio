@@ -11,6 +11,10 @@
 - Applied the backend database migration with a non-login, non-inheriting role and verified real PostgreSQL order-integrity checks; all synthetic records were rolled back.
 - Added a human-run private credential setup recipe; it generates no literal passwords in the saved query text and cannot be invoked through the public payment portal.
 
+### Changed
+
+- Recorded the owner-approved ₹200–₹50,000 inclusive project-payment range in the setup template, with boundary tests. Live payments remain disabled and hosting configuration is unchanged.
+
 ## [1.6.0] - 2026-10-14
 
 ### Added

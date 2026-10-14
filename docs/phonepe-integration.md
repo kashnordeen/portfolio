@@ -61,10 +61,11 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    `https://kkarn.vercel.app/api/payments/webhook`. Its username/password are independent of OAuth credentials.
    HMAC and refunds are not implemented; do not select HMAC or refund events for this listener.
 4. Provide the real merchant ID as `PHONEPE_MERCHANT_ID` and choose `PROJECT_MIN_PAISE`/`PROJECT_MAX_PAISE`.
-   The owner approved a minimum of INR 200 (`PROJECT_MIN_PAISE=20000`). Larger amounts should reflect
-   the agreed project payment. No numeric maximum has been approved yet: confirm the merchant's
-   payment limits with PhonePe and choose an explicit server cap. `PROJECT_MAX_PAISE` remains unset
-   in the local template, so project checkout stays disabled. This does not change Vercel configuration.
+   The owner approved INR 200 through INR 50,000 per project payment, inclusive
+   (`PROJECT_MIN_PAISE=20000`, `PROJECT_MAX_PAISE=5000000`). Customers enter the agreed project
+   payment within that range. Confirm the merchant's PhonePe limits during UAT before go-live.
+   These values are saved in the local template only; Vercel configuration is unchanged and all
+   payment release flags remain false.
    Marketing price tiers are not hardcoded invoice/payment limits. Invoice matching remains manual;
    paying an arbitrary reference does not settle a full invoice.
 5. Provision a durable worker outside the browser that calls `/api/payments/reconcile` with

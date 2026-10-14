@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import { authenticateWebhook, boundedJson, parsePaise, readSession, sessionHash, sha256, validateCustomer } from '../server/payments/security.ts';
 import { loadConfig } from '../server/payments/config.ts';
 import { createPhonePe, normalizeStatus, safeCheckoutUrl } from '../server/payments/phonepe.ts';
@@ -28,16 +29,37 @@ test('live credentials and checkout cannot accidentally run in preview', () => {
   assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true' }).communityEnabled, false);
   assert.throws(() => loadConfig({ ...env, PAYMENT_SITE_ORIGIN: 'http://example.test' }));
 });
-test('approved INR 200 minimum rejects amounts below it and requires an explicit maximum', () => {
+test('approved INR 200 to 50000 project range is inclusive and rejects amounts outside it', () => {
   const input = { purpose: 'project', name: 'Test', email: 'test@example.test', reference: 'INV', amount: '200' };
-  const min = 20000, testMax = 100000; // Test fixture only, not an approved business maximum.
-  assert.equal(validateCustomer(input, min, testMax).amount, 20000);
-  assert.throws(() => validateCustomer({ ...input, amount: '199.99' }, min, testMax));
+  const min = 20000, max = 5000000;
+  for (const [amount, paise] of [['200', 20000], ['200.01', 20001], ['49999.99', 4999999], ['50000', 5000000]]) {
+    assert.equal(validateCustomer({ ...input, amount }, min, max).amount, paise);
+  }
+  for (const amount of ['199.99', '50000.01']) {
+    assert.throws(() => validateCustomer({ ...input, amount }, min, max));
+  }
+  assert.equal(validateCustomer({ ...input, purpose: 'community', amount: '50000' }, min, max).amount, 69900);
   const gatedEnv = { ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: String(min) };
   assert.equal(loadConfig(gatedEnv).projectEnabled, false);
+  assert.equal(loadConfig({ ...gatedEnv, PROJECT_MAX_PAISE: String(max) }).projectEnabled, true);
   for (const maximum of ['', '0', 'unlimited', 'Infinity', '19999']) {
     assert.equal(loadConfig({ ...gatedEnv, PROJECT_MAX_PAISE: maximum }).projectEnabled, false);
   }
+});
+test('setup template records the approved range without enabling any checkout release gates', () => {
+  const template = readFileSync(new URL('../.env.example', import.meta.url), 'utf8');
+  const settings = Object.fromEntries(template.split(/\r?\n/).filter(line => /^[A-Z_]+=/.test(line)).map(line => {
+    const separator = line.indexOf('=');
+    return [line.slice(0, separator), line.slice(separator + 1)];
+  }));
+  assert.equal(settings.PROJECT_MIN_PAISE, '20000');
+  assert.equal(settings.PROJECT_MAX_PAISE, '5000000');
+  for (const flag of ['PAYMENTS_ENABLED', 'PAYMENT_RELEASE_APPROVED', 'COMMUNITY_PAYMENTS_ENABLED']) {
+    assert.equal(settings[flag], 'false');
+  }
+  const config = loadConfig({ ...env, ...Object.fromEntries(Object.entries(settings).filter(([, value]) => value !== '')) });
+  assert.equal(config.projectEnabled, false);
+  assert.equal(config.communityEnabled, false);
 });
 test('hosted checkout URLs require the exact approved HTTPS host', () => {
   assert.equal(safeCheckoutUrl('https://mercury-uat.phonepe.com/transact?token=test', 'mercury-uat.phonepe.com'), 'https://mercury-uat.phonepe.com/transact?token=test');
