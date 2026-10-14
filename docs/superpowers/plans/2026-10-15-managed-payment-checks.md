@@ -2,6 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+Execution result: all five tasks locally committed; independent whole-branch review and one verified
+Important recovery fix completed. Final 123/123 tests, lint, types and build passed. The original steps below
+remain the approved plan; durable decisions/evidence are in `docs/managed-payment-execution-notes.md`.
+No merge, push, deployment, external migration or activation occurred.
+
 **Goal:** Replace the need for a standalone reconciliation process with durable signed QStash jobs, without enabling payments or deploying anything.
 
 **Architecture:** Vercel handles checkout, webhook recording and provider verification; Supabase owns immutable orders, job generations and leases. QStash transports only opaque job IDs and a signed recovery heartbeat. Durable database intents survive the non-atomic database/queue boundary.

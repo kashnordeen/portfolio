@@ -1,4 +1,4 @@
-import postgres from 'postgres';
+import postgres, { type Sql } from 'postgres';
 import { randomUUID } from 'node:crypto';
 import type { PaymentConfig } from './config.ts';
 import { PaymentError, equalSecret, sha256 } from './security.ts';
@@ -50,6 +50,11 @@ export function createStore(config: PaymentConfig) {
   const sql = postgres(url.href, { ssl: { rejectUnauthorized: true, ...(config.databaseCa ? { ca: config.databaseCa } : {}) },
     max: 2, prepare: false, idle_timeout: 20, connect_timeout: 5,
     connection: { statement_timeout: 3000, application_name: 'portfolio-payments' } });
+  return createPaymentStore(sql, config);
+}
+
+// Internal query seam for disposable database tests; production always uses the restricted TLS pool above.
+export function createPaymentStore(sql: Sql, config: PaymentConfig) {
   const jobs = createJobStore(sql, config);
   const finishManaged = async (order: Order, status: ProviderStatus | null) => {
     if (!order.reconcile_lease_id) return;
@@ -75,12 +80,20 @@ export function createStore(config: PaymentConfig) {
           ON CONFLICT (idempotency_key) DO NOTHING RETURNING *`;
         const [order] = inserted.length ? inserted : await tx<Order[]>`SELECT * FROM private_payments.orders WHERE idempotency_key = ${idempotency} FOR UPDATE`;
         if (!order || !sameTerms(order, input, session, config.environment)) throw new PaymentError(409, 'This request is already bound to another payment.');
-        // A durable claim prevents simultaneous submissions and ambiguous provider failures being retried.
+        // Retry the same immutable intent only when /pay is definitively unattempted.
+        // The later locked checkout claim still authorizes at most one provider initiation.
         if (config.jobsEnabled) {
-          if (inserted.length) await tx`SELECT private_payments.new_payment_job(${id},now()+interval '25 seconds')`;
-          const [job] = await tx<JobRow[]>`SELECT * FROM private_payments.reconciliation_jobs
-            WHERE order_id=${order.id} AND state='PENDING' ORDER BY generation DESC LIMIT 1`;
-          return { order, initiate: Boolean(inserted.length), job: job ? paymentJob(job) : null };
+          const initiate = order.state === 'CREATED' && order.checkout_attempted_at === null &&
+            order.phonepe_order_id === null && order.checkout_url === null;
+          let [job] = await tx<JobRow[]>`SELECT * FROM private_payments.reconciliation_jobs
+            WHERE order_id=${order.id} AND state='PENDING' AND generation=
+              (SELECT job_generation FROM private_payments.orders WHERE id=${order.id}) LIMIT 1`;
+          if (initiate && !job) {
+            await tx`SELECT private_payments.new_payment_job(${order.id},now()+interval '25 seconds')`;
+            [job] = await tx<JobRow[]>`SELECT * FROM private_payments.reconciliation_jobs
+              WHERE order_id=${order.id} AND state='PENDING' ORDER BY generation DESC LIMIT 1`;
+          }
+          return { order, initiate, job: job ? paymentJob(job) : null };
         }
         if (!inserted.length) return { order, initiate: false, job: null };
         const [claimed] = await tx<Order[]>`UPDATE private_payments.orders SET checkout_attempted_at = now() WHERE id = ${id} RETURNING *`;

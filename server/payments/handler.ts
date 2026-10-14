@@ -57,7 +57,15 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
       if (!config.jobConfig.ready || !job) throw new PaymentError(503,'Payment scheduler is not ready.');
       await publishPending(store,queue,order.id,1);
       const claimed = await store.claimCheckout(order.id,job.id);
-      if (!claimed) return reply({ orderId: order.id, state: order.state, message: 'This payment request is already being checked.' },409);
+      if (!claimed) {
+        const current = await store.owned(order.id,session);
+        // A job may retire before the claim. Do not trap a never-initiated checkout in verification.
+        if (current.state === 'CREATED' && current.checkout_attempted_at === null &&
+          current.phonepe_order_id === null && current.checkout_url === null) {
+          throw new PaymentError(503,'Checkout has not started. Keep your details unchanged and retry this same request shortly.');
+        }
+        return reply({ orderId: current.id, state: current.state, message: 'This payment request is already being checked.' },409);
+      }
       try {
         const checkout = await provider.pay(claimed);
         await store.checkout(order.id, checkout);

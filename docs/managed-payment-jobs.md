@@ -24,6 +24,8 @@ checks remain mandatory. Jobs never call /pay or grant community access automati
   access. State transitions are SECURITY INVOKER with PUBLIC execution revoked, not privileged RPCs.
 - Reservation and initial intent are atomic; scheduler acceptance precedes the one checkout claim.
   Uncertain /pay is never automatically repeated. Queue failures do not masquerade as bank failures.
+  A customer can manually retry the same immutable request when checkout definitively never started;
+  retired unattempted jobs require a fresh accepted generation and cannot authorize a charge themselves.
 - Current generations and 90-second leases reject stale/overlapping results. A null/expired lease cannot
   complete an order. Status changes and successor intents commit together, and unpublished backoff work
   cannot be falsely acknowledged. A superseded callback flushes successors without another charge.
@@ -83,9 +85,12 @@ deadline compliance. SDK/function/DB/network latency, cold starts, limits and lo
 
 ## Verification and incident handling
 
-Pre-review local checkpoint: 118/118 tests pass; lint, TypeScript and the production frontend build pass;
+Final local checkpoint: 123/123 tests pass; lint, TypeScript and the production frontend build pass;
 online npm audit reports zero known vulnerabilities. No server-secret variable names appear in the built
-frontend. Independent whole-branch review is still pending at this checkpoint; do not infer launch readiness.
+frontend. Independent whole-branch review found one Important pre-charge recovery defect, fixed in one
+RED→GREEN pass with integrated client/handler/restricted-role SQL coverage; no Critical findings or deferred
+minors. No re-review of that fix was dispatched. See managed-payment-execution-notes.md for all decisions.
+Do not infer launch readiness.
 Runtime registry-signature audit also returned no invalid or missing signatures.
 
 Use Node 24: `node --test tests/*.test.mjs`, ESLint, `tsc -b`, Vite build and online npm audit.
@@ -93,8 +98,13 @@ Local tests use synthetic keys and real SDK validation; database scenarios execu
 in disposable PGlite with rollback. No live services are touched. Real transport, target-version behavior,
 multi-session concurrency and signed provider delivery are still untested.
 
-On queue/provider trouble, stop new checkout as appropriate but keep previously initiated orders
-reconciling where safe. Inspect only counts/oldest due ages and generic error categories, never secret
+Before activation, assign an operator/alert recipient and rehearse checkout pausing. Pause new checkout
+on destination-delivery failure: enqueue receipts alone are not delivery-health evidence. This candidate
+does not pause automatically. With separately authorized production configuration/deployment changes,
+set PAYMENTS_ENABLED=false or PAYMENT_RELEASE_APPROVED=false while preserving PAYMENT_JOBS_ENABLED
+for previously initiated orders where safe. Test that new checkout is off and existing verification still
+runs, and require verified recovery before reopening. On provider trouble use the same incident review.
+Inspect only counts/oldest due ages and generic error categories, never secret
 headers or raw queued/customer data. Do not delete intent rows, force /pay retries, mark pending paid,
 disable TLS/signature checks or widen database permissions to make a test pass. Review and preserve
 unresolved orders for manual investigation; verify any rollback will not abandon in-flight payments.

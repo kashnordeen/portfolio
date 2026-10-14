@@ -20,6 +20,7 @@ function fixture() {
   const store = { rate:async()=>{},reserve:async()=>{calls.push('reserve');return{order,job,initiate:true};},
     pendingJobs:async()=>pending,hasUnpublished:async()=>pending.length>0,published:async()=>{calls.push('accepted');pending=[];},publicationFailed:async()=>{},
     claimCheckout:async()=>{calls.push('claim');return order;},checkout:async()=>calls.push('checkout'),
+    owned:async()=>({...order,checkout_attempted_at:new Date()}),
     recordEvent:async()=>{calls.push('event');return order.id;} };
   const queue = { publish:async()=>{calls.push('publish');return{messageId:'fixture-receipt'};} };
   const provider = { pay:async()=>{calls.push('pay');return{url:'https://mercury.phonepe.com/transact?fixture',orderId:'OMO_FIXTURE',expires:new Date(Date.now()+1200000)};} };
@@ -39,12 +40,12 @@ test('reservation, accepted publication and atomic initiation claim precede pay'
   const f=fixture(); const response=await f.run('orders',request()); assert.equal(response.status,201);
   for(const [a,b] of [['reserve','publish'],['publish','accepted'],['accepted','claim'],['claim','pay']]) assert.ok(f.calls.indexOf(a)<f.calls.indexOf(b));
 });
-test('queue refusal never reaches pay and lost acknowledgement preserves the existing request',async()=>{
+test('queue refusal never reaches pay and the same unattempted reservation can be retried',async()=>{
   const f=fixture(); f.queue.publish=async()=>{throw new Error('PRIVATE_QUEUE_ERROR');};
   const response=await f.run('orders',request()); assert.equal(response.status,503); assert.ok(!f.calls.includes('pay'));
   assert.ok(!JSON.stringify(await response.json()).includes('PRIVATE_QUEUE_ERROR'));
-  f.store.reserve=async()=>({order,job,initiate:false});
-  assert.equal((await f.run('orders',request())).status,409); assert.ok(!f.calls.includes('pay'));
+  f.queue.publish=async()=>({messageId:'fixture-receipt'});
+  assert.equal((await f.run('orders',request())).status,201); assert.equal(f.calls.filter(x=>x==='pay').length,1);
 });
 test('losing atomic claim and provider timeout cannot cause automatic reinitiation',async()=>{
   const f=fixture(); f.store.claimCheckout=async()=>null;
