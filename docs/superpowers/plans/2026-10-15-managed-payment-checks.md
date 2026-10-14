@@ -130,5 +130,5 @@ type JobResult = { state: 'ACK' | 'RETRY'; published: number };
 - [x] Task interfaces and owning files are explicit; no second database pool or public credential endpoint.
 - [x] Review Focus failures have named assertions in their owning task.
 - [x] Local and real-platform verification are distinguished; no approval inferred for external writes.
-- [ ] Human plan review and execution-method selection. Recommended: Native execution, because the store/handler/queue interfaces are tightly coupled and it avoids repeated context handoffs; one independent final review before external setup.
-- [ ] Execute only after the above review, using the chosen required execution skill. No implementation was performed while writing this plan.
+- [x] Human plan review and execution-method selection: owner approved Native execution and an isolated worktree on 2026-10-15. Independent final review is required before external setup.
+- [x] Execution began after the above review using executing-plans; no implementation was performed while writing this plan. Progress and review rulings are recorded in the plan-scoped execution ledger.

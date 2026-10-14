@@ -2,6 +2,13 @@
 
 ## Current status
 
+### Managed checks implementation — isolated local branch
+
+The managed QStash candidate is now implemented in `feat/managed-payment-checks`, with disabled templates
+and no external setup/deployment. See `docs/managed-payment-jobs.md` for the exact private handoff and
+release gates. It replaces the need for the standalone Node/SQL worker; do not run the Vault worker-secret
+recipe. Production is unchanged. Older preparation records below are historical where they conflict.
+
 ### Completion checkpoint — 2026-10-15
 
 - The owner explicitly declined deployment. No payment integration push, deployment, checkout activation

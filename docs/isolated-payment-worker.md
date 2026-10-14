@@ -1,5 +1,8 @@
 # Isolated reconciliation worker — local candidate, not deployed
 
+Prior candidate, now superseded by the local managed-queue implementation in `docs/managed-payment-jobs.md`.
+Do not run this Node process alongside managed jobs; no separate server or worker-secret handoff is needed.
+
 Owner scope: prepare an alternative without deployment, push, paid resources or activation.
 This candidate makes **no Supabase permission changes** and does not use the rejected scheduler
 installation through another route. Hosting selection, provisioning and activation need separate approval.

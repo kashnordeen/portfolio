@@ -1,5 +1,8 @@
 # Background payment verification — local preparation
 
+Superseded local candidate: use `docs/managed-payment-jobs.md` for the implemented managed-queue path.
+This SQL dispatcher remains blocked and must not be installed or activated. No Vault worker secret needed.
+
 Status (2026-10-15): **blocked; not installed or activated in Supabase**. PGlite 0.5.10 executes
 the worker functions in disposable PostgreSQL 18.6 with fake Cron, HTTP and Vault interfaces.
 No real extension was enabled, HTTP request made, Vault secret generated or payment-integration deployment performed.
