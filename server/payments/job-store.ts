@@ -13,6 +13,12 @@ export const paymentJob = (row: JobRow): PaymentJob => ({ id: row.id, orderId: r
 
 export function createJobStore(sql: Sql, config: PaymentConfig) {
   return {
+    async hasUnpublished(orderId: string | null): Promise<boolean> {
+      const [row] = await sql`SELECT EXISTS(SELECT 1 FROM private_payments.reconciliation_jobs j JOIN private_payments.orders o ON o.id=j.order_id
+        WHERE j.environment=${config.environment} AND j.generation=o.job_generation AND j.state='PENDING' AND j.published_at IS NULL
+          AND o.state NOT IN ('COMPLETED','REVIEW') AND (${orderId}::uuid IS NULL OR j.order_id=${orderId}::uuid)) AS pending`;
+      return row.pending;
+    },
     async pendingJobs(orderId: string | null, limit = 3): Promise<PaymentJob[]> {
       const size = Math.max(0, Math.min(Number.isSafeInteger(limit) ? limit : 0, 3));
       if (!size) return [];

@@ -71,3 +71,26 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
     },
   };
 }
+
+type PublicationStore = {
+  hasUnpublished(orderId: string | null): Promise<boolean>;
+  pendingJobs(orderId: string | null, limit: number): Promise<PaymentJob[]>;
+  published(jobId: string, messageId: string): Promise<void>;
+  publicationFailed(jobId: string): Promise<void>;
+};
+export async function publishPending(store: PublicationStore, queue: Pick<ReturnType<typeof createJobQueue>, 'publish'>,
+  orderId: string | null, limit = 3): Promise<number> {
+  let published = 0;
+  for (const job of await store.pendingJobs(orderId,Math.max(0,Math.min(limit,3)))) {
+    try {
+      const receipt = await queue.publish(job);
+      await store.published(job.id,receipt.messageId);
+      published++;
+    } catch {
+      await store.publicationFailed(job.id);
+      throw new PaymentError(503,'Payment scheduler is temporarily unavailable.');
+    }
+  }
+  if (await store.hasUnpublished(orderId)) throw new PaymentError(503,'Verification publication is pending.');
+  return published;
+}

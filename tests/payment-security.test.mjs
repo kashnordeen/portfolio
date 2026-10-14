@@ -8,6 +8,8 @@ import { createPhonePe, normalizeStatus, safeCheckoutUrl } from '../server/payme
 const env = { PHONEPE_ENV: 'sandbox', PAYMENT_SITE_ORIGIN: 'https://example.test', DATABASE_URL: 'postgres://test',
   PHONEPE_CLIENT_ID: 'test', PHONEPE_CLIENT_SECRET: 'test', PHONEPE_CLIENT_VERSION: '1', PHONEPE_MERCHANT_ID: 'test',
   PHONEPE_WEBHOOK_USERNAME: 'test', PHONEPE_WEBHOOK_PASSWORD: 'test', PAYMENT_SESSION_SECRET: 's'.repeat(32), PAYMENT_RECONCILIATION_SECRET: 'r'.repeat(32) };
+const queueEnv = { PHONEPE_ENV:'production',VERCEL_ENV:'production',PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app',
+  PAYMENT_JOBS_ENABLED:'true',QSTASH_TOKEN:'fixture',QSTASH_CURRENT_SIGNING_KEY:'fixture-current',QSTASH_NEXT_SIGNING_KEY:'fixture-next' };
 
 test('exact decimal paise conversion rejects negative, exponent, excess decimals and overflow', () => {
   assert.equal(parsePaise('12500.50'), 1250050);
@@ -25,7 +27,8 @@ test('live credentials and checkout cannot accidentally run in preview', () => {
   assert.throws(() => loadConfig({ ...env, PHONEPE_ENV: 'production', VERCEL_ENV: 'preview' }));
   assert.equal(loadConfig(env).projectEnabled, false);
   assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true' }).projectEnabled, false);
-  assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: '100', PROJECT_MAX_PAISE: '10000' }).projectEnabled, true);
+  assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: '100', PROJECT_MAX_PAISE: '10000' }).projectEnabled, false);
+  assert.equal(loadConfig({ ...env, ...queueEnv, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: '100', PROJECT_MAX_PAISE: '10000' }).projectEnabled, true);
   assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true' }).communityEnabled, false);
   assert.throws(() => loadConfig({ ...env, PAYMENT_SITE_ORIGIN: 'http://example.test' }));
 });
@@ -39,7 +42,7 @@ test('approved INR 200 to 50000 project range is inclusive and rejects amounts o
     assert.throws(() => validateCustomer({ ...input, amount }, min, max));
   }
   assert.equal(validateCustomer({ ...input, purpose: 'community', amount: '50000' }, min, max).amount, 69900);
-  const gatedEnv = { ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: String(min) };
+  const gatedEnv = { ...env, ...queueEnv, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: String(min) };
   assert.equal(loadConfig(gatedEnv).projectEnabled, false);
   assert.equal(loadConfig({ ...gatedEnv, PROJECT_MAX_PAISE: String(max) }).projectEnabled, true);
   for (const maximum of ['', '0', 'unlimited', 'Infinity', '19999']) {

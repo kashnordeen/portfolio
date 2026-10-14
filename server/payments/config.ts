@@ -1,4 +1,5 @@
 import { PaymentError } from './security.ts';
+import { loadJobConfig } from './job-config.ts';
 
 export type PaymentConfig = ReturnType<typeof loadConfig>;
 export function loadConfig(env: Record<string, string | undefined>) {
@@ -20,10 +21,11 @@ export function loadConfig(env: Record<string, string | undefined>) {
   const min = Number(env.PROJECT_MIN_PAISE), max = Number(env.PROJECT_MAX_PAISE);
   const amountRangeReady = Number.isSafeInteger(min) && Number.isSafeInteger(max) && min >= 100 && max >= min && max <= 2_147_483_647;
   // Release approval is a separate gate: the five initial variables cannot turn payments on.
-  const enabled = env.PAYMENTS_ENABLED === 'true' && env.PAYMENT_RELEASE_APPROVED === 'true';
+  const jobConfig = loadJobConfig(env);
+  const enabled = env.PAYMENTS_ENABLED === 'true' && env.PAYMENT_RELEASE_APPROVED === 'true' && jobConfig.ready;
   return {
     environment, origin: origin.origin, sessionSecret, workerSecret,
-    jobsEnabled: env.PAYMENT_JOBS_ENABLED === 'true',
+    jobsEnabled: jobConfig.enabled, jobConfig,
     databaseUrl: required('DATABASE_URL'), databaseCa: env.DATABASE_CA_CERT,
     clientId: required('PHONEPE_CLIENT_ID'), clientSecret: required('PHONEPE_CLIENT_SECRET'),
     clientVersion: required('PHONEPE_CLIENT_VERSION'), merchantId: required('PHONEPE_MERCHANT_ID'),

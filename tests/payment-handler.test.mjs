@@ -6,27 +6,30 @@ import { createStore, reconciliationDelay, sameTerms, verifiedState } from '../s
 import { loadConfig } from '../server/payments/config.ts';
 import { PaymentError, sessionHash, sha256 } from '../server/payments/security.ts';
 
-const config = loadConfig({ PHONEPE_ENV: 'sandbox', PAYMENT_SITE_ORIGIN: 'https://example.test', DATABASE_URL: 'postgres://portfolio_payments_api:test@localhost/test',
+const config = loadConfig({ PHONEPE_ENV: 'production', VERCEL_ENV:'production', PAYMENT_SITE_ORIGIN: 'https://kkarn.vercel.app', DATABASE_URL: 'postgres://portfolio_payments_api:test@localhost/test',
   PHONEPE_CLIENT_ID: 'test', PHONEPE_CLIENT_SECRET: 'test', PHONEPE_CLIENT_VERSION: '1', PHONEPE_MERCHANT_ID: 'MID_TEST',
   PHONEPE_WEBHOOK_USERNAME: 'test-user', PHONEPE_WEBHOOK_PASSWORD: 'test-password', PAYMENT_SESSION_SECRET: 's'.repeat(32), PAYMENT_RECONCILIATION_SECRET: 'r'.repeat(32),
-  PROJECT_MIN_PAISE: '100', PROJECT_MAX_PAISE: '10000000', PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true' });
+  PROJECT_MIN_PAISE: '100', PROJECT_MAX_PAISE: '10000000', PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true',
+  PAYMENT_JOBS_ENABLED:'true',QSTASH_TOKEN:'fixture',QSTASH_CURRENT_SIGNING_KEY:'fixture-current',QSTASH_NEXT_SIGNING_KEY:'fixture-next' });
 const token = 'a'.repeat(64), orderId = randomUUID(), key = randomUUID();
 const baseOrder = { id: orderId, idempotency_key: key, merchant_order_id: `KK_${orderId}`, purpose: 'project',
   customer_name: 'Test', customer_email: 'test@example.test', project_reference: 'INV_TEST', amount_paise: 1250050,
-  state: 'PENDING', environment: 'sandbox', session_token_hash: sessionHash(token, config.sessionSecret),
-  phonepe_order_id: 'OMO_TEST', checkout_url: 'https://mercury-uat.phonepe.com/transact?token=test',
+  state: 'PENDING', environment: 'production', session_token_hash: sessionHash(token, config.sessionSecret),
+  phonepe_order_id: 'OMO_TEST', checkout_url: 'https://mercury.phonepe.com/transact?token=test',
   expires_at: new Date(Date.now() + 1200000), paid_at: null, created_at: new Date(), reconcile_lease_id: randomUUID() };
 function fixture() {
   const calls = [];
+  const job={id:randomUUID(),orderId,generation:1,dueAt:new Date(),environment:'production'};
   const store = {
     rate: async (...args) => calls.push(['rate', ...args]),
-    reserve: async (...args) => { calls.push(['reserve', ...args]); return { order: baseOrder, initiate: true }; },
+    reserve: async (...args) => { calls.push(['reserve', ...args]); return { order: baseOrder, initiate: true, job }; },
+    pendingJobs:async()=>[job],hasUnpublished:async()=>false,published:async()=>{},publicationFailed:async()=>{},claimCheckout:async()=>baseOrder,
     checkout: async (...args) => calls.push(['checkout', ...args]),
     owned: async (id, session) => {
       if (id !== orderId || session !== baseOrder.session_token_hash) throw new PaymentError(404, 'Payment was not found in this browser session.');
       return baseOrder;
     },
-    recordEvent: async (...args) => calls.push(['event', ...args]),
+    recordEvent: async (...args) => { calls.push(['event', ...args]); return orderId; },
     claimDue: async () => [baseOrder],
     applyStatus: async (...args) => calls.push(['apply', ...args]),
     retryLater: async (...args) => calls.push(['retry', ...args]),
@@ -34,7 +37,7 @@ function fixture() {
   };
   const provider = { pay: async () => { calls.push(['pay']); return { orderId: 'OMO_TEST', expires: baseOrder.expires_at, url: baseOrder.checkout_url }; },
     status: async () => ({ orderId: 'OMO_TEST', amount: 1250050, state: 'COMPLETED' }) };
-  const runtime = { config: { ...config }, store, provider };
+  const runtime = { config: { ...config }, store, provider, queue:{publish:async()=>({messageId:'fixture-receipt'})} };
   return { calls, store, provider, runtime, run: (route, request) => handlePayment(route, request, () => runtime) };
 }
 function request(body = {}, headers = {}) {
@@ -113,9 +116,10 @@ test('amount and provider-order mismatch require review; immutable terms include
   assert.equal(verifiedState(baseOrder, { orderId: 'OMO_TEST', amount: 1, state: 'COMPLETED' }), 'REVIEW');
   assert.equal(verifiedState(baseOrder, { orderId: 'OTHER', amount: 1250050, state: 'COMPLETED' }), 'REVIEW');
   const normalized = { purpose: 'project', name: 'Test', email: 'test@example.test', reference: 'INV_TEST', amount: 1250050 };
-  assert.equal(sameTerms(baseOrder, normalized, baseOrder.session_token_hash, 'sandbox'), true);
-  assert.equal(sameTerms(baseOrder, { ...normalized, amount: 100 }, baseOrder.session_token_hash, 'sandbox'), false);
-  assert.equal(sameTerms(baseOrder, normalized, 'b'.repeat(64), 'sandbox'), false);
+  assert.equal(sameTerms(baseOrder, normalized, baseOrder.session_token_hash, config.environment), true);
+  assert.equal(sameTerms(baseOrder, { ...normalized, amount: 100 }, baseOrder.session_token_hash, config.environment), false);
+  assert.equal(sameTerms(baseOrder, normalized, 'b'.repeat(64), config.environment), false);
+  assert.equal(sameTerms(baseOrder, normalized, baseOrder.session_token_hash, 'sandbox'), false);
 });
 test('database refuses administrative accounts and weak TLS URL overrides before connecting', () => {
   assert.throws(() => createStore({ ...config, databaseUrl: 'postgres://postgres:fake@localhost/db' }));

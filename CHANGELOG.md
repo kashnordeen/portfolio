@@ -6,6 +6,7 @@
 
 - Added disabled managed-job transport with official QStash signature verification, opaque payloads, fixed targets and bounded publishing; not deployed or configured with real keys.
 - Prepared backend-only durable job generations, checkout acceptance claims, verification leases and transactional successor intents, with local PostgreSQL rollback and permission tests; migration not applied externally.
+- Connected checkout to scheduler acceptance before its single provider initiation, and webhook recording to durable immediate-verification intents; live release flags remain off.
 - Prepared a disabled, isolated Node reconciliation worker candidate with no database/PhonePe credentials, bounded HTTP, durable pause markers and exclusive instance locking. Hosting, credentials, real transport/UAT and activation remain unapproved and untested.
 - Server-only PhonePe checkout preparation with immutable orders, session-owned status reads, authenticated webhook recording and worker-driven verification.
 - Portal API connection and honest pending/failed/review/verified states, with no automatic second payment after ambiguous errors.
