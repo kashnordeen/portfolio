@@ -1,0 +1,49 @@
+export type PaymentAvailability = { projectEnabled: boolean; communityEnabled: boolean };
+export type PaymentStatus = { orderId: string; purpose: 'community' | 'project'; state: 'CREATED' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'REVIEW'; amountPaise: number; currency: 'INR'; paidAt: string | null };
+export type CheckoutResult = { orderId: string; checkoutUrl?: string; state?: string; message?: string };
+
+export class CheckoutError extends Error {
+  editable: boolean;
+  constructor(message: string, editable = false) { super(message); this.editable = editable; }
+}
+
+export async function getPaymentAvailability(signal: AbortSignal): Promise<PaymentAvailability> {
+  try {
+    const response = await fetch('/api/payments/config', { signal, credentials: 'same-origin', cache: 'no-store' });
+    if (!response.ok) throw new Error('unavailable');
+    const data = await response.json();
+    return { projectEnabled: data.projectEnabled === true, communityEnabled: data.communityEnabled === true };
+  } catch { return { projectEnabled: false, communityEnabled: false }; }
+}
+
+export async function startCheckout(input: { purpose: string; name: string; email: string; amount: string; reference: string }, key: string): Promise<CheckoutResult> {
+  let response: Response;
+  try {
+    response = await fetch('/api/payments/orders', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000),
+      headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify(input) });
+  } catch { throw new Error('Connection interrupted. Keep these details unchanged and retry this same request; do not start another payment.'); }
+  const data = await response.json();
+  if (!response.ok && ![202, 409].includes(response.status)) {
+    throw new CheckoutError(typeof data.error === 'string' ? data.error : 'Unable to open checkout.', [400, 403, 415, 429].includes(response.status));
+  }
+  if (typeof data.orderId !== 'string' || !/^[0-9a-f-]{36}$/i.test(data.orderId)) throw new Error('Unable to confirm the order. Please contact support before retrying.');
+  if (data.checkoutUrl) {
+    const url = new URL(data.checkoutUrl);
+    if (url.protocol !== 'https:' || !['mercury.phonepe.com', 'mercury-uat.phonepe.com'].includes(url.hostname) || url.username || url.password || url.port) {
+      throw new Error('Unable to verify the checkout destination. Please contact support.');
+    }
+  }
+  return data;
+}
+
+export async function getPaymentStatus(order: string, signal: AbortSignal): Promise<PaymentStatus> {
+  const response = await fetch(`/api/payments/status?order=${encodeURIComponent(order)}`, { signal, credentials: 'same-origin', cache: 'no-store' });
+  if (!response.ok) throw new Error('Payment status is unavailable in this browser session. Contact support before making another payment.');
+  const data = await response.json();
+  if (data.orderId !== order || !['community', 'project'].includes(data.purpose) || !['CREATED', 'PENDING', 'COMPLETED', 'FAILED', 'REVIEW'].includes(data.state) ||
+    !Number.isSafeInteger(data.amountPaise) || data.amountPaise < 100 || data.currency !== 'INR' ||
+    (data.state === 'COMPLETED' && (typeof data.paidAt !== 'string' || !Number.isFinite(Date.parse(data.paidAt))))) {
+    throw new Error('Payment status could not be verified. Please contact support.');
+  }
+  return data;
+}

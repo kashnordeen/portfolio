@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — payment integration (disabled)
+
+### Added
+
+- Server-only PhonePe checkout preparation with immutable orders, session-owned status reads, authenticated webhook recording and worker-driven verification.
+- Portal API connection and honest pending/failed/review/verified states, with no automatic second payment after ambiguous errors.
+- Independent community and production release gates. Payments remain disabled; no deployment or real payment test has been made.
+- A server environment template, restricted database-role migration and automated security/contract checks.
+
 ## [1.6.0] - 2026-10-14
 
 ### Added

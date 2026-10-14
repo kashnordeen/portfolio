@@ -16,8 +16,60 @@ The Supabase database was provisioned on 2026-10-14:
 - Supabase security advisors reported only the informational [RLS Enabled No Policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) notices. No browser-access policies are intentional for this backend-only store.
 
 The local checkout interface is available at `/?payment=community` and `/?payment=project`.
-It is a preview only. It does not save customer details, call PhonePe, create an order, or accept payments.
-The checkout button is deliberately disabled. The existing public portfolio actions are unchanged.
+The server implementation and portal API wiring are now prepared locally, but have NOT been deployed.
+Local Vite does not run the `/api` functions: the portal safely falls back to disabled checkout.
+Production has only the initial PhonePe credentials, `PHONEPE_ENV=production` and `PAYMENTS_ENABLED=false`.
+No real PhonePe API call or payment was made. The existing public portfolio actions are unchanged.
+
+### Locally implemented
+
+- Vercel Node functions: `GET /api/payments/config`, `POST /api/payments/orders`,
+  `GET /api/payments/status?order=<uuid>`, `POST /api/payments/webhook`, `POST /api/payments/reconcile`.
+- Server-owned community price (69900 paise), exact decimal project amount conversion, configurable integer-paise bounds.
+- Same-origin creation requests; persistent rate limits; opaque Secure/HttpOnly/SameSite=Lax session cookie; session-owned status reads.
+- Parameterized PostgreSQL queries, verified TLS, refusal to use administrative database usernames.
+- Immutable order terms and durable idempotency: only the first reservation can call `/pay`.
+  A timeout never automatically retries checkout. Uncertain orders remain pending until reconciliation/manual review.
+- PhonePe OAuth expiry caching, Standard Checkout v2, environment-specific API URLs, strict checkout-host validation.
+- SHA webhook authentication, merchant validation, semantic event deduplication, durable recording before acknowledgement.
+  Notifications schedule verification; they cannot themselves mark a payment complete.
+- Authenticated reconciliation endpoint, atomic worker claims with lease IDs, amount/provider-order crosschecks,
+  monotonic completed state, and a unique pending fulfilment record. No access or emails are delivered automatically.
+- Portal submission and return-status handling. No credentials or personal details are saved in browser storage;
+  only an opaque idempotency UUID is persisted. A failed network request does not generate another key.
+- Unit/contract tests use fake provider responses only. These do NOT replace real PostgreSQL integration tests or PhonePe UAT.
+
+### Still required before deployment/go-live
+
+1. Apply `database/payment-backend.sql` to add worker metadata/rate-limit tables and the restricted **NOLOGIN** role.
+   This migration is local only and has NOT been applied. Enable role login with a strong password privately,
+   and store its connection string in Vercel as `DATABASE_URL` (Secret), not an administrative connection string.
+2. Configure the remaining values in `.env.example` directly in Vercel. Keep production secrets out of Preview.
+   `DATABASE_URL` must have no `ssl`/`sslmode`/certificate query options; the driver enforces verified TLS.
+   Use `DATABASE_CA_CERT` if the provider requires its CA certificate; never set `rejectUnauthorized=false`.
+3. Configure a **SHA** webhook in PhonePe for `checkout.order.completed` and `checkout.order.failed` at
+   `https://kkarn.vercel.app/api/payments/webhook`. Its username/password are independent of OAuth credentials.
+   HMAC and refunds are not implemented; do not select HMAC or refund events for this listener.
+4. Provide the real merchant ID as `PHONEPE_MERCHANT_ID` and choose `PROJECT_MIN_PAISE`/`PROJECT_MAX_PAISE`.
+   Marketing price tiers are not hardcoded invoice/payment limits. Invoice matching remains manual;
+   paying an arbitrary reference does not settle a full invoice.
+5. Provision a durable external worker that calls `/api/payments/reconcile` with
+   `Authorization: Bearer <PAYMENT_RECONCILIATION_SECRET>` at the required short intervals and continues
+   when the browser closes. No scheduler is installed. A daily or once-minute Vercel cron is not sufficient
+   for the initial short-interval checks. Worker endpoint runs small batches; capacity/load testing is required.
+6. Complete database concurrency/RLS integration tests, sandbox/UAT, authenticated webhook delivery checks,
+   duplicate/out-of-order/timeout tests, and a deployment smoke test. Sandbox credentials are still missing.
+7. Define terms/privacy/refunds, manual support/review/receipt procedures, monitoring and backups.
+   Configure community benefits, fulfilment and delivery later; community checkout stays independently disabled.
+8. Only after review and explicit approval: deploy, verify readiness, then set `PAYMENT_RELEASE_APPROVED=true`
+   and `PAYMENTS_ENABLED=true`. Community additionally needs `COMMUNITY_PAYMENTS_ENABLED=true`.
+   These are release gates, not proof that the worker or business procedures are configured.
+
+No push, deployment, database-role provisioning, credential generation, worker subscription or live payment is part of this local implementation.
+
+Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
+The production dependency audit reports no vulnerabilities. The full audit currently reports two existing high-severity
+development-only dependency warnings (`brace-expansion`, `source-map-js`); review/fix them before release.
 
 ## Before backend integration
 
@@ -33,16 +85,20 @@ The merchant currently has production credentials only. Sandbox credentials must
 
 ## Proposed backend configuration
 
-These are proposed names for the backend integration; the current preview does not read them:
+These are server-only backend configuration names; see `.env.example` for the complete template:
 
 - `DATABASE_URL`: PostgreSQL connection string, with TLS enabled and certificate verification appropriate to the provider.
 - `PHONEPE_ENV`: `sandbox` during testing. Production requires an explicit go-live change.
 - `PHONEPE_CLIENT_ID`, `PHONEPE_CLIENT_SECRET`, `PHONEPE_CLIENT_VERSION`: matching credentials for the selected environment.
-- `PHONEPE_WEBHOOK_SECRET` and `PHONEPE_WEBHOOK_KEY_ID`: if using HMAC authentication.
-- `PHONEPE_WEBHOOK_USERNAME` and `PHONEPE_WEBHOOK_PASSWORD`: if using PhonePe's SHA authentication instead.
+- `PHONEPE_MERCHANT_ID`: expected merchant ID in authenticated notifications (not the OAuth client ID).
+- `PHONEPE_WEBHOOK_USERNAME` and `PHONEPE_WEBHOOK_PASSWORD`: PhonePe SHA webhook credentials. HMAC is not implemented.
 - `PAYMENT_SESSION_SECRET`: independently generated server secret for order ownership/session verification.
 - `PAYMENT_RECONCILIATION_SECRET`: independently generated credential for the background reconciliation worker.
 - `PAYMENTS_ENABLED`: false until configuration, sandbox verification, and business terms are complete.
+- `PAYMENT_RELEASE_APPROVED`: false until explicit release approval after all readiness checks.
+- `COMMUNITY_PAYMENTS_ENABLED`: false while community benefits/delivery remain undecided.
+- `PROJECT_MIN_PAISE` / `PROJECT_MAX_PAISE`: owner-approved project payment bounds as integer paise.
+- `PAYMENT_SITE_ORIGIN`: the exact HTTPS origin (`https://kkarn.vercel.app` for production).
 
 Do not use production secrets in preview deployments. Do not commit `.env` files or log credential values.
 
@@ -55,7 +111,7 @@ Do not use production secrets in preview deployments. Do not commit `.env` files
 - Authenticate order-status requests with an opaque session; knowing an order UUID alone must not expose customer information.
 - Validate allowed origins for customer mutations, enforce request size limits, and use persistent rate limiting. Origin checks alone are not authentication.
 - Use PhonePe's hosted checkout URL exactly as returned after validating it against the provider's current approved HTTPS hosts.
-- Verify webhook authentication according to the configured HMAC or SHA scheme. For HMAC, verify the original request bytes before parsing. Never use a frontend callback as payment proof.
+- Verify webhook authentication according to the configured SHA scheme. If HMAC is added later, verify the original request bytes before parsing using the provider's documented algorithm. Never use a frontend callback as payment proof.
 - Verify the merchant, order, amount and root-level payment state against PhonePe's Order Status API before fulfilment.
 - Apply payment state updates atomically and safely handle duplicate, replayed and out-of-order events. Never downgrade a confirmed paid order to pending because an earlier notification arrives late.
 - Acknowledge authenticated webhooks promptly only after durable recording. Process delivery using an outbox/worker so retries cannot grant access twice.
