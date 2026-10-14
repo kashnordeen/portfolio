@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PaymentPortal } from "./components/PaymentPortal/PaymentPortal";
 import "./App.css";
 import Header from "./components/Header/Header";
 import { HeroSection } from "./components/HeroSection/HeroSection";
@@ -56,6 +57,10 @@ function App() {
     { icon: <GraduationCap size={20} />, label: "Education", onClick: () => scrollToSection("education") },
     { icon: <Send size={20} />, label: "Contact", onClick: () => scrollToSection("contact") },
   ];
+
+  if (new URLSearchParams(window.location.search).has("payment")) {
+    return <PaymentPortal />;
+  }
 
   return (
     <MotionConfig reducedMotion="user">
