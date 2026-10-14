@@ -33,7 +33,10 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
     let response: Response;
     try { response = await send(url, { ...init, redirect: 'error', signal: AbortSignal.timeout(8000) }); }
     catch { throw new PaymentError(502, 'Payment provider is unavailable. Your order will be checked before any retry.'); }
-    if (!response.ok) throw new PaymentError(502, 'Payment provider could not complete the request.');
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) cached = undefined;
+      throw new PaymentError(502, 'Payment provider could not complete the request.');
+    }
     try { return await response.json() as Record<string, unknown>; }
     catch { throw new PaymentError(502, 'Invalid payment provider response.'); }
   };
