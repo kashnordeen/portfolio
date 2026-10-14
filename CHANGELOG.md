@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0] - 2026-10-14
+
+### Added
+
+- Community registration fee of ₹699/- and indicative Basic (₹10K-₹20K+) and Medium (₹50K-₹80K+) project pricing.
+
+### Changed
+
+- Rebuilt the About section with clearer personal copy, a dedicated community invitation, readable pricing, and a compact portfolio facts strip.
+- Centered the contact action beneath pricing, with smoother floating motion that pauses offscreen and respects reduced-motion preferences.
+- Refined mobile and desktop layouts, keyboard navigation, and light and dark theme styling.
+
 ## [1.5.1] - 2026-10-12
 
 ### Updated
