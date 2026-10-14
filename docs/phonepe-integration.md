@@ -13,7 +13,9 @@ The Supabase database was provisioned on 2026-10-14:
 - Migration `prepare_private_payment_backend` was applied from `database/payment-backend.sql` on 2026-10-14.
 - Tables: `private_payments.orders`, `private_payments.events`, `private_payments.fulfilments`, `private_payments.rate_limits`.
 - All four tables have RLS enabled. Policies target only `portfolio_payments_api`; browser roles `anon` and `authenticated` still have no schema usage.
-- `portfolio_payments_api` has NOLOGIN, NOINHERIT, NOSUPERUSER, NOCREATEDB, NOCREATEROLE and NOBYPASSRLS. It inherits no other role.
+- `portfolio_payments_api` was provisioned with NOLOGIN, NOINHERIT, NOSUPERUSER, NOCREATEDB, NOCREATEROLE and NOBYPASSRLS. It inherits no other role.
+- The owner enabled LOGIN in Chrome on 2026-10-14. Metadata checks confirm all elevated capabilities remain off.
+  A password and application connection still require private setup; no credential value has been read by the agent.
 - Real database checks in `database/verify-payment-backend.sql` passed: role restrictions, duplicate reservations/events/fulfilments,
   worker leases, immutable amounts, completed-state protection, and refusal to delete orders. These are database-level
   smoke checks, not a concurrent-load test or a driver/TLS connection test.
@@ -49,8 +51,8 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
 
 ### Still required before deployment/go-live
 
-1. The backend migration is now applied. The restricted role still has **NOLOGIN** and no application connection is configured.
-   Enable role login with a strong password privately,
+1. The backend migration is now applied and the owner enabled role login. No application connection is configured.
+   Set its strong password privately,
    and store its connection string in Vercel as `DATABASE_URL` (Secret), not an administrative connection string.
 2. Configure the remaining values in `.env.example` directly in Vercel. Keep production secrets out of Preview.
    `DATABASE_URL` must have no `ssl`/`sslmode`/certificate query options; the driver enforces verified TLS.
@@ -83,12 +85,28 @@ Only the private database migration and rolled-back smoke tests have now been ex
 
 ### Current private-credential handoff
 
-Chrome is open to the project's [database roles](https://supabase.com/dashboard/project/ghseaquzqlnpmiltsyqy/database/roles),
-filtered to `portfolio_payments_api`. Its permissions panel shows every capability off. The only capability needed for
-the application connection is **User can login**. Keep role creation, database creation, RLS bypass, replication and
-superuser capabilities off. A strong private password and verified-TLS connection configuration are still required;
-the agent must not enter/confirm/submit a new authentication credential through the browser.
+The owner enabled **User can login** for `portfolio_payments_api`; role creation, database creation, RLS bypass,
+replication, superuser and inherited privileges remain off. A strong private password and verified-TLS connection
+configuration are still required; the agent must not enter/confirm/submit a new authentication credential through the browser.
 Do not change the existing `postgres` account or reuse its password. Never paste a database password into chat.
+
+`database/manual-payment-secrets.sql` is a **human-run-only** setup recipe, NOT a migration. It has not been executed
+by the agent. Run it once yourself in the correct project's SQL Editor, then copy each returned value directly into
+Vercel Production as a Secret variable. It generates 32 random bytes per password/server secret (64 hexadecimal
+characters), sets SCRAM-SHA-256 password storage, and uses a temporary SECURITY INVOKER function with PUBLIC
+execution revoked. No literal password is written into the saved SQL recipe; the query result contains secrets.
+Never share, screenshot, download, or commit those results. This does not make a general guarantee about database
+audit logging; privileged database administrators must be trusted. Rerunning rotates the password and produces new
+secrets, so do not rerun merely to check whether setup worked. Close the result after storing the values privately.
+
+The connection endpoint was verified from the project's Chrome Connect panel:
+transaction pooler `aws-0-ap-south-1.pooler.supabase.com:6543`, database `postgres`,
+custom user `portfolio_payments_api.ghseaquzqlnpmiltsyqy`. The URL deliberately has no SSL query overrides;
+the backend enforces certificate verification. Actual driver/TLS authentication is still untested.
+
+Keep `PAYMENTS_ENABLED=false`, `PAYMENT_RELEASE_APPROVED=false`, and `COMMUNITY_PAYMENTS_ENABLED=false`.
+The returned webhook username/password must later be configured in PhonePe's SHA webhook settings as well;
+storing them in Vercel alone does not register a webhook or deploy an endpoint.
 
 Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
 The production dependency audit reports no vulnerabilities. The full audit currently reports two existing high-severity
