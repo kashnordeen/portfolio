@@ -37,6 +37,33 @@ not that any individual payment succeeded. Deferred orders continue to be verifi
 
 ## Required before installation
 
+### Read-only review — 2026-10-14
+
+- Target Supabase is PostgreSQL 17.11. pg_cron 1.6.4 and pg_net 0.20.4 are available but not installed;
+  Vault 0.3.1 is installed. The worker is not installed and no queue/job exists from this implementation.
+- Vault contains zero secrets; the worker's Vault name is absent. Only counts and catalog permissions
+  were queried, never secret values, queued headers or function bodies.
+- PUBLIC, anon, authenticated and portfolio_payments_api cannot read Vault. Browser/service_role roles
+  have no usage/read access to private payment orders; only the restricted application role has backend grants.
+  Its login is enabled, all elevated/inherited capabilities are off and it has no role memberships.
+- The privileged service_role has Vault schema usage, SELECT/DELETE on its secret table/view and execution
+  of Vault create/update/decrypt functions. Grants and object ownership originate from supabase_admin;
+  postgres has grant options but cannot SET ROLE to that platform administrator. Do not assume a
+  non-owner REVOKE removes another grantor's grant, and do not modify platform objects blindly.
+- Security advisors returned no findings. The public security-definer rls_auto_enable function returns
+  event_trigger, not an ordinary callable RPC. This is not evidence of leaked secrets or browser access.
+- **Installation is paused for a design choice.** The current worker guard deliberately rejects
+  service_role's Vault read permission. A regression case now confirms that it pauses without queuing.
+  The supported Vault model treats this privileged server role as trusted; adopting that model would
+  require an explicit, documented guard change, with browser/app Vault access and all non-admin worker
+  control/queue access still denied. Alternatively, stricter platform-owned Vault restrictions require
+  a separately reviewed administrative/support path. Neither option has been applied or approved.
+
+See [Supabase Vault's privilege guidance](https://supabase.com/docs/guides/database/vault) and
+[PostgreSQL's grantor-specific REVOKE rules](https://www.postgresql.org/docs/17/sql-revoke.html).
+
+### Remaining checks
+
 1. Local function execution now passes in embedded PostgreSQL **18.6**, not the deployed **17**.
    Verify the target version and actual Cron/pg_net interfaces, multi-session locking, restart recovery,
    outage handling and delivery timing in UAT. PGlite is single-connection and the extensions are mocks;
@@ -44,7 +71,7 @@ not that any individual payment succeeded. Deferred orders continue to be verifi
    This preparation targets the project's previously observed PostgreSQL 17, pg_cron 1.6.4 and pg_net 0.20.4.
 2. Review enabling Cron and pg_net in the dedicated payment project. Installation script deliberately
    does not enable extensions or modify shared extension permissions. [pg_net is beta](https://supabase.com/docs/guides/database/extensions/pg_net).
-3. Audit table, column, function and inherited grants to Vault and the `net` schema.
+3. Resolve the above trust-model choice, then audit table, column, function and inherited grants to Vault and the `net` schema.
    pg_net temporarily stores the plaintext Authorization header in `net.http_request_queue`.
    The dispatcher fails closed if browser roles, service_role or the application role can read or modify
    queue/response columns, read decrypted Vault columns, or read/write dispatcher controls.

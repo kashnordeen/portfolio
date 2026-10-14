@@ -90,6 +90,9 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    in embedded PostgreSQL 18.6 with mocked extensions; the deployed PostgreSQL 17 and actual HTTP/secret/timing
    behavior are still untested. No extension, job or
    outgoing HTTP request has been created. The worker must stay inactive until the endpoint is deployed and verified.
+   A read-only installation review found default privileged service_role access to Vault (currently empty).
+   The stricter local guard rejects that access, so installation is paused for the owner's trust-model choice;
+   no permissions were changed. Browser/application Vault access remains denied and security advisors are clean.
 6. Complete database concurrency/RLS integration tests, sandbox/UAT, authenticated webhook delivery checks,
    duplicate/out-of-order/timeout tests, and a deployment smoke test. Sandbox credentials are still missing.
 7. Define terms/privacy/refunds, manual support/review/receipt procedures, monitoring and backups.

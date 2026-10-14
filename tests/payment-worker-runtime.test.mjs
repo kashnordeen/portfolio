@@ -160,6 +160,13 @@ test('payment worker executes in isolated PostgreSQL with mocked extension inter
       await db.exec('REVOKE UPDATE(url) ON net.http_request_queue FROM authenticated'); await enable();
       await db.exec('GRANT SELECT(decrypted_secret) ON vault.decrypted_secrets TO portfolio_payments_api');
       assert.equal(await dispatch(), 'PAUSED'); assert.equal(await queueSize(), 0);
+      await db.exec('REVOKE SELECT(decrypted_secret) ON vault.decrypted_secrets FROM portfolio_payments_api');
+      await enable();
+      // Mirrors the actual Supabase installation review: privileged service_role can read Vault.
+      // The current stricter guard must remain fail-closed until the owner approves a trust-model change.
+      await db.exec('GRANT SELECT ON vault.decrypted_secrets TO service_role');
+      assert.equal(await dispatch(), 'PAUSED'); assert.equal((await state()).last_issue, 'ACCESS_REVIEW');
+      assert.equal(await queueSize(), 0);
     });
     await isolated('HTTP enqueue exception rolls back and exposes only a generic paused state', async () => {
       await due(); await fakeSecret(); await enable();
