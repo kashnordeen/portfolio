@@ -15,7 +15,8 @@ The Supabase database was provisioned on 2026-10-14:
 - All four tables have RLS enabled. Policies target only `portfolio_payments_api`; browser roles `anon` and `authenticated` still have no schema usage.
 - `portfolio_payments_api` was provisioned with NOLOGIN, NOINHERIT, NOSUPERUSER, NOCREATEDB, NOCREATEROLE and NOBYPASSRLS. It inherits no other role.
 - The owner enabled LOGIN in Chrome on 2026-10-14. Metadata checks confirm all elevated capabilities remain off.
-  A password and application connection still require private setup; no credential value has been read by the agent.
+  The owner reported completing the private setup recipe. Its Vercel variable names/types/scopes were verified;
+  no credential value has been read by the agent, and application authentication/TLS is still untested.
 - Real database checks in `database/verify-payment-backend.sql` passed: role restrictions, duplicate reservations/events/fulfilments,
   worker leases, immutable amounts, completed-state protection, and refusal to delete orders. These are database-level
   smoke checks, not a concurrent-load test or a driver/TLS connection test.
@@ -28,7 +29,15 @@ The Supabase database was provisioned on 2026-10-14:
 The local checkout interface is available at `/?payment=community` and `/?payment=project`.
 The server implementation and portal API wiring are now prepared locally, but have NOT been deployed.
 Local Vite does not run the `/api` functions: the portal safely falls back to disabled checkout.
-Production has only the initial PhonePe credentials, `PHONEPE_ENV=production` and `PAYMENTS_ENABLED=false`.
+Vercel Production has the initial PhonePe credentials and the five owner-saved private variables:
+`DATABASE_URL`, `PAYMENT_SESSION_SECRET`, `PAYMENT_RECONCILIATION_SECRET`,
+`PHONEPE_WEBHOOK_USERNAME`, `PHONEPE_WEBHOOK_PASSWORD`. All five are Secret and Production-only;
+their values and validity have not been inspected. `PHONEPE_ENV=production`, `PAYMENTS_ENABLED=false`.
+On 2026-10-14 the following Config variables were saved with Production-only scope:
+`PAYMENT_SITE_ORIGIN=https://kkarn.vercel.app`, `PROJECT_MIN_PAISE=20000`,
+`PROJECT_MAX_PAISE=5000000`, `PAYMENT_RELEASE_APPROVED=false`, `COMMUNITY_PAYMENTS_ENABLED=false`.
+The dashboard confirmed creation and requires a new deployment to apply them. No redeploy was triggered.
+`PHONEPE_MERCHANT_ID` is missing; a blank Secret/Production form is prepared in Chrome for owner entry.
 No real PhonePe API call or payment was made. The existing public portfolio actions are unchanged.
 
 ### Locally implemented
@@ -51,9 +60,9 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
 
 ### Still required before deployment/go-live
 
-1. The backend migration is now applied and the owner enabled role login. No application connection is configured.
-   Set its strong password privately,
-   and store its connection string in Vercel as `DATABASE_URL` (Secret), not an administrative connection string.
+1. Verify the owner-saved `DATABASE_URL` using the restricted role and actual driver/TLS authentication.
+   Its Secret/Production metadata is present, but the connection has not been tested. Do not rerun the setup recipe
+   merely to check it: rerunning rotates the password and all five generated values.
 2. Configure the remaining values in `.env.example` directly in Vercel. Keep production secrets out of Preview.
    `DATABASE_URL` must have no `ssl`/`sslmode`/certificate query options; the driver enforces verified TLS.
    Use `DATABASE_CA_CERT` if the provider requires its CA certificate; never set `rejectUnauthorized=false`.
@@ -64,8 +73,8 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    The owner approved INR 200 through INR 50,000 per project payment, inclusive
    (`PROJECT_MIN_PAISE=20000`, `PROJECT_MAX_PAISE=5000000`). Customers enter the agreed project
    payment within that range. Confirm the merchant's PhonePe limits during UAT before go-live.
-   These values are saved in the local template only; Vercel configuration is unchanged and all
-   payment release flags remain false.
+   The range and exact site origin are saved in the local template and Vercel Production configuration.
+   All payment release flags remain false; existing deployments have not been changed.
    Marketing price tiers are not hardcoded invoice/payment limits. Invoice matching remains manual;
    paying an arbitrary reference does not settle a full invoice.
 5. Provision a durable worker outside the browser that calls `/api/payments/reconcile` with
@@ -85,14 +94,17 @@ No real PhonePe API call or payment was made. The existing public portfolio acti
    and `PAYMENTS_ENABLED=true`. Community additionally needs `COMMUNITY_PAYMENTS_ENABLED=true`.
    These are release gates, not proof that the worker or business procedures are configured.
 
-No push, deployment, credential generation, worker subscription, scheduler activation or live payment has been made.
-Only the private database migration and rolled-back smoke tests have now been executed externally.
+No payment-integration push, deployment, agent-run credential generation, worker subscription,
+scheduler activation or live payment has been made. The database migration, rolled-back smoke tests
+and the above Vercel configuration saves have been completed externally; the owner handled private credential entry.
 
 ### Current private-credential handoff
 
 The owner enabled **User can login** for `portfolio_payments_api`; role creation, database creation, RLS bypass,
-replication, superuser and inherited privileges remain off. A strong private password and verified-TLS connection
-configuration are still required; the agent must not enter/confirm/submit a new authentication credential through the browser.
+replication, superuser and inherited privileges remain off. The owner reported private credential setup complete;
+verified-TLS application authentication is still required. The agent must not enter/confirm/submit a new
+authentication credential through the browser. The current handoff is only the missing PhonePe Merchant ID,
+not another run of the database recipe. Enter it privately as `PHONEPE_MERCHANT_ID` (not `PHONEPE_CLIENT_ID`).
 Do not change the existing `postgres` account or reuse its password. Never paste a database password into chat.
 
 `database/manual-payment-secrets.sql` is a **human-run-only** setup recipe, NOT a migration. It has not been executed
