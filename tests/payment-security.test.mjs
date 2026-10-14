@@ -28,6 +28,17 @@ test('live credentials and checkout cannot accidentally run in preview', () => {
   assert.equal(loadConfig({ ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true' }).communityEnabled, false);
   assert.throws(() => loadConfig({ ...env, PAYMENT_SITE_ORIGIN: 'http://example.test' }));
 });
+test('approved INR 200 minimum rejects amounts below it and requires an explicit maximum', () => {
+  const input = { purpose: 'project', name: 'Test', email: 'test@example.test', reference: 'INV', amount: '200' };
+  const min = 20000, testMax = 100000; // Test fixture only, not an approved business maximum.
+  assert.equal(validateCustomer(input, min, testMax).amount, 20000);
+  assert.throws(() => validateCustomer({ ...input, amount: '199.99' }, min, testMax));
+  const gatedEnv = { ...env, PAYMENTS_ENABLED: 'true', PAYMENT_RELEASE_APPROVED: 'true', PROJECT_MIN_PAISE: String(min) };
+  assert.equal(loadConfig(gatedEnv).projectEnabled, false);
+  for (const maximum of ['', '0', 'unlimited', 'Infinity', '19999']) {
+    assert.equal(loadConfig({ ...gatedEnv, PROJECT_MAX_PAISE: maximum }).projectEnabled, false);
+  }
+});
 test('hosted checkout URLs require the exact approved HTTPS host', () => {
   assert.equal(safeCheckoutUrl('https://mercury-uat.phonepe.com/transact?token=test', 'mercury-uat.phonepe.com'), 'https://mercury-uat.phonepe.com/transact?token=test');
   for (const url of ['http://mercury-uat.phonepe.com', 'https://mercury-uat.phonepe.com.evil.test', 'https://evil.test', 'https://user@mercury-uat.phonepe.com', 'javascript:alert(1)']) assert.throws(() => safeCheckoutUrl(url, 'mercury-uat.phonepe.com'));
