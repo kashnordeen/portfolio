@@ -2,20 +2,34 @@
 
 ## Current status
 
+The Supabase database was provisioned on 2026-10-14:
+
+- Project: `portfolio-payments` (`ghseaquzqlnpmiltsyqy`), in `kashnordeen's Org`.
+- Region: South Asia (Mumbai), `ap-south-1`.
+- Organization plan: Free, with the existing spend cap enabled. No paid upgrade was made.
+- Dashboard: https://supabase.com/dashboard/project/ghseaquzqlnpmiltsyqy
+- Data API and automatic table exposure were disabled at project creation; automatic RLS was enabled.
+- Migration `create_private_payment_store` was applied from `database/payment-orders.sql`.
+- Tables: `private_payments.orders`, `private_payments.events`, `private_payments.fulfilments`.
+- All three tables have RLS enabled; `anon` and `authenticated` roles have no schema usage or table-read privileges.
+- The integrity checks in `database/verify-payment-orders.sql` passed, and all synthetic test data was rolled back.
+- Supabase security advisors reported only the informational [RLS Enabled No Policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) notices. No browser-access policies are intentional for this backend-only store.
+
 The local checkout interface is available at `/?payment=community` and `/?payment=project`.
 It is a preview only. It does not save customer details, call PhonePe, create an order, or accept payments.
 The checkout button is deliberately disabled. The existing public portfolio actions are unchanged.
 
 ## Before backend integration
 
-1. Select and provision a PostgreSQL database. No database or paid resource has been created by this change.
-2. Review `database/payment-orders.sql` and apply it to the chosen database using its administrative connection.
+1. Implement the backend using a restricted database role and a verified TLS connection. Do not expose an administrative database credential to the browser.
+2. Connect the backend to the provisioned database via server-only environment variables. No application database connection is configured yet.
 3. Define what community registration includes, how access is delivered, and the refund policy.
 4. Confirm the accepted project payment range and whether a reference must match an issued invoice.
 5. Obtain PhonePe sandbox credentials and configure the test webhook authentication method in the merchant dashboard.
 
 Production credentials alone are not suitable for sandbox testing. Do not paste any credentials into chat.
 Add secrets directly to the hosting provider's server-side environment settings; never use a `VITE_` prefix.
+The merchant currently has production credentials only. Sandbox credentials must be obtained before end-to-end UAT testing.
 
 ## Proposed backend configuration
 
