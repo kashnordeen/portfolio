@@ -135,8 +135,9 @@ The returned webhook username/password must later be configured in PhonePe's SHA
 storing them in Vercel alone does not register a webhook or deploy an endpoint.
 
 Run unit tests with Node.js 24 (`npm test`); the test runner imports server/client TypeScript using native type stripping.
-The production dependency audit reports no vulnerabilities. The full audit currently reports two existing high-severity
-development-only dependency warnings (`brace-expansion`, `source-map-js`); review/fix them before release.
+The online npm audit on 2026-10-15 reports zero known vulnerabilities across production and development
+dependencies after targeted brace-expansion and source-map-js patches. All 62 tests, lint, type checks and
+the local production build pass. This does not validate live credentials, TLS, webhook delivery or UAT.
 
 ## Before backend integration
 

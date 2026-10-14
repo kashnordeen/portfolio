@@ -19,6 +19,10 @@
 
 - Recorded the owner-approved ₹200–₹50,000 inclusive project-payment range in the setup template, with boundary tests. Live payments remain disabled and hosting configuration is unchanged.
 
+### Security
+
+- Patched transitive development dependencies brace-expansion and source-map-js without changing direct dependencies or enabling installation scripts.
+
 ## [1.6.0] - 2026-10-14
 
 ### Added
