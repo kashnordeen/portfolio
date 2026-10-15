@@ -104,3 +104,10 @@ The production project and community checkout remain disabled throughout UAT.
   `QSTASH_NEXT_SIGNING_KEY`. Owner must enter the actual Test Mode merchant ID and
   US-region Quickstart credentials privately, save a password-manager copy, then Save.
   No values were read or submitted. All four payment/job flags remain false.
+- Owner completed those four entries. Metadata check confirms **all twelve** required
+  credentials exist as Production-only Secrets in `portfolio-payments-uat`, with values
+  Hidden. This proves saved presence/type/scope only, not credential validity or region.
+  No secret values were fetched. Next gate: owner approval for a disabled UAT-only
+  deployment, followed by alias/config and restricted database TLS checks. No live
+  deployment, activation, schedule, provider request or Git push is authorized by this
+  private-entry completion.
