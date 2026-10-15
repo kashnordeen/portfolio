@@ -15,7 +15,7 @@ export function loadJobConfig(env: Record<string, string | undefined>) {
       !env.VERCEL_PROJECT_ID || env.VERCEL_PROJECT_ID === target.projectId);
   const ready = enabled && env.VERCEL_ENV === 'production' && identityReady && env.NODE_TLS_REJECT_UNAUTHORIZED !== '0' &&
     Boolean(publishToken && currentSigningKey && nextSigningKey);
-  return { enabled, ready, publishToken, currentSigningKey, nextSigningKey, environment: target.environment,
+  return { enabled, ready, publishToken, currentSigningKey, nextSigningKey, environment: target.environment, queueOrigin: target.queueOrigin,
     jobUrl: `${target.origin}/api/payments/jobs`, recoveryUrl: `${target.origin}/api/payments/recover` };
 }
 export type JobConfig = ReturnType<typeof loadJobConfig>;

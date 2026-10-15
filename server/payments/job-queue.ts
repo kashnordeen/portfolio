@@ -40,7 +40,7 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
       try {
         if (!uuidPattern.test(job.id) || job.environment !== config.environment || !Number.isSafeInteger(job.generation) ||
           job.generation < 1 || !Number.isFinite(job.dueAt.getTime())) throw new Error('invalid job');
-        const response = await send(`https://qstash.upstash.io/v2/publish/${config.jobUrl}`, {
+        const response = await send(`${config.queueOrigin}/v2/publish/${config.jobUrl}`, {
           method: 'POST', redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(8000),
           headers: { Authorization: `Bearer ${config.publishToken}`, 'Content-Type': 'application/json',
             'Upstash-Deduplication-Id': job.id, 'Upstash-Not-Before': String(Math.ceil(job.dueAt.getTime() / 1000)),

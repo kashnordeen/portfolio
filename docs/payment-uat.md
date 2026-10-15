@@ -21,6 +21,9 @@ Owner approved a separate test Vercel project and sandbox-only database access o
   test project's stable target**, never PhonePe production credentials.
 - Queued messages contain only opaque job IDs. Signatures remain bound to the exact URL.
   Test queue credentials must be independently provisioned; never copy the live queue keys.
+  UAT uses QStash **US** (`https://qstash-us-east-1.upstash.io`); live stays **EU**
+  (`https://qstash.upstash.io`). These regions have independent tokens, signing keys,
+  queues and billing. Only the existing/free tier is allowed; stop at any paid activation.
 
 ## Provisioning
 
@@ -80,3 +83,24 @@ The production project and community checkout remain disabled throughout UAT.
   `PHONEPE_CLIENT_ID`, `PHONEPE_CLIENT_SECRET`, `PHONEPE_CLIENT_VERSION`. Owner must enter
   the saved Test Mode values and submit privately. No values were read or entered by agent.
 - No UAT deployment, activation, schedule, private credential generation or paid upgrade yet.
+
+### Private-entry follow-up
+
+- Owner saved the three PhonePe Test Mode credentials and the five generated UAT
+  secrets. Metadata verified: all eight are server-only Secrets scoped to this test
+  project's Production target. Values were not read, downloaded or copied by agent.
+- Owner's first SQL attempt failed because the editor contained an appended fragment of
+  the old production helper. UAT login was still disabled. Agent cleared the editor,
+  verified it empty, and pasted only the UAT recipe; verified the clean final statement.
+  No credential-generation query was executed by agent.
+- After the owner's successful private run, UAT role login is enabled; all elevated flags
+  remain false, memberships zero, and production schema access false. Do not rerun recipe.
+- Still missing: test `PHONEPE_MERCHANT_ID` and three independent **US-region** QStash
+  Secrets. No queue publication, schedule, provider request or deployment has been made.
+- Opened the existing US-region QStash dashboard; its current plan is **Free**. No
+  subscription, credit card, message, schedule or queue settings were changed.
+- Prepared four blank Secret rows in the UAT Vercel project (Production target):
+  `PHONEPE_MERCHANT_ID`, `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`,
+  `QSTASH_NEXT_SIGNING_KEY`. Owner must enter the actual Test Mode merchant ID and
+  US-region Quickstart credentials privately, save a password-manager copy, then Save.
+  No values were read or submitted. All four payment/job flags remain false.

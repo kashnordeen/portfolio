@@ -16,6 +16,7 @@ const env = { PAYMENT_JOBS_ENABLED:'true', VERCEL_ENV:'production', PHONEPE_ENV:
 test('sandbox queue is bound to its exact project, origin and environment', () => {
   const config=loadJobConfig(env);
   assert.equal(config.ready,true); assert.equal(config.environment,'sandbox');
+  assert.equal(config.queueOrigin,'https://qstash-us-east-1.upstash.io');
   assert.equal(config.jobUrl,`${sandboxTarget.origin}/api/payments/jobs`);
   for(const change of [{VERCEL_PROJECT_ID:undefined},{VERCEL_PROJECT_ID:productionTarget.projectId},
     {PHONEPE_ENV:'production'},{VERCEL_ENV:'preview'},{PAYMENT_SITE_ORIGIN:productionTarget.origin},
@@ -33,7 +34,7 @@ test('UAT publisher cannot deliver a production job or choose a caller destinati
   const job={id:crypto.randomUUID(),orderId:crypto.randomUUID(),environment:'sandbox',generation:1,dueAt:new Date()};
   await assert.rejects(queue.publish({...job,environment:'production'})); assert.equal(calls.length,0);
   await queue.publish(job);
-  assert.equal(calls[0].url,`https://qstash.upstash.io/v2/publish/${sandboxTarget.origin}/api/payments/jobs`);
+  assert.equal(calls[0].url,`https://qstash-us-east-1.upstash.io/v2/publish/${sandboxTarget.origin}/api/payments/jobs`);
   assert.deepEqual(JSON.parse(calls[0].options.body),{jobId:job.id});
 });
 
