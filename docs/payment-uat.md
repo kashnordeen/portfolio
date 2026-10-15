@@ -135,3 +135,44 @@ The production project and community checkout remain disabled throughout UAT.
   validation, test webhook registration/delivery and end-to-end UAT cases. Vercel's login
   boundary currently blocks external webhook/queue callbacks; any narrowly scoped access
   change needs separate approval. Do not broadly disable protection to unblock callbacks.
+
+### Verified database and prepared UAT callbacks — 2026-10-15
+
+- Added a build-only read-only diagnostic (`vercel.uat.json`); no public diagnostics route.
+  It refuses the wrong project, provider environment, database destination, unsafe TLS,
+  missing system bypass key, or any payment/job flag not exactly false. The shared runtime
+  connection builder enforces certificate verification. No credentials or raw errors logged.
+  Use this special build configuration only for disabled UAT verification, not activation.
+- First cloud preflight stopped with `TLS_FAILED` (`dpl_9Ycej7paz83LE1V9m5FBHLAVfGCq`).
+  Added the **public** CA linked from the approved Supabase project's Database Settings as
+  UAT-only `DATABASE_CA_CERT` Config, without altering a private credential or disabling TLS.
+  Source: `https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt`.
+  SHA-256: `807025ad50d4ed219d2c9c7d299c004f824eb00cf7f65afef607d07b72e6cafa`.
+- Subsequent cloud preflight passed actual password login and verified TLS. Confirmed
+  both session/current role are the restricted UAT role, zero memberships, no elevated
+  flags, four-connection limit, read-only transaction, denied live-schema USAGE and SELECT
+  privileges on all five RLS-protected test tables. No customer rows read or written.
+- Owner approved UAT-only automation bypass sharing with PhonePe/QStash. Retained Vercel
+  Authentication. Vercel exceptions are domain-wide, so no public domain exception added.
+- QStash publisher now forwards the server-only `VERCEL_AUTOMATION_BYPASS_SECRET` as
+  `Upstash-Forward-x-vercel-protection-bypass` **only for sandbox**, with exact project,
+  fixed destination and existing signature validation unchanged. Never in job URL/body;
+  production drops it even if its own system key exists. Sandbox readiness fails closed
+  without the system key. No queue publication or schedule has occurred.
+- Latest Ready deployment: `dpl_DsKfxeVEJM67mJcPa3f7Zt8xyFVb`, source `925f728`.
+  Cloud build printed `UAT_DB_CHECK_PASSED` and `UAT_CALLBACK_KEY_PRESENT` (not values).
+  All four flags forced false at build/runtime; aliases unchanged. Fresh checks: 134 tests,
+  lint, TypeScript, successful remote build, zero known dependency vulnerabilities.
+  Authenticated smoke: config 200 false/false, orders/jobs 503 disabled, webhook 401.
+- Chrome PhonePe **Test Mode** Create New Webhook form is prepared with SHA and only
+  `checkout.order.completed` / `checkout.order.failed`. Nonsecret description and URL
+  prefix entered; URL ends in `?x-vercel-protection-bypass=` pending owner-private suffix.
+  The first loading view was misread as unavailable; fully loaded UI supports creation.
+  Owner must privately append the existing UAT system bypass key, replace any autofilled
+  username/password with the saved UAT webhook pair, then submit Create. Agent has not
+  read, entered or submitted those credential values; webhook registration is not complete.
+- Handoff tabs: UAT Vercel Deployment Protection and PhonePe Test Mode webhook form.
+  Save the full callback URL privately; never paste it into chat, logs or source.
+  Still pending: registered test webhook, actual provider/queue delivery, UAT scenarios,
+  any explicitly approved UAT activation and provider go-live signoff. Live site unchanged;
+  no push, paid upgrade, live credential rotation, real payment or schedule.
