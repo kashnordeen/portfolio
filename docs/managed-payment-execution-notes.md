@@ -144,3 +144,18 @@ PhonePe must receive this same new private pair before registration and authenti
 Earlier deployments retain older credential values: do not roll back to one after registering the
 new pair without a coordinated credential plan. No secret-value matching or end-to-end delivery is
 claimed by the unauthenticated rejection checks above.
+
+## PhonePe webhook registered — 2026-10-15
+
+Owner reported creating the webhook privately in PhonePe. Its saved listing was verified as Enabled,
+SHA, at https://kkarn.vercel.app/api/payments/webhook. It initially listed three events, including
+unsupported order.split.settlement.accepted. Only that extra subscription was removed in the existing
+webhook editor; no credential field, authentication type, URL or enabled status was changed.
+The saved listing then showed two events, and the details panel confirmed exactly
+checkout.order.completed and checkout.order.failed (last modified 15:57 IST).
+
+Public smoke checks again passed: disabled project/community flags, rejected checkout, unauthenticated
+webhook=401, disabled job/recovery endpoints, unowned status=404, homepage=200. Registration and these
+negative probes do not prove matching private credentials, authenticated provider delivery, production
+database login/TLS or successful order verification. Payments/jobs remain off. No real payment,
+provider status request, recovery schedule, activation or Git push was performed.
