@@ -1,10 +1,16 @@
 # Managed payment checks — execution decisions
 
-Scope: approved Native implementation, isolated `feat/managed-payment-checks` branch. Main and the live
-portfolio remain unchanged. All five implementation tasks are locally checkpointed. Independent
+Scope: approved Native implementation on isolated `feat/managed-payment-checks`, subsequently fast-forwarded
+into local `main` at `cade4ed` on 2026-10-15 after the owner's continuation request. The live portfolio remains
+unchanged. All five implementation tasks are locally checkpointed. Independent
 whole-branch review found one Important recovery defect and no Critical findings or deferred minors.
 The author's single fix pass verified that defect RED→GREEN; no second review was dispatched.
 No external setup, secrets, paid resources, migration application, push or deployment occurred.
+
+Local integration verification: 123/123 tests, lint, TypeScript and frontend build passed in the main
+checkout. Its unrelated untracked `presentation/` folder was preserved. Dependencies were installed from
+the existing lockfile with lifecycle scripts disabled; package manifests/lockfile were unchanged by install.
+The integrated temporary worktree is eligible for normal Git cleanup; its commits and decisions are retained.
 
 ## Rulings made, in execution order
 

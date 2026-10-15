@@ -1,7 +1,8 @@
 # Managed payment verification — local candidate, not online
 
-Status: implemented on `feat/managed-payment-checks` in an isolated worktree. No merge to main,
-Git push, deployment, QStash account/message/schedule, external migration or activation has occurred.
+Status: implemented and reviewed in an isolated worktree, then fast-forwarded into local `main` on
+2026-10-15 at `cade4ed`. The merged checkout passed 123/123 tests, lint, type checks and the frontend build.
+No Git push, deployment, QStash account/message/schedule, external migration or activation has occurred.
 All checkout/job template flags are false. No real credentials were viewed/generated/rotated or
 PhonePe payment/status API called by the agent. Existing production portfolio is unchanged.
 
@@ -50,7 +51,7 @@ checks remain mandatory. Jobs never call /pay or grant community access automati
 3. **Database:** review/apply `database/payment-jobs.sql` only after migration approval and a restore plan.
    Run `database/verify-payment-jobs.sql` and synthetic transaction tests with rollback on target PG17;
    preserve existing real records/roles. Local PGlite PG18 is not proof of PG17 concurrency or driver/TLS.
-4. **Deployment:** separately approve merging the reviewed branch and deploying the backend with checkout
+4. **Deployment:** the local merge is complete; separately approve pushing/deploying the backend with checkout
    and job execution disabled. Verify route recognition, native duration config, production DB driver/TLS
    and private environment scopes. Local Vite does not execute Vercel /api routes; a frontend build alone
    is not a deployed backend test. Do not copy production credentials into Preview.
