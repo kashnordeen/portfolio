@@ -119,3 +119,28 @@ was performed. Remaining launch gates in managed-payment-jobs.md still apply.
 Final scoped 15-minute runtime scan returned zero error/fatal/stderr records for this deployment.
 Chrome verification of the live project portal showed the setup notice and disabled
 "Checkout coming soon" button. Monitoring/alert delivery itself has not been established.
+
+## Webhook credential replacement deployment — 2026-10-15
+
+Owner could not recover the original private webhook pair and explicitly approved replacing only
+PHONEPE_WEBHOOK_USERNAME and PHONEPE_WEBHOOK_PASSWORD, followed by a disabled redeployment.
+Owner reported saving replacements directly in Vercel. Both rows were verified as recently updated,
+Production-only Secrets; no credential input values, clipboard or stored secrets were read.
+Private password-manager retention was explicitly requested. The original all-secrets SQL recipe
+must not be rerun for this replacement because it also rotates the database password.
+
+Reviewed source commit 477c6424a5608a1b1c56f8cf6bb24662843c0f91 was rebuilt without cache using
+current Production environment settings. Deployment dpl_2re2bWtZRrCd1iMtxwn9GX4p999j was staged,
+verified, promoted, then confirmed as kkarn.vercel.app's READY production deployment. Build duration
+was 30 seconds. All four release/job flags were explicitly false at build and runtime.
+The 125-file source manifest excluded private environment and unrelated untracked files.
+Fresh verification: 125/125 local tests and npm audit with zero known vulnerabilities; staged
+config/orders/webhook/jobs/recover guards passed. Public-domain checks passed for all six API guards
+and homepage. The first unowned-status request timed out at 20 seconds; one bounded full-suite retry
+passed. A scoped runtime error/fatal/stderr scan returned zero records. No database/provider test,
+Git push, job/payment activation, schedule or PhonePe webhook creation was performed.
+
+PhonePe must receive this same new private pair before registration and authenticated delivery tests.
+Earlier deployments retain older credential values: do not roll back to one after registering the
+new pair without a coordinated credential plan. No secret-value matching or end-to-end delivery is
+claimed by the unauthenticated rejection checks above.
