@@ -7,6 +7,7 @@ import { createPaymentStore } from '../server/payments/store.ts';
 import { loadConfig } from '../server/payments/config.ts';
 import { handlePayment } from '../server/payments/handler.ts';
 import { CheckoutError, startCheckout } from '../src/lib/payment-client.ts';
+import { pgliteSql } from './support/pglite-sql.mjs';
 
 const config = loadConfig({ PHONEPE_ENV:'production', VERCEL_ENV:'production', PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app',
   DATABASE_URL:'postgres://portfolio_payments_api:fixture@localhost/test', PHONEPE_CLIENT_ID:'fixture', PHONEPE_CLIENT_SECRET:'fixture',
@@ -25,7 +26,7 @@ test('same-browser checkout recovery executes the production store under its res
     }
     await db.exec('SET ROLE portfolio_payments_api;');
     let savepoint = 0;
-    const sql = async (strings,...values) => (await db.query(strings.reduce((text,part,i)=>text+part+(i<values.length?`$${i+1}`:''),''), values)).rows;
+    const sql = pgliteSql(db);
     sql.begin = async run => {
       const name = `checkout_test_${++savepoint}`;
       await db.exec(`SAVEPOINT ${name}`);

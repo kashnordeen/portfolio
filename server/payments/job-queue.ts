@@ -38,7 +38,7 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
     async publish(job: PaymentJob): Promise<{ messageId: string }> {
       if (!config.ready) throw new PaymentError(503, 'Payment scheduler is not enabled.');
       try {
-        if (!uuidPattern.test(job.id) || job.environment !== 'production' || !Number.isSafeInteger(job.generation) ||
+        if (!uuidPattern.test(job.id) || job.environment !== config.environment || !Number.isSafeInteger(job.generation) ||
           job.generation < 1 || !Number.isFinite(job.dueAt.getTime())) throw new Error('invalid job');
         const response = await send(`https://qstash.upstash.io/v2/publish/${config.jobUrl}`, {
           method: 'POST', redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(8000),

@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { reconciliationDelay } from '../server/payments/store.ts';
 import { createJobStore } from '../server/payments/job-store.ts';
+import { pgliteSql } from './support/pglite-sql.mjs';
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
 const migration = await read('../database/payment-jobs.sql');
 
@@ -30,10 +31,7 @@ test('durable payment job transitions execute in local PostgreSQL', async t => {
     (await one('SELECT private_payments.finish_payment_job($1,$2,$3,$4,$5) AS applied', [job, lease, state, amount, provider])).applied;
   // Adapt tagged parameters to the embedded engine: execute production queries, not a fake job store.
   let savepoint = 0;
-  const sql = async (strings, ...values) => {
-    const query = strings.reduce((text, part, index) => text + part + (index < values.length ? `$${index+1}` : ''), '');
-    return (await db.query(query, values)).rows;
-  };
+  const sql = pgliteSql(db);
   sql.begin = async run => {
     const name = `job_test_${++savepoint}`;
     await db.exec(`SAVEPOINT ${name}`);
