@@ -6,6 +6,7 @@ import { sandboxTarget } from '../server/payments/targets.ts';
 const env = {
   VERCEL_ENV:'production', VERCEL_PROJECT_ID:sandboxTarget.projectId, PHONEPE_ENV:'sandbox',
   PAYMENT_SITE_ORIGIN:sandboxTarget.origin, NODE_TLS_REJECT_UNAUTHORIZED:'1',
+  VERCEL_AUTOMATION_BYPASS_SECRET:'fixture-uat-bypass'.padEnd(40,'x'),
   PAYMENTS_ENABLED:'false', PAYMENT_RELEASE_APPROVED:'false', COMMUNITY_PAYMENTS_ENABLED:'false', PAYMENT_JOBS_ENABLED:'false',
   DATABASE_URL:'postgresql://portfolio_payments_uat.ghseaquzqlnpmiltsyqy:fixture@aws-0-ap-south-1.pooler.supabase.com:6543/postgres',
   PAYMENT_SESSION_SECRET:'s'.repeat(64), PAYMENT_RECONCILIATION_SECRET:'r'.repeat(64),
@@ -22,6 +23,7 @@ function fixture(overrides={}) {
 test('UAT preflight refuses wrong target, active flags, unsafe TLS and unexpected DB destinations before connecting',async()=>{
   for(const change of [{VERCEL_PROJECT_ID:'live'},{VERCEL_ENV:'preview'},{PHONEPE_ENV:'production'},
     {PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app'},{NODE_TLS_REJECT_UNAUTHORIZED:'0'},
+    {VERCEL_AUTOMATION_BYPASS_SECRET:undefined},{VERCEL_AUTOMATION_BYPASS_SECRET:'short'},
     ...['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED'].flatMap(key=>[{[key]:'true'},{[key]:undefined}]),
     {DATABASE_URL:env.DATABASE_URL.replace('aws-0-ap-south-1.pooler.supabase.com','evil.example')},
     {DATABASE_URL:env.DATABASE_URL.replace('portfolio_payments_uat.','portfolio_payments_api.')},

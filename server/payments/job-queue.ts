@@ -43,6 +43,8 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
         const response = await send(`${config.queueOrigin}/v2/publish/${config.jobUrl}`, {
           method: 'POST', redirect: 'error', credentials: 'omit', signal: AbortSignal.timeout(8000),
           headers: { Authorization: `Bearer ${config.publishToken}`, 'Content-Type': 'application/json',
+            ...(config.environment === 'sandbox' && config.automationBypassSecret ?
+              { 'Upstash-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}),
             'Upstash-Deduplication-Id': job.id, 'Upstash-Not-Before': String(Math.ceil(job.dueAt.getTime() / 1000)),
             'Upstash-Retries': '3', 'Upstash-Timeout': '60s' },
           body: JSON.stringify({ jobId: job.id }),

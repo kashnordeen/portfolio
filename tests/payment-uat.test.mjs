@@ -11,7 +11,8 @@ import { pgliteSql } from './support/pglite-sql.mjs';
 
 const env = { PAYMENT_JOBS_ENABLED:'true', VERCEL_ENV:'production', PHONEPE_ENV:'sandbox',
   VERCEL_PROJECT_ID:sandboxTarget.projectId, PAYMENT_SITE_ORIGIN:sandboxTarget.origin,
-  QSTASH_TOKEN:'fixture', QSTASH_CURRENT_SIGNING_KEY:'fixture-current', QSTASH_NEXT_SIGNING_KEY:'fixture-next' };
+  QSTASH_TOKEN:'fixture', QSTASH_CURRENT_SIGNING_KEY:'fixture-current', QSTASH_NEXT_SIGNING_KEY:'fixture-next',
+  VERCEL_AUTOMATION_BYPASS_SECRET:'fixture-uat-bypass'.padEnd(40,'x') };
 
 test('sandbox queue is bound to its exact project, origin and environment', () => {
   const config=loadJobConfig(env);
@@ -24,6 +25,9 @@ test('sandbox queue is bound to its exact project, origin and environment', () =
     assert.equal(loadJobConfig({...env,...change}).ready,false);
   }
   assert.equal(loadJobConfig({...env,PAYMENT_JOBS_ENABLED:'false'}).ready,false);
+  for(const value of [undefined,'','short','unsafe\r\nheader'.padEnd(40,'x')]) {
+    assert.equal(loadJobConfig({...env,VERCEL_AUTOMATION_BYPASS_SECRET:value}).ready,false);
+  }
 });
 
 test('UAT publisher cannot deliver a production job or choose a caller destination', async () => {
@@ -36,6 +40,20 @@ test('UAT publisher cannot deliver a production job or choose a caller destinati
   await queue.publish(job);
   assert.equal(calls[0].url,`https://qstash-us-east-1.upstash.io/v2/publish/${sandboxTarget.origin}/api/payments/jobs`);
   assert.deepEqual(JSON.parse(calls[0].options.body),{jobId:job.id});
+  assert.equal(calls[0].options.headers['Upstash-Forward-x-vercel-protection-bypass'],env.VERCEL_AUTOMATION_BYPASS_SECRET);
+  assert.equal(calls[0].url.includes(env.VERCEL_AUTOMATION_BYPASS_SECRET),false);
+  assert.equal(calls[0].options.body.includes(env.VERCEL_AUTOMATION_BYPASS_SECRET),false);
+});
+
+test('production queue never receives the UAT automation bypass even if a system key exists',async()=>{
+  let forwarded;
+  const config=loadJobConfig({...env,PHONEPE_ENV:'production',VERCEL_PROJECT_ID:productionTarget.projectId,
+    PAYMENT_SITE_ORIGIN:productionTarget.origin});
+  assert.equal(config.ready,true);
+  assert.equal(config.automationBypassSecret,'');
+  await createJobQueue(config,{send:async(_url,options)=>{forwarded=options.headers;return Response.json({messageId:'fixture'});}})
+    .publish({id:crypto.randomUUID(),orderId:crypto.randomUUID(),environment:'production',generation:1,dueAt:new Date()});
+  assert.equal('Upstash-Forward-x-vercel-protection-bypass' in forwarded,false);
 });
 
 test('sandbox and production database credentials cannot be swapped', () => {

@@ -9,6 +9,9 @@ export async function verifyUatDatabase(env: Record<string, string | undefined>,
       env.NODE_TLS_REJECT_UNAUTHORIZED === '0' ||
       ['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']
         .some(key => env[key] !== 'false')) throw new Error('UAT preflight guard failed.');
+  if (!/^[\x21-\x7e]{32,4096}$/.test(env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '')) {
+    throw new Error('UAT callback credential is not configured.');
+  }
   const config = loadConfig(env);
   const url = new URL(config.databaseUrl);
   if (!['postgres:','postgresql:'].includes(url.protocol) ||
