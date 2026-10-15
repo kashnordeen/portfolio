@@ -95,4 +95,27 @@ Vercel's native API compiler (local noEmit checks used tsconfig.node.json instea
 reproduced TS5097 before the fix and compiles all seven native API entries and dependencies in
 memory, checking the emitted JavaScript graph. Root rewriteRelativeImportExtensions fixes the
 deployment compiler without changing source imports, payment logic or release gates.
-vercel.json keeps remote dependency lifecycle scripts disabled. Deployment verification is pending.
+vercel.json keeps remote dependency lifecycle scripts disabled.
+
+Corrected source commit 477c6424a5608a1b1c56f8cf6bb24662843c0f91 was deployed as
+dpl_3TGoNXadSgrvW1uEuXRQAF3Vd7jA, production target, READY. Its build emitted all seven
+native Node.js API functions without the earlier TS5097 diagnostics. Staged runtime probes passed
+before promotion; kkarn.vercel.app was then confirmed to resolve to this exact deployment.
+Prior main-domain deployment for rollback reference: dpl_9fF4RvfMe4feMtaPP7Wgu39SGeeT.
+
+All four Production flags were explicitly saved as Config=false as well as overridden false in
+the deployment build/runtime inputs: PAYMENTS_ENABLED, PAYMENT_RELEASE_APPROVED,
+COMMUNITY_PAYMENTS_ENABLED, PAYMENT_JOBS_ENABLED. No secrets were retrieved.
+
+Fresh local verification: 125/125 tests, lint, TypeScript and frontend production build passed;
+npm audit reported zero known vulnerabilities. Public-domain HTTP checks confirmed:
+config GET=200 with exactly disabled project/community booleans, orders POST=503 disabled,
+unauthenticated webhook POST=401, jobs/recover POST=503 disabled, and unowned status GET=404.
+All API probes returned JSON, no-store, nosniff and no Set-Cookie. Homepage=200 with full name.
+These probes reject before database writes/provider calls; they do not establish database login/TLS,
+signed queue delivery/retries, provider UAT, backup restoration, or successful real payments.
+No Git push, payment activation, recovery schedule, real payment or PhonePe webhook registration
+was performed. Remaining launch gates in managed-payment-jobs.md still apply.
+Final scoped 15-minute runtime scan returned zero error/fatal/stderr records for this deployment.
+Chrome verification of the live project portal showed the setup notice and disabled
+"Checkout coming soon" button. Monitoring/alert delivery itself has not been established.
