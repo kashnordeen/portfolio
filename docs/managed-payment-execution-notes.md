@@ -76,3 +76,23 @@ The skill's separate security-checklist reference was absent. Its fully read sec
 controls and hardening-patterns reference were used; no compliance certification is claimed.
 Local verification and an independent review do not establish production readiness. Remaining account,
 database, deployment, webhook, delivery/health and UAT gates are grouped in managed-payment-jobs.md.
+
+## Disabled deployment preparation — 2026-10-15
+
+Owner approved deploying the backend with all four payment/job flags false, without Git push,
+payment/job activation, a schedule, credential rotation or a real payment. Vercel MCP lacked
+the required team scope; the official pinned CLI 64.2.0 authenticated through the owner account
+and verified project portfolio (prj_SV6MLqre8MI2eFF1hY2AdOJgik9z), Node.js 24 and Vite.
+Only the committed source archive is uploaded; unrelated presentation files and local environment
+files are excluded. CLI linking unexpectedly generated a staging .env.local; it was removed unread.
+The CLI's protected-deployment curl command automatically provisioned its project bypass credential;
+no value was read or logged and project deployment protection remains enabled.
+
+Initial staged deployment dpl_EakYdvCq62bra5mEBovSpgK8eZD5 was READY but its config function
+returned 500: emitted config.js still imported server/payments/handler.ts, which was not present.
+Do not promote that build. The root compiler config lacked the import rewriting setting used by
+Vercel's native API compiler (local noEmit checks used tsconfig.node.json instead). A new test
+reproduced TS5097 before the fix and compiles all seven native API entries and dependencies in
+memory, checking the emitted JavaScript graph. Root rewriteRelativeImportExtensions fixes the
+deployment compiler without changing source imports, payment logic or release gates.
+vercel.json keeps remote dependency lifecycle scripts disabled. Deployment verification is pending.

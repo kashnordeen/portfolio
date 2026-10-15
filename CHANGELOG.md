@@ -2,6 +2,10 @@
 
 ## Unreleased — payment integration (disabled)
 
+### Fixed
+
+- Rewrites TypeScript-relative imports when compiling native Vercel API functions, preventing missing-module startup failures. Added an emitted-module-graph regression check and disabled dependency installation scripts for deployments.
+
 ### Added
 
 - Added disabled managed-job transport with official QStash signature verification, opaque payloads, fixed targets and bounded publishing; not deployed or configured with real keys.
