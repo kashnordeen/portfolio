@@ -111,3 +111,27 @@ The production project and community checkout remain disabled throughout UAT.
   deployment, followed by alias/config and restricted database TLS checks. No live
   deployment, activation, schedule, provider request or Git push is authorized by this
   private-entry completion.
+
+### Disabled UAT deployment — 2026-10-15
+
+- Owner explicitly approved: "Deploy UAT only with all payment/job flags false".
+- Deployed source `b4a4076` only to `portfolio-payments-uat`:
+  `dpl_GhiAmVcA5912S2Eixj5qiZXrUPaQ`, Ready at approximately 23:00 IST.
+  Stable origin verified: `https://portfolio-payments-uat-kashnordeens-projects.vercel.app`.
+- Forced all eight nonsecret sandbox settings above at build and runtime; all four
+  payment/job flags are false. No Git push, schedule, provider request or payment.
+- Vercel Authentication remains enabled. Public requests stop at that boundary.
+  Authenticated `vercel curl` checks: homepage 200; config 200 with both options false;
+  empty orders 503 (disabled); jobs/recovery 503 (disabled); unauthenticated webhook 401;
+  status without a session 404. Application API responses are no-store/nosniff and set no
+  payment-session cookie. CLI's automatic protected access generated an automation bypass
+  token internally; its value was never read or copied. No protection settings were disabled.
+- Fresh verification: 130/130 local tests, zero known npm audit vulnerabilities, remote
+  `tsc -b && vite build` and function builds successful. Nonfatal ESLint support warning
+  remains; no dependency changes made in this deployment.
+- Live alias `kkarn.vercel.app` still resolves to existing deployment
+  `dpl_2re2bWtZRrCd1iMtxwn9GX4p999j`; it was not redeployed.
+- Still pending: actual UAT database password login/TLS check, provider credential
+  validation, test webhook registration/delivery and end-to-end UAT cases. Vercel's login
+  boundary currently blocks external webhook/queue callbacks; any narrowly scoped access
+  change needs separate approval. Do not broadly disable protection to unblock callbacks.
