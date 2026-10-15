@@ -37,7 +37,7 @@ export function reconciliationDelay(created: Date, now = Date.now()) {
   return 60;
 }
 
-export function createStore(config: PaymentConfig) {
+export function createPaymentDatabase(config: PaymentConfig) {
   let url: URL;
   try { url = new URL(config.databaseUrl); } catch { throw new PaymentError(503, 'Payment database is not configured.'); }
   const username = decodeURIComponent(url.username);
@@ -50,10 +50,13 @@ export function createStore(config: PaymentConfig) {
   for (const name of ['sslmode', 'ssl', 'sslrootcert', 'sslcert', 'sslkey']) {
     if (url.searchParams.has(name)) throw new PaymentError(503, 'Configure payment database TLS separately from its URL.');
   }
-  const sql = postgres(url.href, { ssl: { rejectUnauthorized: true, ...(config.databaseCa ? { ca: config.databaseCa } : {}) },
+  return postgres(url.href, { ssl: { rejectUnauthorized: true, ...(config.databaseCa ? { ca: config.databaseCa } : {}) },
     max: 2, prepare: false, idle_timeout: 20, connect_timeout: 5,
     connection: { statement_timeout: 3000, application_name: `portfolio-payments-${target.environment}` } });
-  return createPaymentStore(sql, config);
+}
+
+export function createStore(config: PaymentConfig) {
+  return createPaymentStore(createPaymentDatabase(config), config);
 }
 
 // Internal query seam for disposable database tests; production always uses the restricted TLS pool above.

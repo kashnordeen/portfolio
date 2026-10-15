@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "node scripts/payment-uat-preflight.mjs && npm run build"
+}
