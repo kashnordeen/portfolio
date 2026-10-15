@@ -58,11 +58,16 @@ Before accepting real payments, establish and test a full backup/restore procedu
 - On the owner's retry request, Chrome blocked the GitHub authentication redirect through its origin
   approval gate. No workaround, alternate browser, cookie access or automatic authentication was used.
   Owner completed login privately and returned to Upstash before queue setup continued.
-- Three empty Secret rows are prepared in Vercel portfolio, Production only: QSTASH_TOKEN,
-  QSTASH_CURRENT_SIGNING_KEY, QSTASH_NEXT_SIGNING_KEY. The owner must privately copy their EU Region
-  Quickstart values and save them without redeploying. Names/type/scope alone were inspected; values,
-  clipboard, token endpoints and production environment downloads were not accessed. Saving is pending
-  owner confirmation; even saved variables do not prove an undeployed runtime can use them.
+- Owner confirmed privately saving QSTASH_TOKEN, QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY.
+  The saved Vercel portfolio rows were independently verified by name, Production scope and the
+  "Secret environment variable" indicator. No secret value, clipboard, signing-key endpoint or environment
+  download was accessed. This proves storage/type/scope only, not credential validity or runtime delivery.
+- The non-secret COMMUNITY_PAYMENTS_ENABLED Config was verified false. Value reveals for PAYMENTS_ENABLED
+  and PAYMENT_RELEASE_APPROVED stalled at Loading, so their current values were not established. A separate
+  connector metadata request with decrypt=false failed; no secret decrypt request or API mutation followed.
+  PAYMENT_JOBS_ENABLED was not found in the PAYMENT-filtered dashboard; source defaults missing/anything
+  other than literal true to disabled. Before any separately approved deployment, explicitly verify/set all
+  four release/job Config flags false. No flag value was changed during this verification.
 - Deployment, push, webhook registration, live transport tests and payment activation: not performed.
 - Local verification after adding the target-check script: 124/124 tests pass; lint and TypeScript pass.
   No application runtime, frontend, amount limits, credentials or release flags were changed in this setup.
