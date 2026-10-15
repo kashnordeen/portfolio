@@ -2,7 +2,9 @@
 
 Status: implemented and reviewed in an isolated worktree, then fast-forwarded into local `main` on
 2026-10-15 at `cade4ed`. The merged checkout passed 123/123 tests, lint, type checks and the frontend build.
-No Git push, deployment, QStash account/message/schedule, external migration or activation has occurred.
+After separate owner approval, managed jobs migration `20261015071431` was applied to the existing
+portfolio-payments database; see managed-payment-setup.md for checks and remaining limits. No Git push,
+deployment, QStash account/message/schedule or payment activation has occurred.
 All checkout/job template flags are false. No real credentials were viewed/generated/rotated or
 PhonePe payment/status API called by the agent. Existing production portfolio is unchanged.
 
@@ -48,9 +50,10 @@ checks remain mandatory. Jobs never call /pay or grant community access automati
    QSTASH_NEXT_SIGNING_KEY into the appropriate Vercel server-only secret scope. Never use VITE_ names,
    chat, source, command arguments, screenshots or environment downloads. No existing database/session/
    PhonePe password rotation is required. The old lost worker bearer is not shared with QStash or Vault.
-3. **Database:** review/apply `database/payment-jobs.sql` only after migration approval and a restore plan.
-   Run `database/verify-payment-jobs.sql` and synthetic transaction tests with rollback on target PG17;
-   preserve existing real records/roles. Local PGlite PG18 is not proof of PG17 concurrency or driver/TLS.
+3. **Database:** reviewed migration applied after approval to the initially empty PG17.11 payment schema.
+   Target synthetic transitions passed with rollback, RLS/grants checked and security advisors empty.
+   Actual restricted-login/driver/TLS, multi-session/crash and full backup/restore tests remain pending;
+   migration-role target checks and local restricted-role PGlite checks are not proof of those gates.
 4. **Deployment:** the local merge is complete; separately approve pushing/deploying the backend with checkout
    and job execution disabled. Verify route recognition, native duration config, production DB driver/TLS
    and private environment scopes. Local Vite does not execute Vercel /api routes; a frontend build alone
@@ -86,7 +89,8 @@ deadline compliance. SDK/function/DB/network latency, cold starts, limits and lo
 
 ## Verification and incident handling
 
-Final local checkpoint: 123/123 tests pass; lint, TypeScript and the production frontend build pass;
+Local implementation checkpoint: 123/123 tests passed with lint, TypeScript and the frontend build.
+After approved database setup, the added rollback-script regression brings the passing suite to 124/124;
 online npm audit reports zero known vulnerabilities. No server-secret variable names appear in the built
 frontend. Independent whole-branch review found one Important pre-charge recovery defect, fixed in one
 RED→GREEN pass with integrated client/handler/restricted-role SQL coverage; no Critical findings or deferred

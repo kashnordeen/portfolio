@@ -2,10 +2,13 @@
 
 ## Current status
 
-### Managed checks implementation — isolated local branch
+### Managed checks implementation — local main and approved database setup
 
-The managed QStash candidate is now implemented in `feat/managed-payment-checks`, with disabled templates
-and no external setup/deployment. See `docs/managed-payment-jobs.md` for the exact private handoff and
+The reviewed managed QStash candidate is merged into local main, with disabled templates. The owner-approved
+managed-jobs migration is applied and rollback-tested on the existing PG17.11 database; restricted runtime
+login and live transport tests remain pending. QStash EU Free plan was confirmed; three Production-only
+Secret entries await the owner's private copy/save in Vercel, without redeployment. See
+`docs/managed-payment-setup.md` for the setup evidence and `docs/managed-payment-jobs.md` for the private handoff and
 release gates. It replaces the need for the standalone Node/SQL worker; do not run the Vault worker-secret
 recipe. Production is unchanged. Older preparation records below are historical where they conflict.
 

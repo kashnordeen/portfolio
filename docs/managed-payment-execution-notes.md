@@ -5,7 +5,9 @@ into local `main` at `cade4ed` on 2026-10-15 after the owner's continuation requ
 unchanged. All five implementation tasks are locally checkpointed. Independent
 whole-branch review found one Important recovery defect and no Critical findings or deferred minors.
 The author's single fix pass verified that defect RED→GREEN; no second review was dispatched.
-No external setup, secrets, paid resources, migration application, push or deployment occurred.
+At the implementation/local-merge checkpoint, no external setup, secrets, paid resources, migration
+application, push or deployment had occurred. Subsequent separately approved database setup and its
+verification limits are recorded in managed-payment-setup.md; there is still no push or deployment.
 
 Local integration verification: 123/123 tests, lint, TypeScript and frontend build passed in the main
 checkout. Its unrelated untracked `presentation/` folder was preserved. Dependencies were installed from

@@ -6,7 +6,9 @@ Execution result: all five tasks locally committed; independent whole-branch rev
 Important recovery fix completed. Final 123/123 tests, lint, types and build passed. The original steps below
 remain the approved plan; durable decisions/evidence are in `docs/managed-payment-execution-notes.md`.
 Subsequently fast-forwarded into local main on 2026-10-15; merged-result verification passed all the same
-gates. No push, deployment, external migration or activation occurred.
+gates. No push, deployment, external migration or activation occurred during that implementation.
+Subsequent separately approved database application is recorded in `docs/managed-payment-setup.md`;
+production deployment and activation remain unapproved.
 
 **Goal:** Replace the need for a standalone reconciliation process with durable signed QStash jobs, without enabling payments or deploying anything.
 
