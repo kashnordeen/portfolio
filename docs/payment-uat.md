@@ -334,3 +334,7 @@ The production project and community checkout remain disabled throughout UAT.
 - Added syntax-aware navigation checks. Local verification: 146 tests, lint, TypeScript,
   frontend build and npm audit (zero known advisories). No payment handlers, credentials,
   database settings, release flags, production deployment or Git remote were changed.
+- Source `6eab1cf` deployed Ready as `dpl_7NCQfNhfu3FTo1f3t3XF7y4Y6t8y` to the
+  same protected UAT project. Active database/TLS preflight and build passed; deployed
+  portfolio contains the project-payment link. UAT config remains true/false and fresh
+  live kkarn config remains false/false. No order or payment was submitted for this UI test.
