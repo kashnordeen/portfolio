@@ -49,3 +49,33 @@ receipt service. No new database permissions or dependency were added.
 References: [QStash failure callbacks](https://upstash.com/docs/qstash/features/callbacks),
 [signature verification](https://upstash.com/docs/qstash/howto/signature),
 [Resend idempotency](https://resend.com/docs/dashboard/emails/idempotency-keys).
+
+## Private API-based completion when the dashboard lacks callback forwarding
+
+The inspected Request Builder exposed `Upstash-Forward-*` but not the separate
+`Upstash-Failure-Callback-Forward-*` control. The copied saved schedule had the
+correct failure URL and normal bypass header, not the callback-specific header.
+No test was published from that unsent builder and no schedule was resumed.
+
+Run `scripts/private-uat-alert-setup.ps1` yourself in a private PowerShell 7 window,
+without transcription/debugging. It prompts for the existing **US Region QStash
+token** and the **regenerated UAT bypass key**, using hidden input. Values are sent
+to Node through stdin, never arguments, environment variables or credential files.
+The token goes only to the fixed US QStash API; the UAT key goes only to that
+approved service and its configured UAT deliveries. Neither value is printed.
+
+Preparation first validates the exact existing paused schedule, origin, cadence,
+normal bypass, empty body and three retries. It refuses mismatches. It then queues
+one signed recovery control and one deliberately blocked job delivery (no normal
+bypass) with the correct authenticated failure callback. It creates no orders,
+charges nothing and changes no schedule. A failed test will leave an intentional
+labelled DLQ entry as evidence; do not erase it automatically.
+
+Keep the window open at its confirmation prompt and report `test queued` to Codex.
+Only after the recovery 200, signed alert callback and expected email delivery are
+verified, type `VERIFIED`. This is a separate explicit operator acknowledgement:
+it permits overwriting the SAME schedule ID with the reviewed callback headers,
+then resuming and reading back its state. Before this acknowledgement there is no
+schedule mutation. On apply errors it attempts to pause again but cannot guarantee
+a pause during an API outage; check the dashboard manually if it reports failure.
+Closing the window or entering anything else stops without requesting that update.
