@@ -464,3 +464,23 @@ References: [QStash schedules](https://upstash.com/docs/qstash/features/schedule
   Live rollout/community enablement, Git push and any paid upgrade remain unapproved.
   No source deployment, credential disclosure, real payment or live flag change was
   performed as part of this acceptance and activation handoff.
+
+### Obsolete Test Mode webhook retired — 2026-10-17 IST
+
+- A reversible disable/save attempt did not persist; reloading still showed two
+  Enabled test registrations. Nothing was permanently removed under the owner's
+  ambiguous "do what is safe" instruction. The owner then explicitly said "delete"
+  after the exact obsolete target and permanent-deletion risk were explained.
+- Reidentified both registrations immediately before deletion: the preserved hook
+  reached the application and returned 400 for the unsupported dashboard envelope
+  at 2026-10-16 21:50:17.076 UTC; the obsolete registration returned platform 401
+  at 21:50:50.544 UTC. The opened drawer's destination matched only the rejected
+  registration. Identification did not rely on row order alone; no private URL or
+  bypass value was emitted.
+- Deleted only that confirmed obsolete registration and confirmed the provider's
+  final Delete action. Reload showed exactly one Enabled UAT SHA webhook with two
+  events. A post-deletion validation reached the application again (400 at
+  21:52:35.533 UTC). This is not a new payment success test or provider go-live sign-off.
+- Deletion is permanent through the dashboard's normal flow. Production webhooks,
+  credentials, live flags, schedules and Git remote were not changed. The sole
+  remaining test webhook stays Enabled. Cropped UI proof excludes private URLs.
