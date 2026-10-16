@@ -260,3 +260,21 @@ The production project and community checkout remain disabled throughout UAT.
   activation and no schedule. This requires new activation approval; do not interpret
   the owner's secret-entry or webhook-created reply as permission to enable flags.
   Old failing test webhook remains untouched. Live site and Git remote unchanged.
+
+### Approved sandbox checkout test profile — 2026-10-16
+
+- Owner approved project checkout and verification jobs on protected UAT only. This
+  does not authorize live/community payments, real money, schedules, paid upgrades,
+  credential rotation or a Git push. Use synthetic customer data only.
+- `vercel.uat-active.json` selects a separate build-only preflight. The original
+  `vercel.uat.json` still requires all four flags false; it is not weakened. The active
+  profile requires project/release/jobs true, community false, diagnostics/probe false,
+  exact sandbox project/origin, the approved ₹200–₹50,000 limits and ready queue config.
+  Both profiles retain the same verified TLS, fixed restricted UAT login and read-only
+  database permission checks. Neither preflight creates orders or contacts PhonePe.
+- Apply active flags explicitly to both build and runtime of the UAT deployment only;
+  saved project flags remain disabled. Keep Vercel Authentication and signed queue
+  verification enabled. Do not call a dashboard Validate toast an end-to-end success.
+- Known disabled fallback: source `20902ab`, deployment
+  `dpl_oNeKDMEPXfMJzintWFeV3qczz8vg`. Promote this same-project deployment if needed
+  to turn the UAT site back off without rebuilding or exposing any saved secrets.

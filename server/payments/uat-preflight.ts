@@ -4,15 +4,32 @@ import { sandboxTarget } from './targets.ts';
 
 // Build-time only. No HTTP route, provider calls, payment rows or credential output.
 export async function verifyUatDatabase(env: Record<string, string | undefined>, connect = createPaymentDatabase) {
+  return verifyUatProfile(env, false, connect);
+}
+
+// Explicit, separately selected sandbox test profile. The default remains disabled-only.
+export async function verifyActiveUatDatabase(env: Record<string, string | undefined>, connect = createPaymentDatabase) {
+  return verifyUatProfile(env, true, connect);
+}
+
+async function verifyUatProfile(env: Record<string, string | undefined>, active: boolean, connect: typeof createPaymentDatabase) {
+  const expectedFlags = {
+    PAYMENTS_ENABLED: String(active), PAYMENT_RELEASE_APPROVED: String(active),
+    COMMUNITY_PAYMENTS_ENABLED: 'false', PAYMENT_JOBS_ENABLED: String(active),
+  };
   if (env.VERCEL_PROJECT_ID !== sandboxTarget.projectId || env.VERCEL_ENV !== 'production' ||
       env.PHONEPE_ENV !== 'sandbox' || env.PAYMENT_SITE_ORIGIN !== sandboxTarget.origin ||
       env.NODE_TLS_REJECT_UNAUTHORIZED === '0' ||
-      ['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']
-        .some(key => env[key] !== 'false')) throw new Error('UAT preflight guard failed.');
+      Object.entries(expectedFlags).some(([key,value]) => env[key] !== value)) throw new Error('UAT preflight guard failed.');
   if (!/^[\x21-\x7e]{32,4096}$/.test(env.VERCEL_AUTOMATION_BYPASS_SECRET ?? '')) {
     throw new Error('UAT callback credential is not configured.');
   }
   const config = loadConfig(env);
+  if (active && (env.PAYMENT_UAT_DIAGNOSTICS !== 'false' || env.PAYMENT_UAT_VALIDATION_PROBE !== 'false' ||
+      env.PROJECT_MIN_PAISE !== '20000' || env.PROJECT_MAX_PAISE !== '5000000' ||
+      !config.projectEnabled || config.communityEnabled || !config.jobConfig.ready)) {
+    throw new Error('Active UAT configuration guard failed.');
+  }
   const url = new URL(config.databaseUrl);
   if (!['postgres:','postgresql:'].includes(url.protocol) ||
       url.hostname !== 'aws-0-ap-south-1.pooler.supabase.com' || url.port !== '6543' ||

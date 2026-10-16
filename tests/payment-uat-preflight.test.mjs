@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyUatDatabase, uatFailureCode } from '../server/payments/uat-preflight.ts';
+import { verifyUatDatabase, verifyActiveUatDatabase, uatFailureCode } from '../server/payments/uat-preflight.ts';
 import { sandboxTarget } from '../server/payments/targets.ts';
 
 const env = {
@@ -50,4 +50,40 @@ test('UAT preflight closes failed queries and never exposes arbitrary error text
   assert.equal(uatFailureCode({code:'28P01',message:'private credential'}),'AUTH_FAILED');
   assert.equal(uatFailureCode({code:'SELF_SIGNED_CERT_IN_CHAIN',message:'private credential'}),'TLS_FAILED');
   assert.equal(uatFailureCode({code:'private credential',message:'private credential'}),'CHECK_FAILED');
+});
+
+const activeEnv = {...env, PAYMENTS_ENABLED:'true', PAYMENT_RELEASE_APPROVED:'true', PAYMENT_JOBS_ENABLED:'true',
+  PAYMENT_UAT_DIAGNOSTICS:'false', PAYMENT_UAT_VALIDATION_PROBE:'false',
+  QSTASH_TOKEN:'fixture-token', QSTASH_CURRENT_SIGNING_KEY:'fixture-current', QSTASH_NEXT_SIGNING_KEY:'fixture-next'};
+
+test('active UAT profile requires explicit sandbox-only flags, bounded amounts and queue readiness before connecting',async()=>{
+  const changes = [
+    {VERCEL_PROJECT_ID:'live'}, {VERCEL_ENV:'preview'}, {PHONEPE_ENV:'production'},
+    {PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app'}, {NODE_TLS_REJECT_UNAUTHORIZED:'0'},
+    {VERCEL_AUTOMATION_BYPASS_SECRET:undefined}, {COMMUNITY_PAYMENTS_ENABLED:'true'},
+    {PROJECT_MIN_PAISE:'100'}, {PROJECT_MAX_PAISE:'5000001'},
+    {DATABASE_URL:env.DATABASE_URL.replace('portfolio_payments_uat.','portfolio_payments_api.')},
+    ...['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','PAYMENT_JOBS_ENABLED'].flatMap(key=>[{[key]:'false'},{[key]:undefined}]),
+    ...['COMMUNITY_PAYMENTS_ENABLED','PAYMENT_UAT_DIAGNOSTICS','PAYMENT_UAT_VALIDATION_PROBE'].flatMap(key=>[{[key]:'true'},{[key]:undefined}]),
+    ...['QSTASH_TOKEN','QSTASH_CURRENT_SIGNING_KEY','QSTASH_NEXT_SIGNING_KEY'].flatMap(key=>[{[key]:undefined},{[key]:'bad\nkey'}]),
+  ];
+  for (const change of changes) {
+    let connected=false;
+    await assert.rejects(verifyActiveUatDatabase({...activeEnv,...change},()=>{connected=true;throw Error('must not connect');}));
+    assert.equal(connected,false);
+  }
+  await assert.rejects(verifyUatDatabase(activeEnv,()=>{throw Error('disabled profile must refuse active flags');}));
+  await assert.rejects(verifyActiveUatDatabase(env,()=>{throw Error('active profile must refuse disabled flags');}));
+});
+
+test('active UAT profile retains the same restricted read-only metadata checks and cleanup',async()=>{
+  const f=fixture();
+  assert.equal(await verifyActiveUatDatabase(activeEnv,f.connect),true);
+  assert.deepEqual(f.calls,['read only',{timeout:1}]);
+  for (const row of [{role_ok:false},{session_ok:false},{read_only:false},{live_access:true},
+    {uat_access:false},{safe_role:false},{memberships:1},{rls_tables:4}]) {
+    const bad=fixture(row);
+    await assert.rejects(verifyActiveUatDatabase(activeEnv,bad.connect));
+    assert.deepEqual(bad.calls,['read only',{timeout:1}]);
+  }
 });
