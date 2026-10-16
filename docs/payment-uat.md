@@ -397,3 +397,37 @@ References: [QStash schedules](https://upstash.com/docs/qstash/features/schedule
   substitute. A monitored failure-callback destination requires owner approval.
   Stale PhonePe test-webhook retirement still needs an exposed management control or
   provider assistance. No live rollout, Git push, paid upgrade or real payment occurred.
+
+### Rotated UAT key and approved email-alert deployment — 2026-10-17 IST
+
+- Owner approved coordinated UAT bypass rotation, regenerated the value privately,
+  and confirmed updating the existing PhonePe Test Mode callback and paused QStash
+  schedule. Replacement values were not read or recorded. Recovery stayed paused.
+- Rebuilt UAT source `8f7f92c` as `dpl_AyJE5pqvNjENhgr1knTrC7uBYGSu`. A single
+  signed recovery test returned 200 at 2026-10-16 16:29:58.500 UTC; unsigned controls
+  returned 401. The updated PhonePe dashboard envelope reached the handler and
+  returned 400, consistent with unsupported Validate payloads, not a new payment test.
+- The obsolete PhonePe callback was identified by its different, revoked bypass
+  value on the same UAT host/path, not solely by row order. An attempt to uncheck
+  Enabled and save did not persist: refresh still showed two Enabled registrations.
+  Do not claim retirement. Permanent deletion requires explicit action-time approval;
+  the revoked value no longer grants UAT deployment access. No production hook changed.
+- Owner approved free-tier Resend for UAT operational failure summaries to the existing
+  selected email, created a Sending access key privately, and saved `RESEND_API_KEY`
+  as Production-only Secret in the separate UAT project. No key value was retrieved.
+- Source `a647799` adds the signed UAT-only alert endpoint and fixed failure callback
+  on opted-in sandbox jobs. Fresh local verification: 153 tests, lint, TypeScript,
+  frontend build and dependency audit (zero known vulnerabilities). No new package
+  or database privileges. See `uat-payment-alerts.md` for privacy/coalescing limitations.
+- Deployed Ready as `dpl_5wdPL5Cugtpt3U9zATGjBpy9mMDk`, with both stable UAT aliases,
+  sandbox identity, project/jobs active, community false and diagnostics false. The
+  alert flag is true only on this UAT build/runtime; no live/project-saved flags changed.
+  Unsigned POST `/api/payments/alerts` returned 401, confirming fail-closed routing.
+  Fresh live kkarn config remained false/false; UAT config remained true/false.
+- The Upstash schedule editor repeatedly closed before automation could add headers.
+  No duplicate schedule was created or existing schedule resumed. Owner handoff is
+  to add the fixed alerts URL as `Upstash-Failure-Callback` and privately supply the
+  rotated UAT key as `Upstash-Failure-Callback-Forward-x-vercel-protection-bypass`,
+  preserving the existing paused schedule. Signed failure-to-email delivery and
+  inbox receipt remain UNVERIFIED until that configuration and a controlled test.
+- No live rollout, real payment, paid upgrade, credential output or Git push occurred.
