@@ -67,11 +67,14 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
         }
         return reply({ orderId: current.id, state: current.state, message: 'This payment request is already being checked.' },409);
       }
+      let checkoutStage: 'PROVIDER' | 'PERSISTENCE' = 'PROVIDER';
       try {
         const checkout = await provider.pay(claimed);
+        checkoutStage = 'PERSISTENCE';
         await store.checkout(order.id, checkout);
         return reply({ orderId: order.id, checkoutUrl: checkout.url }, 201);
       } catch {
+        if (config.environment === 'sandbox') console.warn(JSON.stringify({event:'UAT_CHECKOUT_DEFERRED',stage:checkoutStage}));
         // The persisted order will be reconciled; a timeout must not imply failed payment.
         return reply({ orderId: order.id, state: 'PENDING', message: 'We could not open checkout. Your order is being checked; do not create another payment.' }, 202);
       }

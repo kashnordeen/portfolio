@@ -22,6 +22,8 @@ function emptyData(value: unknown) {
     (Array.isArray(value) && value.length === 0);
 }
 
+const owns = (object: Record<string, unknown>, key: string) => Object.prototype.hasOwnProperty.call(object,key);
+
 // Call only after authentication and bounded parsing. Never emit actual field values.
 export function logUatNotificationShape(body: Record<string, unknown>,
   env: Record<string, string | undefined> = process.env, log: (entry: string) => void = console.info) {
@@ -35,14 +37,14 @@ export function logUatNotificationShape(body: Record<string, unknown>,
   try {
     log(JSON.stringify({ event:'UAT_WEBHOOK_SHAPE',eventClass,payloadObject,
       emptyObject:Object.keys(body).length === 0,
-      hasMessage:Object.hasOwn(body,'message'),hasTest:Object.hasOwn(body,'test'),
-      hasData:Object.hasOwn(body,'data'),hasResponse:Object.hasOwn(body,'response'),
-      hasCallback:Object.hasOwn(body,'callback'),hasBody:Object.hasOwn(body,'body'),
-      hasTestCallback:Object.hasOwn(body,'testCallback'),hasEventType:Object.hasOwn(body,'eventType'),
-      hasTestWebhook:Object.hasOwn(body,'testWebhook'),hasIsTest:Object.hasOwn(body,'isTest'),
+      hasMessage:owns(body,'message'),hasTest:owns(body,'test'),
+      hasData:owns(body,'data'),hasResponse:owns(body,'response'),
+      hasCallback:owns(body,'callback'),hasBody:owns(body,'body'),
+      hasTestCallback:owns(body,'testCallback'),hasEventType:owns(body,'eventType'),
+      hasTestWebhook:owns(body,'testWebhook'),hasIsTest:owns(body,'isTest'),
       messageIsString:typeof body.message === 'string',dataIsNull:body.data === null,
       dataIsEmpty:emptyData(body.data),rootIsMessageDataOnly:Object.keys(body).length === 2 &&
-        Object.hasOwn(body,'message') && Object.hasOwn(body,'data'),
+        owns(body,'message') && owns(body,'data'),
       stateMatchesEvent:(body.event === 'checkout.order.completed' && payload.state === 'COMPLETED') ||
         (body.event === 'checkout.order.failed' && payload.state === 'FAILED'),
       merchantOrderIdValid:typeof payload.merchantOrderId === 'string' && /^[A-Za-z0-9_-]{1,63}$/.test(payload.merchantOrderId),

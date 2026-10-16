@@ -115,3 +115,22 @@ test('PhonePe adapter caches OAuth and never leaks customer data or retries chec
   await assert.rejects(failing.pay({ id: 'id', merchant_order_id: 'KK_test', amount_paise: 100, purpose: 'project' }), error => !error.message.includes('private'));
   assert.equal(failures, 1);
 });
+
+test('sandbox provider failures emit only fixed operation, category and HTTP status, never sensitive values',async()=>{
+  const logs=[];
+  const order={id:'private-id',merchant_order_id:'private-merchant-order',amount_paise:20000,purpose:'project'};
+  const fail=createPhonePe(loadConfig(env),async()=>new Response('private-token-and-error',{status:401}),Date.now,entry=>logs.push(JSON.parse(entry)));
+  await assert.rejects(fail.pay(order));
+  assert.deepEqual(logs,[{event:'UAT_PROVIDER_FAILURE',operation:'TOKEN',code:'HTTP_REJECTED',status:401}]);
+  const invalid=createPhonePe(loadConfig(env),async url=>url.endsWith('/oauth/token')
+    ? Response.json({access_token:'private-token',expires_at:Date.now()/1000+3600})
+    : Response.json({orderId:'OMO_PRIVATE',state:'PENDING',expireAt:1,redirectUrl:'https://private.invalid/token'}),Date.now,entry=>logs.push(JSON.parse(entry)));
+  await assert.rejects(invalid.pay(order));
+  assert.deepEqual(logs.at(-1),{event:'UAT_PROVIDER_FAILURE',operation:'PAY',code:'INVALID_CHECKOUT_EXPIRY'});
+  const before=logs.length;
+  const live=createPhonePe(loadConfig({...env,...queueEnv}),async()=>new Response('private',{status:403}),Date.now,entry=>logs.push(entry));
+  await assert.rejects(live.pay(order));
+  assert.equal(logs.length,before);
+  const brokenLogger=createPhonePe(loadConfig(env),async()=>{throw Error('private');},Date.now,()=>{throw Error('private');});
+  await assert.rejects(brokenLogger.pay(order),error=>!error.message.includes('private'));
+});
