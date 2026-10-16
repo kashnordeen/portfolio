@@ -295,3 +295,29 @@ The production project and community checkout remain disabled throughout UAT.
   checkout expiry to the earlier of provider expiry and the requested 20-minute window.
   Long provider lifetimes cannot lengthen local checkout availability; stale/invalid
   timestamps, wrong redirect hosts and all payment verification checks still fail closed.
+
+### End-to-end sandbox success and failure verified — 2026-10-16
+
+- Source `c2c56d5` deployed Ready to the separate protected UAT project as
+  `dpl_6CHAtZsovjyyYZ8omZ4hQEbuji3i` (stable UAT aliases retained). Active build-only
+  guard and verified restricted database/TLS checks passed; no TypeScript build errors.
+  Local verification: 144/144 tests, lint, TypeScript and npm audit (zero known advisories).
+- Synthetic ₹200 project checkout now returns a hosted PhonePe sandbox page with QR,
+  cards and net banking. Used explicit TESTBANK and PhonePe's simulator, never real
+  payment details or funds. Sandbox success callback returned 200 at 15:24:13 UTC;
+  signed status verification produced COMPLETED, correct amount, paid timestamp,
+  one durable event and one fulfilment. Local expiry stayed within 20 minutes.
+  Browser return page displayed Payment verified.
+- Separate synthetic ₹200 failure callback returned 200 at 15:27:52 UTC. Independent
+  verification produced FAILED, correct amount, no paid timestamp, one event and
+  zero fulfilments. Thus a failed attempt did not grant delivery/access.
+- Old stale Test Mode webhook also received callbacks but correctly returned 401;
+  it remains untouched. The replacement's actual completed/failed payment events
+  are now proven, unlike the incompatible dashboard Validate envelope. Retire the
+  stale test webhook only with owner approval and unambiguous row identification.
+- Final UAT config: project true, community false; unsigned jobs still return 401.
+  Fresh public live config at kkarn.vercel.app remains false/false. No live deployment,
+  real money, community activation, Git push, schedule, paid upgrade or secret rotation.
+- Remaining go-live gates are separate: approved operational recovery scheduling and
+  alerts, stale UAT webhook cleanup, production configuration/release approval and
+  owner-controlled live payment acceptance testing. Sandbox success is not live approval.
