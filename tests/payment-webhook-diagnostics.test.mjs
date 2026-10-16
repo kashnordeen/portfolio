@@ -57,6 +57,7 @@ test('notification shape diagnostics emit only fixed classes and validity boolea
   assert.deepEqual(JSON.parse(logs[0]),{event:'UAT_WEBHOOK_SHAPE',eventClass:'CHECKOUT_COMPLETED',
     emptyObject:false,hasMessage:false,hasTest:false,hasData:false,hasResponse:false,hasCallback:false,
     hasBody:false,hasTestCallback:false,hasEventType:false,hasTestWebhook:false,hasIsTest:false,
+    messageIsString:false,dataIsNull:false,dataIsEmpty:false,rootIsMessageDataOnly:false,
     payloadObject:true,stateMatchesEvent:true,merchantOrderIdValid:false,orderIdValid:true,
     amountSafeInteger:false,amountIsString:true,merchantIdPresent:true,legacyTypeRecognized:false});
   assert.doesNotMatch(logs.join(''),/PRIVATE/);
@@ -79,11 +80,17 @@ test('notification shape diagnostics are inert outside disabled UAT',()=>{
   }
 });
 
-test('read-only validation probe requires explicit opt-in, disabled UAT and an exactly empty object',()=>{
+test('read-only validation probe requires explicit opt-in, disabled UAT and an empty connectivity envelope',()=>{
   const probeEnv={...env,PAYMENT_UAT_VALIDATION_PROBE:'true'};
   assert.equal(isDisabledUatValidationProbe({},probeEnv),true);
+  for(const data of [null,{},[]]) assert.equal(isDisabledUatValidationProbe({message:'Fixture probe',data},probeEnv),true);
   for(const body of [null,[],0,'',new Date(),{event:'checkout.order.completed'},{payload:{}},{type:'UNKNOWN'},{test:true},
     JSON.parse('{"__proto__":{}}')]) assert.equal(isDisabledUatValidationProbe(body,probeEnv),false);
+  for(const body of [{message:'Fixture',data:{amount:1}},{message:'Fixture',data:'PRIVATE_DATA'},
+    {message:'Fixture',data:{event:'checkout.order.completed'}},{message:'Fixture',data:null,event:'checkout.order.completed'},
+    {message:'',data:null},{message:{},data:null},{message:'x'.repeat(513),data:null}]) {
+    assert.equal(isDisabledUatValidationProbe(body,probeEnv),false);
+  }
   for(const change of [{PAYMENT_UAT_VALIDATION_PROBE:undefined},{PHONEPE_ENV:'production'},
     {VERCEL_ENV:'preview'},{VERCEL_PROJECT_ID:'live'},{PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app'},
     ...['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']

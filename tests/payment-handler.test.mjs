@@ -126,6 +126,9 @@ test('UAT shape diagnostics and exact-empty probe preserve authentication, parsi
     const probe=await f.run('webhook',request({},auth));
     assert.equal(probe.status,200);assert.deepEqual(await probe.json(),{received:true,validationOnly:true});
     assert.equal(probe.headers.get('set-cookie'),null);
+    const envelope=await f.run('webhook',request({message:'Fixture probe',data:{}},auth));
+    assert.equal(envelope.status,200);assert.deepEqual(await envelope.json(),{received:true,validationOnly:true});
+    assert.equal((await f.run('webhook',request({message:'Fixture',data:{amount:1}},auth))).status,400);
     assert.equal((await f.run('webhook',request({test:true},auth))).status,400);
     process.env.PHONEPE_ENV='production';
     assert.equal((await f.run('webhook',request({},auth))).status,400);

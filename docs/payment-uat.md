@@ -251,3 +251,12 @@ The production project and community checkout remain disabled throughout UAT.
   connectivity/authentication, never a successful payment or fulfilment.
 - This opt-in is deployment-specific, not a project-wide setting; disable it before
   eventual separately approved UAT activation. No real payment, activation or push.
+
+- Follow-up diagnostics proved the dashboard request is **not** an empty object:
+  `message` and `data` are present while event/payload/identifiers are absent. The first
+  exact-empty predicate correctly continued to reject it. Expanded only the inactive-UAT
+  probe predicate to also recognize an object containing **exactly** `message` (nonempty
+  string, max 512) and `data` (null, empty object or empty array). Extra fields, nested
+  payment data, arbitrary string data and normal malformed payment notifications still
+  fail. No message/data contents are logged. Cloud verification must confirm a match;
+  do not claim 200 merely from presence booleans or the owner's success toast.

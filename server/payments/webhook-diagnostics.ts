@@ -12,13 +12,25 @@ function diagnosticsEnabled(env: Record<string, string | undefined>) {
   return env.PAYMENT_UAT_DIAGNOSTICS === 'true' && disabledUat(env);
 }
 
+function plainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) &&
+    Object.getPrototypeOf(value) === Object.prototype;
+}
+
+function emptyData(value: unknown) {
+  return value === null || (plainObject(value) && Object.keys(value).length === 0) ||
+    (Array.isArray(value) && value.length === 0);
+}
+
 // Connectivity-only setup probe, never a payment event or an activation bypass.
 // Handler must authenticate and bounded-parse before calling this predicate.
 export function isDisabledUatValidationProbe(body: unknown,
   env: Record<string, string | undefined> = process.env) {
-  return env.PAYMENT_UAT_VALIDATION_PROBE === 'true' && disabledUat(env) && body !== null &&
-    typeof body === 'object' && !Array.isArray(body) && Object.getPrototypeOf(body) === Object.prototype &&
-    Object.keys(body).length === 0;
+  if (env.PAYMENT_UAT_VALIDATION_PROBE !== 'true' || !disabledUat(env) || !plainObject(body)) return false;
+  const keys=Object.keys(body);
+  if (keys.length === 0) return true;
+  return keys.length === 2 && Object.hasOwn(body,'message') && Object.hasOwn(body,'data') &&
+    typeof body.message === 'string' && body.message.trim().length > 0 && body.message.length <= 512 && emptyData(body.data);
 }
 
 // Call only after authentication and bounded parsing. Never emit actual field values.
@@ -39,6 +51,9 @@ export function logUatNotificationShape(body: Record<string, unknown>,
       hasCallback:Object.hasOwn(body,'callback'),hasBody:Object.hasOwn(body,'body'),
       hasTestCallback:Object.hasOwn(body,'testCallback'),hasEventType:Object.hasOwn(body,'eventType'),
       hasTestWebhook:Object.hasOwn(body,'testWebhook'),hasIsTest:Object.hasOwn(body,'isTest'),
+      messageIsString:typeof body.message === 'string',dataIsNull:body.data === null,
+      dataIsEmpty:emptyData(body.data),rootIsMessageDataOnly:Object.keys(body).length === 2 &&
+        Object.hasOwn(body,'message') && Object.hasOwn(body,'data'),
       stateMatchesEvent:(body.event === 'checkout.order.completed' && payload.state === 'COMPLETED') ||
         (body.event === 'checkout.order.failed' && payload.state === 'FAILED'),
       merchantOrderIdValid:typeof payload.merchantOrderId === 'string' && /^[A-Za-z0-9_-]{1,63}$/.test(payload.merchantOrderId),
