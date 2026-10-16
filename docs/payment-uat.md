@@ -373,3 +373,27 @@ The production project and community checkout remain disabled throughout UAT.
 References: [QStash schedules](https://upstash.com/docs/qstash/features/schedules),
 [pricing and retry accounting](https://upstash.com/pricing/qstash),
 [failure callbacks](https://upstash.com/docs/qstash/howto/handling-failures).
+
+### Owner-created recovery schedule verified — 2026-10-16
+
+- Owner privately supplied the existing UAT automation-bypass value and submitted
+  `portfolio-payments-uat-recovery-v1`. Console verified one active schedule, zero
+  paused, and the fixed stable UAT `/api/payments/recover` destination. The prepared
+  five-minute POST configuration is now saved; no duplicate schedule was created.
+- First scheduled run at 16:05:00 UTC (21:35 IST) is DELIVERED in QStash, duration
+  five seconds. Vercel independently recorded POST 200 at 16:05:00.452 UTC on
+  `dpl_7NCQfNhfu3FTo1f3t3XF7y4Y6t8y`. No response publication count was inspected;
+  this verifies delivery and handler acceptance, not a new payment or fulfilment.
+  The QStash dead-letter view explicitly showed DLQ is currently empty.
+- Separate unsigned control POST returned 401 Invalid scheduler authentication at
+  16:05:23.404 UTC. This expected rejection is not a scheduled-delivery failure.
+  UAT config remained project true/community false; fresh live config was false/false.
+- An editor snapshot accidentally included the UAT bypass value in tool output before
+  the collapse transition finished. No value is recorded here or in source. Stop
+  full-form snapshots; consider owner-approved coordinated UAT bypass rotation before
+  further external testing, updating both test callbacks and the schedule together.
+  No credential was rotated, and production credentials were not involved.
+- Delivery-failure email alerts remain unconfigured: usage-limit emails are not a
+  substitute. A monitored failure-callback destination requires owner approval.
+  Stale PhonePe test-webhook retirement still needs an exposed management control or
+  provider assistance. No live rollout, Git push, paid upgrade or real payment occurred.
