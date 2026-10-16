@@ -65,6 +65,7 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
   };
   return {
     async pay(order: { id: string; merchant_order_id: string; amount_paise: number; purpose: string }) {
+      const checkoutStarted = now();
       const redirect = new URL('/', config.origin);
       redirect.searchParams.set('payment', order.purpose);
       redirect.searchParams.set('order', order.id);
@@ -75,21 +76,16 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
         report('PAY','INVALID_CHECKOUT_STATE');
         throw new PaymentError(502, 'Invalid payment provider response.');
       }
-      if (typeof data.expireAt !== 'number' || data.expireAt <= now() || data.expireAt > now() + 3_660_000) {
+      if (typeof data.expireAt !== 'number' || !Number.isSafeInteger(data.expireAt) || data.expireAt <= now()) {
         report('PAY','INVALID_CHECKOUT_EXPIRY');
-        if (config.environment === 'sandbox') {
-          try { log(JSON.stringify({event:'UAT_CHECKOUT_EXPIRY',
-            numeric:typeof data.expireAt === 'number',numericString:typeof data.expireAt === 'string' && /^\d+$/.test(data.expireAt),
-            future:typeof data.expireAt === 'number' && data.expireAt > now(),
-            withinWindow:typeof data.expireAt === 'number' && data.expireAt <= now()+3_660_000})); }
-          catch { /* Fixed type/validity booleans only; no response values. */ }
-        }
         throw new PaymentError(502, 'Invalid payment provider response.');
       }
       let url: string;
       try { url = safeCheckoutUrl(data.redirectUrl, config.checkoutHost); }
       catch (error) { report('PAY','INVALID_CHECKOUT_URL'); throw error; }
-      return { orderId: data.orderId, expires: new Date(data.expireAt), url };
+      // The provider may return a longer sandbox lifetime. Never extend our requested
+      // 20-minute checkout window, or the provider's earlier expiry.
+      return { orderId: data.orderId, expires: new Date(Math.min(data.expireAt,checkoutStarted+1_200_000)), url };
     },
     async status(merchantOrderId: string) {
       const data = await json('STATUS', `${base}/checkout/v2/order/${encodeURIComponent(merchantOrderId)}/status?details=false`, {

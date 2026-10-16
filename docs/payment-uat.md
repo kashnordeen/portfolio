@@ -278,3 +278,20 @@ The production project and community checkout remain disabled throughout UAT.
 - Known disabled fallback: source `20902ab`, deployment
   `dpl_oNeKDMEPXfMJzintWFeV3qczz8vg`. Promote this same-project deployment if needed
   to turn the UAT site back off without rebuilding or exposing any saved secrets.
+
+### First approved checkout test: transport passes, expiry guard corrected
+
+- Active source `e3fdae7` deployed Ready as `dpl_9E971MnDoJfnZmALm6cGfrSy6tbi`.
+  Preflight passed; project config true, community false; unsigned jobs rejected 401.
+  Synthetic ₹200 checkout returned 202 rather than exposing an unverified redirect.
+- Signed QStash deliveries returned 200, and restricted UAT database metadata showed
+  attempted checkout, a provider order from independent status reconciliation, and
+  no saved checkout URL. No successful payment callback/event yet; no real money.
+- Sandbox-only fixed-category logging (never payloads, URLs, IDs, tokens or raw errors)
+  isolated the rejection to PAY expiry validation. Source `c81abb5`, deployment
+  `dpl_HZUv6oX53YnS1f5QjtYfEphfWSDD`, showed only that expiry was numeric, future,
+  and beyond the previous one-hour guard. Temporary expiry-shape logging was removed.
+- Corrected adapter requires a future safe-integer epoch timestamp and caps the local
+  checkout expiry to the earlier of provider expiry and the requested 20-minute window.
+  Long provider lifetimes cannot lengthen local checkout availability; stale/invalid
+  timestamps, wrong redirect hosts and all payment verification checks still fail closed.

@@ -126,12 +126,22 @@ test('sandbox provider failures emit only fixed operation, category and HTTP sta
     ? Response.json({access_token:'private-token',expires_at:Date.now()/1000+3600})
     : Response.json({orderId:'OMO_PRIVATE',state:'PENDING',expireAt:1,redirectUrl:'https://private.invalid/token'}),Date.now,entry=>logs.push(JSON.parse(entry)));
   await assert.rejects(invalid.pay(order));
-  assert.deepEqual(logs.at(-2),{event:'UAT_PROVIDER_FAILURE',operation:'PAY',code:'INVALID_CHECKOUT_EXPIRY'});
-  assert.deepEqual(logs.at(-1),{event:'UAT_CHECKOUT_EXPIRY',numeric:true,numericString:false,future:false,withinWindow:true});
+  assert.deepEqual(logs.at(-1),{event:'UAT_PROVIDER_FAILURE',operation:'PAY',code:'INVALID_CHECKOUT_EXPIRY'});
   const before=logs.length;
   const live=createPhonePe(loadConfig({...env,...queueEnv}),async()=>new Response('private',{status:403}),Date.now,entry=>logs.push(entry));
   await assert.rejects(live.pay(order));
   assert.equal(logs.length,before);
   const brokenLogger=createPhonePe(loadConfig(env),async()=>{throw Error('private');},Date.now,()=>{throw Error('private');});
   await assert.rejects(brokenLogger.pay(order),error=>!error.message.includes('private'));
+});
+
+test('checkout expiry is capped to requested 20 minutes without accepting stale or malformed timestamps',async()=>{
+  const now=()=>1_800_000_000_000;
+  const order={id:'fixture',merchant_order_id:'KK_FIXTURE',amount_paise:20000,purpose:'project'};
+  const adapter=expiry=>createPhonePe(loadConfig(env),async url=>url.endsWith('/oauth/token')
+    ? Response.json({access_token:'fixture',expires_at:now()/1000+3600})
+    : Response.json({orderId:'OMO_FIXTURE',state:'PENDING',expireAt:expiry,redirectUrl:'https://mercury-uat.phonepe.com/transact?token=fixture'}),now,()=>{});
+  assert.equal((await adapter(now()+86_400_000).pay(order)).expires.getTime(),now()+1_200_000);
+  assert.equal((await adapter(now()+300_000).pay(order)).expires.getTime(),now()+300_000);
+  for (const expiry of [now()-1,now(),String(now()+300_000),null,1e30,now()+0.5]) await assert.rejects(adapter(expiry).pay(order));
 });
