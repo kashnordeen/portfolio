@@ -1,11 +1,24 @@
 import { sandboxTarget } from './targets.ts';
 
-function diagnosticsEnabled(env: Record<string, string | undefined>) {
-  return env.PAYMENT_UAT_DIAGNOSTICS === 'true' && env.PHONEPE_ENV === 'sandbox' &&
+function disabledUat(env: Record<string, string | undefined>) {
+  return env.PHONEPE_ENV === 'sandbox' &&
     env.VERCEL_ENV === 'production' && env.VERCEL_PROJECT_ID === sandboxTarget.projectId &&
     env.PAYMENT_SITE_ORIGIN === sandboxTarget.origin &&
     ['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']
       .every(key => env[key] === 'false');
+}
+
+function diagnosticsEnabled(env: Record<string, string | undefined>) {
+  return env.PAYMENT_UAT_DIAGNOSTICS === 'true' && disabledUat(env);
+}
+
+// Connectivity-only setup probe, never a payment event or an activation bypass.
+// Handler must authenticate and bounded-parse before calling this predicate.
+export function isDisabledUatValidationProbe(body: unknown,
+  env: Record<string, string | undefined> = process.env) {
+  return env.PAYMENT_UAT_VALIDATION_PROBE === 'true' && disabledUat(env) && body !== null &&
+    typeof body === 'object' && !Array.isArray(body) && Object.getPrototypeOf(body) === Object.prototype &&
+    Object.keys(body).length === 0;
 }
 
 // Call only after authentication and bounded parsing. Never emit actual field values.
@@ -50,6 +63,7 @@ export async function diagnoseUatWebhook(request: Request, run: () => Promise<Re
   let code = response.ok ? 'ACCEPTED' : 'OTHER_REJECTION';
   try {
     const body = await response.clone().json();
+    if (response.ok && body.received === true && body.validationOnly === true) code = 'VALIDATION_PROBE';
     const reasons = new Map([
       ['Webhook authentication failed.','AUTHENTICATION_FAILED'],
       ['Payment notification merchant does not match.','MERCHANT_MISMATCH'],

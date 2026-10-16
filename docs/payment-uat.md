@@ -234,3 +234,20 @@ The production project and community checkout remain disabled throughout UAT.
   payload-object presence, state/event consistency, identifier validity, amount type,
   merchant-ID presence and recognition of a legacy type label. No actual field, ID,
   amount, header, URL, credential or customer value is emitted. Rejection rules unchanged.
+
+### Empty-object UAT connectivity probe
+
+- Authenticated dashboard Validate request showed event MISSING, no payload object, no
+  payment identifiers/state/amount/merchant and no recognized legacy type. Actual values
+  were never logged. This is not a complete payment notification.
+- Added a separate, explicit `PAYMENT_UAT_VALIDATION_PROBE=true` opt-in for an **exactly
+  empty JSON object**, only in the fixed sandbox project/origin and Production target,
+  with all four payment/job flags exactly false. Authentication and bounded object parsing
+  still happen first. The handler returns `received:true, validationOnly:true` immediately,
+  without recording events, updating orders, setting a session or calling provider/queue.
+- Nonempty notifications retain all original checks. The probe cannot run in live,
+  preview, active UAT, without opt-in or with a missing release flag. Its diagnostic code
+  is `VALIDATION_PROBE`, distinct from accepted payment events. A probe 200 proves only
+  connectivity/authentication, never a successful payment or fulfilment.
+- This opt-in is deployment-specific, not a project-wide setting; disable it before
+  eventual separately approved UAT activation. No real payment, activation or push.

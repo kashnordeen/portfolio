@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { diagnoseUatWebhook, logUatNotificationShape } from '../server/payments/webhook-diagnostics.ts';
+import { diagnoseUatWebhook, logUatNotificationShape, isDisabledUatValidationProbe } from '../server/payments/webhook-diagnostics.ts';
 import { sandboxTarget } from '../server/payments/targets.ts';
 
 const env = { PAYMENT_UAT_DIAGNOSTICS:'true', PHONEPE_ENV:'sandbox', VERCEL_ENV:'production',
@@ -75,4 +75,23 @@ test('notification shape diagnostics are inert outside disabled UAT',()=>{
     const logs=[];logUatNotificationShape({event:'PRIVATE_EVENT'},{...env,...change},x=>logs.push(x));
     assert.deepEqual(logs,[]);
   }
+});
+
+test('read-only validation probe requires explicit opt-in, disabled UAT and an exactly empty object',()=>{
+  const probeEnv={...env,PAYMENT_UAT_VALIDATION_PROBE:'true'};
+  assert.equal(isDisabledUatValidationProbe({},probeEnv),true);
+  for(const body of [null,[],0,'',new Date(),{event:'checkout.order.completed'},{payload:{}},{type:'UNKNOWN'},{test:true},
+    JSON.parse('{"__proto__":{}}')]) assert.equal(isDisabledUatValidationProbe(body,probeEnv),false);
+  for(const change of [{PAYMENT_UAT_VALIDATION_PROBE:undefined},{PHONEPE_ENV:'production'},
+    {VERCEL_ENV:'preview'},{VERCEL_PROJECT_ID:'live'},{PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app'},
+    ...['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']
+      .flatMap(key=>[{[key]:'true'},{[key]:undefined}])]) {
+    assert.equal(isDisabledUatValidationProbe({},{...probeEnv,...change}),false);
+  }
+});
+
+test('diagnostics distinguish a connectivity probe from an accepted payment event',async()=>{
+  const logs=[],response=Response.json({received:true,validationOnly:true});
+  assert.equal(await diagnoseUatWebhook(request('a'.repeat(64)),async()=>response,env,x=>logs.push(x)),response);
+  assert.equal(JSON.parse(logs[0]).code,'VALIDATION_PROBE');
 });

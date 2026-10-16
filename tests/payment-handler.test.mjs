@@ -106,10 +106,11 @@ test('webhooks authenticate merchant and durably queue an event; never trust not
   assert.equal((await f.run('webhook', request(event, auth))).status, 503);
 });
 
-test('shape diagnostics run only after webhook authentication and bounded parsing, without storage calls',async t=>{
+test('UAT shape diagnostics and exact-empty probe preserve authentication, parsing and zero-write guards',async t=>{
   const gate={PAYMENT_UAT_DIAGNOSTICS:'true',PHONEPE_ENV:'sandbox',VERCEL_ENV:'production',
     VERCEL_PROJECT_ID:sandboxTarget.projectId,PAYMENT_SITE_ORIGIN:sandboxTarget.origin,
-    PAYMENTS_ENABLED:'false',PAYMENT_RELEASE_APPROVED:'false',COMMUNITY_PAYMENTS_ENABLED:'false',PAYMENT_JOBS_ENABLED:'false'};
+    PAYMENTS_ENABLED:'false',PAYMENT_RELEASE_APPROVED:'false',COMMUNITY_PAYMENTS_ENABLED:'false',PAYMENT_JOBS_ENABLED:'false',
+    PAYMENT_UAT_VALIDATION_PROBE:'true'};
   const previous=Object.fromEntries(Object.keys(gate).map(key=>[key,process.env[key]]));
   const logs=[];t.mock.method(console,'info',entry=>logs.push(entry));
   Object.assign(process.env,gate);
@@ -121,6 +122,15 @@ test('shape diagnostics run only after webhook authentication and bounded parsin
     assert.equal((await f.run('webhook',request(body,auth))).status,400);
     assert.equal(logs.length,1);assert.equal(JSON.parse(logs[0]).eventClass,'OTHER');
     assert.doesNotMatch(logs.join(''),/PRIVATE|test-user|test-password/);
+    assert.equal((await f.run('webhook',request({}))).status,401);
+    const probe=await f.run('webhook',request({},auth));
+    assert.equal(probe.status,200);assert.deepEqual(await probe.json(),{received:true,validationOnly:true});
+    assert.equal(probe.headers.get('set-cookie'),null);
+    assert.equal((await f.run('webhook',request({test:true},auth))).status,400);
+    process.env.PHONEPE_ENV='production';
+    assert.equal((await f.run('webhook',request({},auth))).status,400);
+    process.env.PHONEPE_ENV='sandbox';process.env.PAYMENT_JOBS_ENABLED='true';
+    assert.equal((await f.run('webhook',request({},auth))).status,400);
     assert.equal(f.calls.length,0);
   } finally {
     for(const [key,value] of Object.entries(previous)) {
