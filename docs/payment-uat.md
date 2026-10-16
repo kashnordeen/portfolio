@@ -431,3 +431,36 @@ References: [QStash schedules](https://upstash.com/docs/qstash/features/schedule
   preserving the existing paused schedule. Signed failure-to-email delivery and
   inbox receipt remain UNVERIFIED until that configuration and a controlled test.
 - No live rollout, real payment, paid upgrade, credential output or Git push occurred.
+
+### Signed alert acceptance and recovery activation — 2026-10-17 IST
+
+- Owner ran the private two-phase helper from local source `3d50fc5`; credentials
+  were entered only at hidden prompts. The first attempt did not start because the
+  owner's terminal lacked `pwsh` on PATH. The verified bundled PowerShell executable
+  resolved startup without installation, an execution-policy change or elevation.
+- Preparation left the schedule paused and published two no-money controls. Signed
+  recovery returned HTTP 200 at 2026-10-16 21:00:54.340 UTC. The intentionally
+  unbypassed jobs request was rejected by deployment protection, not used to create
+  an order. Default exponential retries made this acceptance test take roughly
+  36 minutes; a future isolated acceptance test should explicitly use short retry
+  delays rather than alter the recovery schedule's production-like retry policy.
+- The final intentional rejection returned 401 at 21:36:35.690 UTC. Its signed
+  failure callback returned 200 from `/api/payments/alerts` at 21:36:36.352 UTC on
+  `dpl_5wdPL5Cugtpt3U9zATGjBpy9mMDk`. Resend independently showed the expected
+  `[Portfolio UAT] Payment verification delivery needs attention` email Delivered
+  to the approved recipient. This proves provider delivery, not owner inbox reading,
+  payment completion or the recovery-failure category specifically.
+- After these checks, the owner entered `VERIFIED` and reported completion. The
+  helper updates the same fixed schedule ID with callback-forward headers, resumes
+  it and reads back its guarded settings. Console inspection independently showed
+  one schedule row for the stable UAT `/api/payments/recover` destination with the
+  Pause action (active). First scheduled recovery returned HTTP 200 at
+  21:40:00.587 UTC (03:10:00.587 IST), on the same reviewed deployment.
+- Preserve the intentional failed test as diagnostic evidence; do not describe the
+  DLQ as empty. Alerting is not a dead-man monitor for a paused/missing scheduler,
+  an exhausted publication quota or complete queue/email-provider outage.
+- Obsolete PhonePe test-webhook retirement still requires exact-target identification
+  and action-time deletion approval. No stale hook was deleted during these checks.
+  Live rollout/community enablement, Git push and any paid upgrade remain unapproved.
+  No source deployment, credential disclosure, real payment or live flag change was
+  performed as part of this acceptance and activation handoff.
