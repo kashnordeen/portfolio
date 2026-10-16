@@ -198,3 +198,20 @@ The production project and community checkout remain disabled throughout UAT.
 - A diagnostic response proves the request reached the application. CDN-only rejection
   without that marker requires separate protection-layer investigation, not auth weakening.
   Disable the opt-in flag after diagnosis; no UAT activation, schedule or live push authorized.
+
+### Confirmed callback rejection — 2026-10-16
+
+- Diagnostic source `94a15e9` deployed Ready as `dpl_5GhfKej6Vpz1dikAcGyRqEJUeYqs`.
+  Cloud database/TLS checks passed; checkout config remained false/false. Local verification:
+  137 tests, lint, TypeScript and npm audit (zero known vulnerabilities).
+- Control request without authorization logged `AUTHENTICATION_FAILED` / 401 / `MISSING`.
+  PhonePe Validate then logged `AUTHENTICATION_FAILED` / 401 / `SHA256` at 07:24:54 UTC.
+  This proves PhonePe passes Vercel protection and reaches the handler with a correctly
+  shaped SHA header, but it does not match the configured UAT username/password hash.
+  Merchant/payload/database checks are not reached. No provider payment or queue request.
+- Do not weaken SHA verification, modify the bypass key, generate another credential pair,
+  or enable payment/job flags. Owner must privately synchronize the exact saved webhook
+  pair between PhonePe Test Mode and the separate UAT project's two webhook Secrets,
+  avoiding leading/trailing whitespace. Redeploy disabled UAT after any saved env change.
+  No credential values were read. Temporary diagnostic opt-in is being disabled after
+  this bounded investigation; no successful authenticated delivery is claimed yet.
