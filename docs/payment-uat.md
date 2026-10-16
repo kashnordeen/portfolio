@@ -338,3 +338,38 @@ The production project and community checkout remain disabled throughout UAT.
   same protected UAT project. Active database/TLS preflight and build passed; deployed
   portfolio contains the project-payment link. UAT config remains true/false and fresh
   live kkarn config remains false/false. No order or payment was submitted for this UI test.
+
+### Recovery/alert preparation; no production publication — 2026-10-16
+
+- Owner declined live portfolio publication and asked to continue recovery/alerts and
+  stale-test-webhook cleanup instead. Live deployment, checkout, community activation,
+  Git push and paid services remain out of scope. Owner selected kash.nordeen@gmail.com
+  for Upstash UAT operational emails.
+- US Region QStash console verified Free, 101/1,000 daily messages, $0 cost, no active
+  or paused schedules. Account transactional usage-limit emails were already enabled
+  for the selected email; no preference, email address, billing or key was changed.
+  This is NOT confirmation of payment-delivery-failure email alerting. The current
+  region Settings view offers paid Datadog/Prometheus, not a native failure-email rule.
+  Failure callbacks need an approved monitored destination/email service; none added.
+- Prepared an UNSAVED recovery schedule in Chrome: fixed stable UAT `/api/payments/recover`,
+  POST `{}`, Content-Type application/json, every five minutes in default UTC,
+  one-minute timeout, three default retries and ID `portfolio-payments-uat-recovery-v1`.
+  `Upstash-Forward-*` header name is `x-vercel-protection-bypass`; its private value
+  is deliberately blank. Never substitute a PhonePe password, QStash token, or live key.
+  The owner must privately supply the existing UAT Vercel automation-bypass secret
+  and submit. No schedule was created/activated or signed recovery delivery claimed.
+- A five-minute schedule uses 288 deliveries/day before retries and order work. Each
+  retry consumes another delivery. Recheck the actual plan/usage before activation;
+  never upgrade automatically. After creation, verify signed recovery POST 200 and
+  expected bounded publication counts; preserve normal signature/TLS checks. Pause
+  the identified UAT schedule if delivery fails rather than weakening protection.
+- PhonePe initially opened in Production VIEW; switched to Test Mode before inspection.
+  Two Enabled SHA rows remain. Only Validate is exposed in the inspected table; no
+  edit/disable/delete control was found. A status-cell inspection made no change.
+  No hook was removed, no credentials replaced, and no production webhook changed.
+  Owner/provider assistance is needed to expose a retirement control for the stale
+  test registration. Do not identify it solely by row order or delete the verified hook.
+
+References: [QStash schedules](https://upstash.com/docs/qstash/features/schedules),
+[pricing and retry accounting](https://upstash.com/pricing/qstash),
+[failure callbacks](https://upstash.com/docs/qstash/howto/handling-failures).
