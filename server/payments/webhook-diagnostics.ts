@@ -22,17 +22,6 @@ function emptyData(value: unknown) {
     (Array.isArray(value) && value.length === 0);
 }
 
-// Connectivity-only setup probe, never a payment event or an activation bypass.
-// Handler must authenticate and bounded-parse before calling this predicate.
-export function isDisabledUatValidationProbe(body: unknown,
-  env: Record<string, string | undefined> = process.env) {
-  if (env.PAYMENT_UAT_VALIDATION_PROBE !== 'true' || !disabledUat(env) || !plainObject(body)) return false;
-  const keys=Object.keys(body);
-  if (keys.length === 0) return true;
-  return keys.length === 2 && Object.hasOwn(body,'message') && Object.hasOwn(body,'data') &&
-    typeof body.message === 'string' && body.message.trim().length > 0 && body.message.length <= 512 && emptyData(body.data);
-}
-
 // Call only after authentication and bounded parsing. Never emit actual field values.
 export function logUatNotificationShape(body: Record<string, unknown>,
   env: Record<string, string | undefined> = process.env, log: (entry: string) => void = console.info) {
@@ -84,7 +73,6 @@ export async function diagnoseUatWebhook(request: Request, run: () => Promise<Re
   let code = response.ok ? 'ACCEPTED' : 'OTHER_REJECTION';
   try {
     const body = await response.clone().json();
-    if (response.ok && body.received === true && body.validationOnly === true) code = 'VALIDATION_PROBE';
     const reasons = new Map([
       ['Webhook authentication failed.','AUTHENTICATION_FAILED'],
       ['Payment notification merchant does not match.','MERCHANT_MISMATCH'],

@@ -3,7 +3,7 @@ import { loadConfig } from './config.ts';
 import { createPhonePe, safeCheckoutUrl } from './phonepe.ts';
 import { createStore } from './store.ts';
 import { createJobQueue, publishPending } from './job-queue.ts';
-import { isDisabledUatValidationProbe, logUatNotificationShape } from './webhook-diagnostics.ts';
+import { logUatNotificationShape } from './webhook-diagnostics.ts';
 import { PaymentError, authenticateWebhook, boundedJson, equalSecret, newSession, readSession, sessionCookie, sessionHash, sha256, uuidPattern, validateCustomer } from './security.ts';
 
 type Route = 'config' | 'orders' | 'status' | 'webhook' | 'reconcile';
@@ -88,7 +88,6 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
     if (route === 'webhook') {
       authenticateWebhook(request, config.webhookUsername, config.webhookPassword);
       const body = await boundedJson(request, 65536);
-      if (isDisabledUatValidationProbe(body)) return reply({ received:true,validationOnly:true });
       const payload = body.payload as Record<string, unknown> | undefined;
       const event = body.event;
       if (!payload || typeof payload !== 'object' || Array.isArray(payload) ||

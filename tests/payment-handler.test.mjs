@@ -106,11 +106,10 @@ test('webhooks authenticate merchant and durably queue an event; never trust not
   assert.equal((await f.run('webhook', request(event, auth))).status, 503);
 });
 
-test('UAT shape diagnostics and exact-empty probe preserve authentication, parsing and zero-write guards',async t=>{
+test('UAT shape diagnostics preserve authentication, parsing, strict payload checks and zero-write guards',async t=>{
   const gate={PAYMENT_UAT_DIAGNOSTICS:'true',PHONEPE_ENV:'sandbox',VERCEL_ENV:'production',
     VERCEL_PROJECT_ID:sandboxTarget.projectId,PAYMENT_SITE_ORIGIN:sandboxTarget.origin,
-    PAYMENTS_ENABLED:'false',PAYMENT_RELEASE_APPROVED:'false',COMMUNITY_PAYMENTS_ENABLED:'false',PAYMENT_JOBS_ENABLED:'false',
-    PAYMENT_UAT_VALIDATION_PROBE:'true'};
+    PAYMENTS_ENABLED:'false',PAYMENT_RELEASE_APPROVED:'false',COMMUNITY_PAYMENTS_ENABLED:'false',PAYMENT_JOBS_ENABLED:'false'};
   const previous=Object.fromEntries(Object.keys(gate).map(key=>[key,process.env[key]]));
   const logs=[];t.mock.method(console,'info',entry=>logs.push(entry));
   Object.assign(process.env,gate);
@@ -124,10 +123,9 @@ test('UAT shape diagnostics and exact-empty probe preserve authentication, parsi
     assert.doesNotMatch(logs.join(''),/PRIVATE|test-user|test-password/);
     assert.equal((await f.run('webhook',request({}))).status,401);
     const probe=await f.run('webhook',request({},auth));
-    assert.equal(probe.status,200);assert.deepEqual(await probe.json(),{received:true,validationOnly:true});
-    assert.equal(probe.headers.get('set-cookie'),null);
+    assert.equal(probe.status,400);assert.equal(probe.headers.get('set-cookie'),null);
     const envelope=await f.run('webhook',request({message:'Fixture probe',data:{}},auth));
-    assert.equal(envelope.status,200);assert.deepEqual(await envelope.json(),{received:true,validationOnly:true});
+    assert.equal(envelope.status,400);
     assert.equal((await f.run('webhook',request({message:'Fixture',data:{amount:1}},auth))).status,400);
     assert.equal((await f.run('webhook',request({test:true},auth))).status,400);
     process.env.PHONEPE_ENV='production';

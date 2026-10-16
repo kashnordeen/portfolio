@@ -235,28 +235,28 @@ The production project and community checkout remain disabled throughout UAT.
   merchant-ID presence and recognition of a legacy type label. No actual field, ID,
   amount, header, URL, credential or customer value is emitted. Rejection rules unchanged.
 
-### Empty-object UAT connectivity probe
+### Dashboard envelope diagnosis and rejected probe experiments
 
-- Authenticated dashboard Validate request showed event MISSING, no payload object, no
-  payment identifiers/state/amount/merchant and no recognized legacy type. Actual values
-  were never logged. This is not a complete payment notification.
-- Added a separate, explicit `PAYMENT_UAT_VALIDATION_PROBE=true` opt-in for an **exactly
-  empty JSON object**, only in the fixed sandbox project/origin and Production target,
-  with all four payment/job flags exactly false. Authentication and bounded object parsing
-  still happen first. The handler returns `received:true, validationOnly:true` immediately,
-  without recording events, updating orders, setting a session or calling provider/queue.
-- Nonempty notifications retain all original checks. The probe cannot run in live,
-  preview, active UAT, without opt-in or with a missing release flag. Its diagnostic code
-  is `VALIDATION_PROBE`, distinct from accepted payment events. A probe 200 proves only
-  connectivity/authentication, never a successful payment or fulfilment.
-- This opt-in is deployment-specific, not a project-wide setting; disable it before
-  eventual separately approved UAT activation. No real payment, activation or push.
-
-- Follow-up diagnostics proved the dashboard request is **not** an empty object:
-  `message` and `data` are present while event/payload/identifiers are absent. The first
-  exact-empty predicate correctly continued to reject it. Expanded only the inactive-UAT
-  probe predicate to also recognize an object containing **exactly** `message` (nonempty
-  string, max 512) and `data` (null, empty object or empty array). Extra fields, nested
-  payment data, arbitrary string data and normal malformed payment notifications still
-  fail. No message/data contents are logged. Cloud verification must confirm a match;
-  do not claim 200 merely from presence booleans or the owner's success toast.
+- Authenticated first-row Validate request has event MISSING, no root payload object,
+  no root payment identifiers/state/amount/merchant, and no recognized legacy type.
+  `message`/`data` exist, but message is not a string, data is nonempty, and the root
+  contains additional fields. Only presence/type-validity booleans were logged, never
+  field names outside the fixed vocabulary or message/data contents. Do not infer its
+  exact legacy protocol or payment status from these limited observations.
+- Tried two tightly gated, read-only UAT probe predicates: an empty object and an exact
+  message/empty-data pair. Neither matched the observed dashboard request, so they
+  continued returning 400. They never produced a successful cloud probe or touched
+  payment records. Both acceptance predicates and their opt-in handling were then
+  **removed from current source**; commits preserve the experiment audit trail.
+- Last diagnostic: source `2bd9b53`, `dpl_2VznzXKNrjZyDcDzjiFjLfCmEP8U`, at
+  09:12:56 UTC returned `UNSUPPORTED_NOTIFICATION` / 400 after successful SHA auth.
+  This dashboard test is not a supported Standard Checkout event. No fabricated 200,
+  weak authentication, merchant-check bypass or payment-state update was introduced.
+- Current handler retains the original payment-event validation, plus dormant UAT-only
+  shape logging. Before ending investigation, deploy diagnostics false and all four
+  payment/job flags false. No persistent probe or diagnostic project setting was added.
+- Next useful gate: separately approved **UAT-only** project checkout and managed-job
+  testing with PhonePe sandbox, synthetic customer data, no real money, no community
+  activation and no schedule. This requires new activation approval; do not interpret
+  the owner's secret-entry or webhook-created reply as permission to enable flags.
+  Old failing test webhook remains untouched. Live site and Git remote unchanged.
