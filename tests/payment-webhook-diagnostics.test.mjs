@@ -55,6 +55,8 @@ test('notification shape diagnostics emit only fixed classes and validity boolea
     merchantId:'PRIVATE_MERCHANT',merchantOrderId:'PRIVATE.ORDER',orderId:'PRIVATE_ORDER',
     amount:'PRIVATE_AMOUNT',email:'PRIVATE_EMAIL'}},env,x=>logs.push(x));
   assert.deepEqual(JSON.parse(logs[0]),{event:'UAT_WEBHOOK_SHAPE',eventClass:'CHECKOUT_COMPLETED',
+    emptyObject:false,hasMessage:false,hasTest:false,hasData:false,hasResponse:false,hasCallback:false,
+    hasBody:false,hasTestCallback:false,hasEventType:false,hasTestWebhook:false,hasIsTest:false,
     payloadObject:true,stateMatchesEvent:true,merchantOrderIdValid:false,orderIdValid:true,
     amountSafeInteger:false,amountIsString:true,merchantIdPresent:true,legacyTypeRecognized:false});
   assert.doesNotMatch(logs.join(''),/PRIVATE/);

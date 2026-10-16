@@ -33,6 +33,12 @@ export function logUatNotificationShape(body: Record<string, unknown>,
   ]).get(typeof body.event === 'string' ? body.event : '') ?? 'OTHER';
   try {
     log(JSON.stringify({ event:'UAT_WEBHOOK_SHAPE',eventClass,payloadObject,
+      emptyObject:Object.keys(body).length === 0,
+      hasMessage:Object.hasOwn(body,'message'),hasTest:Object.hasOwn(body,'test'),
+      hasData:Object.hasOwn(body,'data'),hasResponse:Object.hasOwn(body,'response'),
+      hasCallback:Object.hasOwn(body,'callback'),hasBody:Object.hasOwn(body,'body'),
+      hasTestCallback:Object.hasOwn(body,'testCallback'),hasEventType:Object.hasOwn(body,'eventType'),
+      hasTestWebhook:Object.hasOwn(body,'testWebhook'),hasIsTest:Object.hasOwn(body,'isTest'),
       stateMatchesEvent:(body.event === 'checkout.order.completed' && payload.state === 'COMPLETED') ||
         (body.event === 'checkout.order.failed' && payload.state === 'FAILED'),
       merchantOrderIdValid:typeof payload.merchantOrderId === 'string' && /^[A-Za-z0-9_-]{1,63}$/.test(payload.merchantOrderId),
