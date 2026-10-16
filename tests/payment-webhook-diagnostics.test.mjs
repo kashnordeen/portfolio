@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { diagnoseUatWebhook } from '../server/payments/webhook-diagnostics.ts';
+import { diagnoseUatWebhook, logUatNotificationShape } from '../server/payments/webhook-diagnostics.ts';
 import { sandboxTarget } from '../server/payments/targets.ts';
 
 const env = { PAYMENT_UAT_DIAGNOSTICS:'true', PHONEPE_ENV:'sandbox', VERCEL_ENV:'production',
@@ -47,4 +47,32 @@ test('UAT diagnostics log only header format and preserve accepted responses, th
   assert.doesNotMatch(logs.join(''),/PRIVATE/);
   const response=Response.json({received:true});
   assert.equal(await diagnoseUatWebhook(request(),async()=>response,env,()=>{throw Error('logger offline');}),response);
+});
+
+test('notification shape diagnostics emit only fixed classes and validity booleans, never field values',()=>{
+  const logs=[];
+  logUatNotificationShape({event:'checkout.order.completed',payload:{state:'COMPLETED',
+    merchantId:'PRIVATE_MERCHANT',merchantOrderId:'PRIVATE.ORDER',orderId:'PRIVATE_ORDER',
+    amount:'PRIVATE_AMOUNT',email:'PRIVATE_EMAIL'}},env,x=>logs.push(x));
+  assert.deepEqual(JSON.parse(logs[0]),{event:'UAT_WEBHOOK_SHAPE',eventClass:'CHECKOUT_COMPLETED',
+    payloadObject:true,stateMatchesEvent:true,merchantOrderIdValid:false,orderIdValid:true,
+    amountSafeInteger:false,amountIsString:true,merchantIdPresent:true,legacyTypeRecognized:false});
+  assert.doesNotMatch(logs.join(''),/PRIVATE/);
+  for(const [event,eventClass] of [[undefined,'MISSING'],['checkout.order.failed','CHECKOUT_FAILED'],
+    ['pg.order.completed','LEGACY_COMPLETED'],['pg.order.failed','LEGACY_FAILED'],['PRIVATE_EVENT','OTHER']]) {
+    const result=[];logUatNotificationShape({event,payload:null},env,x=>result.push(x));
+    const shape=JSON.parse(result[0]);assert.equal(shape.eventClass,eventClass);
+    assert.equal(shape.payloadObject,false);
+    for(const [key,value] of Object.entries(shape)) if(!['event','eventClass'].includes(key)) assert.equal(typeof value,'boolean');
+    assert.doesNotMatch(result.join(''),/PRIVATE/);
+  }
+  logUatNotificationShape({},env,()=>{throw Error('logger unavailable');});
+});
+
+test('notification shape diagnostics are inert outside disabled UAT',()=>{
+  for(const change of [{PAYMENT_UAT_DIAGNOSTICS:'false'},{PHONEPE_ENV:'production'},
+    {VERCEL_PROJECT_ID:'live'},{PAYMENTS_ENABLED:'true'},{PAYMENT_JOBS_ENABLED:'true'}]) {
+    const logs=[];logUatNotificationShape({event:'PRIVATE_EVENT'},{...env,...change},x=>logs.push(x));
+    assert.deepEqual(logs,[]);
+  }
 });

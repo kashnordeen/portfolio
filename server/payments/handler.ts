@@ -3,6 +3,7 @@ import { loadConfig } from './config.ts';
 import { createPhonePe, safeCheckoutUrl } from './phonepe.ts';
 import { createStore } from './store.ts';
 import { createJobQueue, publishPending } from './job-queue.ts';
+import { logUatNotificationShape } from './webhook-diagnostics.ts';
 import { PaymentError, authenticateWebhook, boundedJson, equalSecret, newSession, readSession, sessionCookie, sessionHash, sha256, uuidPattern, validateCustomer } from './security.ts';
 
 type Route = 'config' | 'orders' | 'status' | 'webhook' | 'reconcile';
@@ -94,6 +95,7 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
         payload.state !== (event === 'checkout.order.completed' ? 'COMPLETED' : 'FAILED') ||
         typeof payload.merchantOrderId !== 'string' || !/^[A-Za-z0-9_-]{1,63}$/.test(payload.merchantOrderId) ||
         typeof payload.orderId !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(payload.orderId) || !Number.isSafeInteger(payload.amount)) {
+        logUatNotificationShape(body);
         throw new PaymentError(400, 'Unsupported payment notification.');
       }
       if (payload.merchantId !== config.merchantId) throw new PaymentError(401, 'Payment notification merchant does not match.');

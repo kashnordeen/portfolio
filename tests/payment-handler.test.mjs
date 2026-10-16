@@ -5,6 +5,7 @@ import { handlePayment } from '../server/payments/handler.ts';
 import { createStore, reconciliationDelay, sameTerms, verifiedState } from '../server/payments/store.ts';
 import { loadConfig } from '../server/payments/config.ts';
 import { PaymentError, sessionHash, sha256 } from '../server/payments/security.ts';
+import { sandboxTarget } from '../server/payments/targets.ts';
 
 const config = loadConfig({ PHONEPE_ENV: 'production', VERCEL_ENV:'production', PAYMENT_SITE_ORIGIN: 'https://kkarn.vercel.app', DATABASE_URL: 'postgres://portfolio_payments_api:test@localhost/test',
   PHONEPE_CLIENT_ID: 'test', PHONEPE_CLIENT_SECRET: 'test', PHONEPE_CLIENT_VERSION: '1', PHONEPE_MERCHANT_ID: 'MID_TEST',
@@ -103,6 +104,29 @@ test('webhooks authenticate merchant and durably queue an event; never trust not
   assert.equal(f.calls.filter(call => call[0] === 'apply' || call[0] === 'pay').length, 0);
   f.store.recordEvent = async () => { throw new Error('database offline'); };
   assert.equal((await f.run('webhook', request(event, auth))).status, 503);
+});
+
+test('shape diagnostics run only after webhook authentication and bounded parsing, without storage calls',async t=>{
+  const gate={PAYMENT_UAT_DIAGNOSTICS:'true',PHONEPE_ENV:'sandbox',VERCEL_ENV:'production',
+    VERCEL_PROJECT_ID:sandboxTarget.projectId,PAYMENT_SITE_ORIGIN:sandboxTarget.origin,
+    PAYMENTS_ENABLED:'false',PAYMENT_RELEASE_APPROVED:'false',COMMUNITY_PAYMENTS_ENABLED:'false',PAYMENT_JOBS_ENABLED:'false'};
+  const previous=Object.fromEntries(Object.keys(gate).map(key=>[key,process.env[key]]));
+  const logs=[];t.mock.method(console,'info',entry=>logs.push(entry));
+  Object.assign(process.env,gate);
+  try {
+    const f=fixture(),auth={authorization:sha256('test-user:test-password')};
+    const body={event:'PRIVATE_EVENT',payload:{merchantOrderId:'PRIVATE_ORDER',email:'PRIVATE_EMAIL'}};
+    assert.equal((await f.run('webhook',request(body))).status,401);assert.deepEqual(logs,[]);
+    assert.equal((await f.run('webhook',request([],auth))).status,400);assert.deepEqual(logs,[]);
+    assert.equal((await f.run('webhook',request(body,auth))).status,400);
+    assert.equal(logs.length,1);assert.equal(JSON.parse(logs[0]).eventClass,'OTHER');
+    assert.doesNotMatch(logs.join(''),/PRIVATE|test-user|test-password/);
+    assert.equal(f.calls.length,0);
+  } finally {
+    for(const [key,value] of Object.entries(previous)) {
+      if(value === undefined) delete process.env[key]; else process.env[key]=value;
+    }
+  }
 });
 test('worker is authenticated, verifies via provider status, and retries transient failures', async () => {
   const f = fixture(); f.runtime.config.jobsEnabled=false; assert.equal((await f.run('reconcile', request())).status, 401);

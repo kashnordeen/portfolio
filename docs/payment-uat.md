@@ -215,3 +215,22 @@ The production project and community checkout remain disabled throughout UAT.
   avoiding leading/trailing whitespace. Redeploy disabled UAT after any saved env change.
   No credential values were read. Temporary diagnostic opt-in is being disabled after
   this bounded investigation; no successful authenticated delivery is claimed yet.
+
+### Replacement authentication verified; payload diagnosis — 2026-10-16
+
+- Owner synchronized UAT Vercel secrets and created a second Test Mode SHA webhook.
+  No old/live webhook was deleted or changed. In the observed table order, first-row
+  Validate returned 400; second-row Validate returned 401. Both point to the fixed UAT
+  endpoint with a bypass parameter and two subscribed events; values were not read.
+- Bounded diagnostic deployment `dpl_7KqUq2AKt8QKpY3Exi6fiyF9iToh`, source `9eb4e98`,
+  confirmed `UNSUPPORTED_NOTIFICATION` / 400 / `SHA256` for the first row at 08:51:52 UTC.
+  This proves its SHA authentication passes. The shape check fails before merchant,
+  storage, provider or queue processing. No 200 payment-event delivery is claimed.
+- Restored the previously verified diagnostics-off deployment
+  `dpl_94nCv3KTPhEGbYW3S5RMH1BJ9Acc` without rebuilding; stable UAT alias and false/false
+  checkout config reverified. All four payment/job flags remain false. Live unchanged.
+- Follow-up shape diagnostic emits only fixed event classes and validity booleans after
+  authentication and bounded JSON parsing, and only in disabled, opt-in UAT. It reports
+  payload-object presence, state/event consistency, identifier validity, amount type,
+  merchant-ID presence and recognition of a legacy type label. No actual field, ID,
+  amount, header, URL, credential or customer value is emitted. Rejection rules unchanged.
