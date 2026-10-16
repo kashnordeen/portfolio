@@ -77,6 +77,13 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
       }
       if (typeof data.expireAt !== 'number' || data.expireAt <= now() || data.expireAt > now() + 3_660_000) {
         report('PAY','INVALID_CHECKOUT_EXPIRY');
+        if (config.environment === 'sandbox') {
+          try { log(JSON.stringify({event:'UAT_CHECKOUT_EXPIRY',
+            numeric:typeof data.expireAt === 'number',numericString:typeof data.expireAt === 'string' && /^\d+$/.test(data.expireAt),
+            future:typeof data.expireAt === 'number' && data.expireAt > now(),
+            withinWindow:typeof data.expireAt === 'number' && data.expireAt <= now()+3_660_000})); }
+          catch { /* Fixed type/validity booleans only; no response values. */ }
+        }
         throw new PaymentError(502, 'Invalid payment provider response.');
       }
       let url: string;

@@ -126,7 +126,8 @@ test('sandbox provider failures emit only fixed operation, category and HTTP sta
     ? Response.json({access_token:'private-token',expires_at:Date.now()/1000+3600})
     : Response.json({orderId:'OMO_PRIVATE',state:'PENDING',expireAt:1,redirectUrl:'https://private.invalid/token'}),Date.now,entry=>logs.push(JSON.parse(entry)));
   await assert.rejects(invalid.pay(order));
-  assert.deepEqual(logs.at(-1),{event:'UAT_PROVIDER_FAILURE',operation:'PAY',code:'INVALID_CHECKOUT_EXPIRY'});
+  assert.deepEqual(logs.at(-2),{event:'UAT_PROVIDER_FAILURE',operation:'PAY',code:'INVALID_CHECKOUT_EXPIRY'});
+  assert.deepEqual(logs.at(-1),{event:'UAT_CHECKOUT_EXPIRY',numeric:true,numericString:false,future:false,withinWindow:true});
   const before=logs.length;
   const live=createPhonePe(loadConfig({...env,...queueEnv}),async()=>new Response('private',{status:403}),Date.now,entry=>logs.push(entry));
   await assert.rejects(live.pay(order));
