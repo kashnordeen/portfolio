@@ -102,7 +102,7 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex flex-1 justify-center">
-              <ul className="flex space-x-8">
+              <ul className="flex items-center space-x-6">
                 {navItems.map((item) => (
                   <motion.li key={item.name} className="relative group text-sm font-medium text-muted-foreground transition-colors">
                     <a
@@ -123,6 +123,9 @@ export default function Header() {
                     />
                   </motion.li>
                 ))}
+                <li className="text-sm font-semibold text-primary">
+                  <a href="/?payment=project" className="inline-flex min-h-11 items-center hover:text-foreground">Payments</a>
+                </li>
               </ul>
             </nav>
 
@@ -190,6 +193,11 @@ export default function Header() {
                       </a>
                     </motion.li>
                   ))}
+                  <motion.li {...({ variants: itemVariants } as MotionProps)}>
+                    <a href="/?payment=project" onClick={() => setIsMobileMenuOpen(false)} className="inline-flex min-h-11 items-center text-3xl font-bold text-primary hover:text-foreground">
+                      Payments
+                    </a>
+                  </motion.li>
                 </motion.ul>
               </motion.dialog>
             )}

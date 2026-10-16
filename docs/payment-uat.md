@@ -321,3 +321,16 @@ The production project and community checkout remain disabled throughout UAT.
 - Remaining go-live gates are separate: approved operational recovery scheduling and
   alerts, stale UAT webhook cleanup, production configuration/release approval and
   owner-controlled live payment acceptance testing. Sandbox success is not live approval.
+
+### Portfolio payment-page discovery — 2026-10-16
+
+- Added a native same-origin project-payment link beside About pricing, in desktop and
+  mobile navigation, and in the footer. Opening the page does not submit an order or
+  enable checkout. The existing discussion action and independent community gate remain.
+- Chrome checks at 320, 768, 1024 and 1440 pixels showed no horizontal page overflow;
+  visible payment links fit the viewport and retain at least 44-pixel target heights.
+  Desktop and mobile-menu keyboard activation reached the existing portal. Missing
+  local backend config still showed Checkout coming soon, with no payment submitted.
+- Added syntax-aware navigation checks. Local verification: 146 tests, lint, TypeScript,
+  frontend build and npm audit (zero known advisories). No payment handlers, credentials,
+  database settings, release flags, production deployment or Git remote were changed.

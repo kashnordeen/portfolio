@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Code2, MessageCircle, Users } from "lucide-react";
+import { ArrowUpRight, Code2, CreditCard, MessageCircle, Users } from "lucide-react";
 import { profile, stats } from "@/data/portfolio";
 import "./AboutSection.css";
 
@@ -87,6 +87,17 @@ export const AboutSection = () => {
           ))}
         </div>
         <p className="about-pricing-note">{profile.projectPricing.note}</p>
+        <div className="about-payment">
+          <div>
+            <h4>Already working together?</h4>
+            <p>Review your details and enter an agreed project amount or instalment.</p>
+          </div>
+          <a href="/?payment=project" className="about-payment-link">
+            <CreditCard size={18} aria-hidden="true" />
+            Make a project payment
+            <ArrowUpRight size={18} aria-hidden="true" />
+          </a>
+        </div>
       </motion.div>
 
       <ContactInvitation reduceMotion={reduceMotion} />

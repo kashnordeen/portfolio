@@ -8,6 +8,7 @@
 
 ### Added
 
+- Added a project-payment button beside pricing, plus desktop/mobile navigation and footer links to the same-origin payment page. Checkout release gates are unchanged; community payments remain off.
 - Added disabled managed-job transport with official QStash signature verification, opaque payloads, fixed targets and bounded publishing; not deployed or configured with real keys.
 - Prepared backend-only durable job generations, checkout acceptance claims, verification leases and transactional successor intents, with local PostgreSQL rollback and permission tests; migration not applied externally.
 - Connected checkout to scheduler acceptance before its single provider initiation, and webhook recording to durable immediate-verification intents; live release flags remain off.
