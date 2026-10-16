@@ -176,3 +176,25 @@ The production project and community checkout remain disabled throughout UAT.
   Still pending: registered test webhook, actual provider/queue delivery, UAT scenarios,
   any explicitly approved UAT activation and provider go-live signoff. Live site unchanged;
   no push, paid upgrade, live credential rotation, real payment or schedule.
+
+### Opt-in callback rejection diagnostics — 2026-10-16
+
+- Owner replaced the UAT webhook pair privately. Disabled deployment
+  `dpl_F9fFJPTfJTBq9vpywNLBiT84fZQr` passed cloud database/TLS preflight and was Ready.
+  PhonePe Test Mode now lists one Enabled SHA webhook with two events. Its URL shape
+  matches the fixed UAT origin/path and contains a nonempty bypass parameter.
+- Owner reported a successful-request toast, but UAT CDN metadata still showed POST 401
+  responses. Registration/Enabled/toast is not proof of authenticated delivery. Do not
+  rotate credentials blindly or activate checkout to troubleshoot this.
+- Owner approved a disabled UAT diagnostic update. Set `PAYMENT_UAT_DIAGNOSTICS=true`
+  only on that deployment, not as a persistent project setting. The wrapper also requires
+  the fixed UAT project/origin, sandbox environment, Production target and all four flags
+  exactly false. It is inert for live, active or differently targeted deployments.
+- Emits only `UAT_WEBHOOK_DIAGNOSTIC`, a fixed rejection category, HTTP status and header
+  format (missing/SHA256/Bearer/Basic/other). No URL/query string, authorization value,
+  credential/hash, payload, merchant/customer/order identifier, raw body or error is logged.
+  Original authentication, merchant checks, response/body and storage behaviour remain
+  unchanged; logger failures cannot change a response. No diagnostic endpoint is added.
+- A diagnostic response proves the request reached the application. CDN-only rejection
+  without that marker requires separate protection-layer investigation, not auth weakening.
+  Disable the opt-in flag after diagnosis; no UAT activation, schedule or live push authorized.

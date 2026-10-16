@@ -1,2 +1,3 @@
 import { handlePayment } from '../../server/payments/handler.ts';
-export default { fetch: (request: Request) => handlePayment('webhook', request) };
+import { diagnoseUatWebhook } from '../../server/payments/webhook-diagnostics.ts';
+export default { fetch: (request: Request) => diagnoseUatWebhook(request, () => handlePayment('webhook', request)) };
