@@ -4,6 +4,10 @@ Owner-approved Resend integration, restricted to the existing protected sandbox
 project and kash.nordeen@gmail.com. This is not production monitoring or a payment
 receipt service. No new database permissions or dependency were added.
 
+The shared handler now has a separately guarded, off-by-default production candidate;
+see `production-payment-readiness.md`. The UAT-only wrapper and this UAT flag still
+cannot activate production. This does not deploy or activate production alerting.
+
 ## Configuration and activation
 
 - Owner creates a **Sending access** Resend key on the free plan, saves it privately,

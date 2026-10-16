@@ -46,7 +46,9 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
             ...(config.environment === 'sandbox' && config.automationBypassSecret ?
               { 'Upstash-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}),
             ...(config.failureCallbackUrl ? { 'Upstash-Failure-Callback':config.failureCallbackUrl,
-              'Upstash-Failure-Callback-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}),
+              'Upstash-Failure-Callback-Forward-Content-Type':'application/json',
+              ...(config.environment === 'sandbox' ? {
+                'Upstash-Failure-Callback-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}) } : {}),
             'Upstash-Deduplication-Id': job.id, 'Upstash-Not-Before': String(Math.ceil(job.dueAt.getTime() / 1000)),
             'Upstash-Retries': '3', 'Upstash-Timeout': '60s' },
           body: JSON.stringify({ jobId: job.id }),
