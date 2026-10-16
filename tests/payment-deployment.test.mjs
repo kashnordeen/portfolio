@@ -12,7 +12,7 @@ test('Vercel API compiler emits JavaScript imports for the complete payment modu
   const entries = readdirSync(path.join(root, 'api/payments'))
     .filter(name => name.endsWith('.ts'))
     .map(name => path.join(root, 'api/payments', name));
-  assert.equal(entries.length, 7);
+  assert.equal(entries.length, 8);
   const program = ts.createProgram(entries, {
     ...parsed.options, module: ts.ModuleKind.ESNext,
     moduleResolution: ts.ModuleResolutionKind.Bundler,
@@ -26,6 +26,7 @@ test('Vercel API compiler emits JavaScript imports for the complete payment modu
   assert.equal(result.emitSkipped, false);
   const javascript = [...emitted].filter(([file]) => file.endsWith('.js'));
   assert.ok(javascript.some(([file]) => file.endsWith('/api/payments/config.js')));
+  assert.ok(javascript.some(([file]) => file.endsWith('/api/payments/alerts.js')));
   assert.ok(javascript.some(([file]) => file.endsWith('/server/payments/handler.js')));
   for (const [file, content] of javascript) {
     assert.doesNotMatch(content, /(?:from\s*|import\s*\()["'][.]{1,2}\/[^"']+\.ts["']/, file);

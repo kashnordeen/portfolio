@@ -25,6 +25,9 @@ async function verifyUatProfile(env: Record<string, string | undefined>, active:
     throw new Error('UAT callback credential is not configured.');
   }
   const config = loadConfig(env);
+  if (env.PAYMENT_UAT_ALERTS_ENABLED === 'true' && (!active || !config.jobConfig.failureCallbackUrl)) {
+    throw new Error('UAT alert configuration guard failed.');
+  }
   if (active && (env.PAYMENT_UAT_DIAGNOSTICS !== 'false' || env.PAYMENT_UAT_VALIDATION_PROBE !== 'false' ||
       env.PROJECT_MIN_PAISE !== '20000' || env.PROJECT_MAX_PAISE !== '5000000' ||
       !config.projectEnabled || config.communityEnabled || !config.jobConfig.ready)) {

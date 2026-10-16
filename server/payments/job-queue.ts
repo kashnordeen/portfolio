@@ -4,7 +4,7 @@ import { PaymentError, uuidPattern } from './security.ts';
 
 // Structural boundary shared with the durable store. No customer fields belong here.
 export type PaymentJob = { id: string; orderId: string; environment: 'production' | 'sandbox'; generation: number; dueAt: Date };
-export async function readJobBody(body: ReadableStream<Uint8Array> | null): Promise<string> {
+export async function readJobBody(body: ReadableStream<Uint8Array> | null, limit = 1024): Promise<string> {
   if (!body) throw new PaymentError(400, 'Invalid scheduler request.');
   const reader = body.getReader();
   const chunks: Uint8Array[] = [];
@@ -18,7 +18,7 @@ export async function readJobBody(body: ReadableStream<Uint8Array> | null): Prom
       const { done, value } = await Promise.race([reader.read(), deadline]);
       if (done) break;
       length += value.byteLength;
-      if (length > 1024) throw new PaymentError(413, 'Scheduler request is too large.');
+      if (length > limit) throw new PaymentError(413, 'Scheduler request is too large.');
       chunks.push(value);
     }
     const bytes = new Uint8Array(length);
@@ -45,6 +45,8 @@ export function createJobQueue(config: JobConfig, { send = fetch }: { send?: typ
           headers: { Authorization: `Bearer ${config.publishToken}`, 'Content-Type': 'application/json',
             ...(config.environment === 'sandbox' && config.automationBypassSecret ?
               { 'Upstash-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}),
+            ...(config.failureCallbackUrl ? { 'Upstash-Failure-Callback':config.failureCallbackUrl,
+              'Upstash-Failure-Callback-Forward-x-vercel-protection-bypass':config.automationBypassSecret } : {}),
             'Upstash-Deduplication-Id': job.id, 'Upstash-Not-Before': String(Math.ceil(job.dueAt.getTime() / 1000)),
             'Upstash-Retries': '3', 'Upstash-Timeout': '60s' },
           body: JSON.stringify({ jobId: job.id }),

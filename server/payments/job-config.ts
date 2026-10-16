@@ -18,7 +18,9 @@ export function loadJobConfig(env: Record<string, string | undefined>) {
   const ready = enabled && env.VERCEL_ENV === 'production' && identityReady && env.NODE_TLS_REJECT_UNAUTHORIZED !== '0' &&
     Boolean(publishToken && currentSigningKey && nextSigningKey) &&
     (target.environment !== 'sandbox' || automationBypassSecret.length >= 32);
+  const failureCallbackUrl = ready && target.environment === 'sandbox' && env.PAYMENT_UAT_ALERTS_ENABLED === 'true' &&
+    /^re_[A-Za-z0-9_-]{16,256}$/.test(env.RESEND_API_KEY ?? '') ? `${target.origin}/api/payments/alerts` : '';
   return { enabled, ready, publishToken, currentSigningKey, nextSigningKey, automationBypassSecret, environment: target.environment, queueOrigin: target.queueOrigin,
-    jobUrl: `${target.origin}/api/payments/jobs`, recoveryUrl: `${target.origin}/api/payments/recover` };
+    jobUrl: `${target.origin}/api/payments/jobs`, recoveryUrl: `${target.origin}/api/payments/recover`, failureCallbackUrl };
 }
 export type JobConfig = ReturnType<typeof loadJobConfig>;

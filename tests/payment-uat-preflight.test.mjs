@@ -62,6 +62,7 @@ test('active UAT profile requires explicit sandbox-only flags, bounded amounts a
     {PAYMENT_SITE_ORIGIN:'https://kkarn.vercel.app'}, {NODE_TLS_REJECT_UNAUTHORIZED:'0'},
     {VERCEL_AUTOMATION_BYPASS_SECRET:undefined}, {COMMUNITY_PAYMENTS_ENABLED:'true'},
     {PROJECT_MIN_PAISE:'100'}, {PROJECT_MAX_PAISE:'5000001'},
+    {PAYMENT_UAT_ALERTS_ENABLED:'true',RESEND_API_KEY:undefined},
     {DATABASE_URL:env.DATABASE_URL.replace('portfolio_payments_uat.','portfolio_payments_api.')},
     ...['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','PAYMENT_JOBS_ENABLED'].flatMap(key=>[{[key]:'false'},{[key]:undefined}]),
     ...['COMMUNITY_PAYMENTS_ENABLED','PAYMENT_UAT_DIAGNOSTICS','PAYMENT_UAT_VALIDATION_PROBE'].flatMap(key=>[{[key]:'true'},{[key]:undefined}]),
@@ -86,4 +87,12 @@ test('active UAT profile retains the same restricted read-only metadata checks a
     await assert.rejects(verifyActiveUatDatabase(activeEnv,bad.connect));
     assert.deepEqual(bad.calls,['read only',{timeout:1}]);
   }
+});
+
+test('UAT alerts require explicit active profile and a server-only sending credential before database access',async()=>{
+  const f=fixture();
+  assert.equal(await verifyActiveUatDatabase({...activeEnv,PAYMENT_UAT_ALERTS_ENABLED:'true',
+    RESEND_API_KEY:'re_fixture_not_a_real_api_key'},f.connect),true);
+  await assert.rejects(verifyUatDatabase({...env,PAYMENT_UAT_ALERTS_ENABLED:'true',
+    RESEND_API_KEY:'re_fixture_not_a_real_api_key'},()=>assert.fail('must refuse before connecting')));
 });
