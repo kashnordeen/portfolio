@@ -1,12 +1,12 @@
 # Project refunds and cancellations
 
 Version: 0.1, owner-selected Option A, 17 October 2026 (IST).
-Status: local and unpublished. No effective date has been set.
+Status: historical wording draft. The owner approved publication and the effective
+customer page is now `/policies/refunds.html`, published 17 October 2026 (IST).
 
-> Before publication, confirm the remaining seller disclosures and refund procedure,
-> and complete the policy/legal review. The seller name, support email and business
-> days below are owner-confirmed. This draft is not legal advice. It does not
-> authorise deployment, payment activation or a refund.
+> Refer to the published HTML for customer-facing terms. This draft is not legal
+> advice or a compliance certification. Publishing terms does not execute a refund;
+> refunds still require owner handling and provider reconciliation.
 
 ## 1. Your project agreement
 

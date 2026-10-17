@@ -1,5 +1,12 @@
 # Payment policies — UNPUBLISHED OWNER-REVIEW DRAFT
 
+Historical preparation only: the owner subsequently approved publication of the
+service terms, selected Option A refunds and factual privacy notice. The effective
+HTML pages were published on 17 October 2026 (IST) at `/policies/terms.html`,
+`/policies/refunds.html` and `/policies/privacy.html`. See `production-launch.md`
+for current operational evidence. Unresolved fields below are historical review
+notes, not authority to invent seller details or a fixed legal retention period.
+
 This is a starting point for review, not legal advice, a compliance certification or
 approved published customer terms. Do not publish with unresolved fields. The owner
 selected Option A and its response/processing targets on 17 October 2026 (IST);

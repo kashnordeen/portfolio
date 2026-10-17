@@ -1,5 +1,9 @@
 # Production payment readiness — NOT a go-live approval
 
+Current deployment evidence and accepted owner deferrals are recorded in
+`production-launch.md`. The sections below retain the staged preparation history;
+they must not override subsequent explicit publication/launch instructions.
+
 Prepared locally on 2026-10-17 IST. Live checkout/community remain disabled. No
 deployment, scheduler creation, paid plan, DNS change or real transaction is authorized
 by this document. Sandbox evidence is recorded in `payment-uat.md`.
@@ -200,8 +204,8 @@ schedule (do not create it during local work):
 | Method/body | POST / `{}` / JSON |
 | Cadence | `*/5 * * * *` UTC |
 | Retry/timeout | 3 retries / 60 seconds |
-| Failure callback | `https://kkarn.vercel.app/api/payments/alerts` |
-| Callback content type | `Upstash-Failure-Callback-Forward-Content-Type: application/json` |
+| Failure callback | NONE during the owner-approved manual-monitoring launch; add only after a sender is configured and delivery tested |
+| Callback content type | Not applicable while failure callbacks are disabled |
 | Vercel bypass | NONE — never copy the UAT bypass |
 
 Use production's matching QStash region/signing keys, not the sandbox US keys.
