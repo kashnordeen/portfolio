@@ -4,6 +4,28 @@ Prepared locally on 2026-10-17 IST. Live checkout/community remain disabled. No
 deployment, scheduler creation, paid plan, DNS change or real transaction is authorized
 by this document. Sandbox evidence is recorded in `payment-uat.md`.
 
+## Current handoff
+
+Local checks pass, but the production release is on hold. The owner has confirmed
+the Option A refund terms, seller name, support email and support calendar. The
+following items still prevent a completed live rollout:
+
+- Production alert delivery has no verified sender. The owner has only a Vercel
+  subdomain and declined another monitoring service. No domain purchase, service
+  addition or workaround using Resend's testing sender is authorised.
+- Service/delivery approval, remaining seller disclosures, retention periods and
+  the support/refund procedure need completion before public policy pages can be
+  published. Do not replace those choices with invented commitments.
+- A hosted backup and isolated restore rehearsal need approval of the source,
+  destination, encrypted storage and any cost. Do not use the owner's unrelated
+  Supabase project as a disposable target.
+- PhonePe must confirm any remaining go-live/refund cases and its exact API-access
+  deadline. Provider sign-off, a real-payment test and production activation are
+  not established by local tests or sandbox callbacks.
+
+After those items are resolved, request explicit deployment and activation
+approval. Git push requires separate permission. Community checkout stays off.
+
 ## Completed evidence
 
 - Sandbox success/failure callbacks, independently verified payment states and
@@ -15,10 +37,42 @@ by this document. Sandbox evidence is recorded in `payment-uat.md`.
   Its dashboard validation reached the application (400 for the unsupported probe).
   No production webhook or credential was modified.
 - Production alert support is now a local candidate, not deployed or configured.
-- Fresh local checks: 167 tests passed, including UAT compatibility and production
+- Fresh local checks: 169 tests passed, including UAT compatibility and production
   isolation, lint, TypeScript/API compilation and frontend build. Native npm audit
   reported zero known vulnerabilities; no server-only alert/queue markers appeared
   in the browser bundle. This is local evidence, not hosted production acceptance.
+- Read-only live checks on 17 October 2026 (IST): the homepage returned HTTP 200
+  with HSTS, and the public configuration returned project/community disabled.
+  Other selected browser security headers were absent from the homepage response.
+- The hosted `portfolio-payments` Supabase security advisor returned no findings.
+  Metadata showed RLS enabled on all five production and five UAT payment tables.
+  This does not prove backup recovery or certify all database permissions.
+
+## Local security-header candidate
+
+`vercel.json` now prepares `nosniff`, `X-Frame-Options: DENY`, `no-referrer` and
+disabled camera/microphone/geolocation permissions on all paths. It changes no
+rewrites, CORS, API caching, authentication or payment flags. The configuration has
+two regression tests, verified failing before the change and passing afterwards.
+The new headers are not deployed; check the actual hosted HTML, asset and API
+responses after a separately approved UAT deployment.
+
+The resource CSP starts in report-only mode. It restricts the proposed script
+sources to self and the exact static theme-script hash, while allowing existing
+Web3Forms/GitHub API connections, jsDelivr images and self-hosted fonts. Inline
+styles remain allowed for the existing React/motion styles. It adds no reporting
+endpoint or third-party reporting service; inspect browser console violations.
+Report-only CSP does not block script/resource loads. Its `frame-ancestors`
+directive is not an enforced framing control; the separate X-Frame-Options header
+provides that protection in browsers that support it after deployment.
+
+Before enforcing CSP, validate the portfolio, both themes, payment-page navigation,
+pending/failed/verified states, existing contact-form integration and UAT platform
+toolbar under the real hosted responses. Observe reports for at least a week as
+required by the CSP skill; classify any platform injection separately. Do not send
+a customer message, create an order or pay merely to test a header. Recheck the
+inline-script hash against the built HTML if the theme script changes. Enforcement
+requires a reviewed follow-up, not an automatic flag change.
 
 ## Gate 1: production operational alerts and recovery
 

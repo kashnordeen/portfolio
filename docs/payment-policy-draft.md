@@ -73,6 +73,11 @@ are designed to contain a fixed failure category and hour, not customer data or
 payment details. Do not claim no third-party processing or that hashing removes
 every privacy obligation.
 
+The portfolio's separate contact form sends the sender's name, email and message
+to Web3Forms. Its current form discloses that transfer and offers direct email as
+an alternative. Include that existing service in the website-wide privacy review;
+it is not part of payment verification or a newly added integration.
+
 The site does not collect card numbers, UPI PINs or OTPs in its own payment form.
 PhonePe's hosted interface has its own privacy and payment terms. Confirm the
 appropriate disclosures/agreements for actual business operation and jurisdiction.

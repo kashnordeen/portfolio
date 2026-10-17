@@ -32,6 +32,8 @@
 
 ### Security
 
+- Prepared browser security headers for all Vercel paths and a report-only CSP candidate, with regression tests. This local change is not deployed; payment flags, API routing and CORS are unchanged.
+- Rechecked local build/lint, 169 tests and npm audit (zero known vulnerabilities). Read-only hosted checks confirmed checkout disabled, RLS enabled on the ten payment/UAT tables and no Supabase security-advisor findings; production monitoring, policies and restore acceptance remain open.
 - Patched transitive development dependencies brace-expansion and source-map-js without changing direct dependencies or enabling installation scripts.
 
 ## [1.6.0] - 2026-10-14
