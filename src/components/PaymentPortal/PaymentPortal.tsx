@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowUpRight, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, CircleHelp, LockKeyhole, ShieldCheck } from "lucide-react";
 import { profile } from "@/data/portfolio";
 import { CheckoutError, getPaymentAvailability, getPaymentStatus, startCheckout } from "@/lib/payment-client";
 import type { PaymentStatus } from "@/lib/payment-client";
+import { projectAmountError, projectAmountPaise } from "@/lib/project-payment-input";
 import "./PaymentPortal.css";
 
 type PaymentPurpose = "community" | "project";
@@ -15,16 +16,20 @@ export function PaymentPortal() {
   const [email, setEmail] = useState("");
   const [reference, setReference] = useState("");
   const [availability, setAvailability] = useState({ projectEnabled: false, communityEnabled: false });
+  const [availabilityLoaded, setAvailabilityLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(() => new URLSearchParams(window.location.search).get("order") ?? "");
   const [status, setStatus] = useState<PaymentStatus | null>(null);
   const requestKey = useRef<string | null>(null);
+  const submitting = useRef(false);
   const [attempted, setAttempted] = useState(false);
   const enabled = purpose === "community" ? availability.communityEnabled : availability.projectEnabled;
   useEffect(() => {
     const controller = new AbortController();
-    void getPaymentAvailability(controller.signal).then(result => { if (!controller.signal.aborted) setAvailability(result); });
+    void getPaymentAvailability(controller.signal).then(result => {
+      if (!controller.signal.aborted) { setAvailability(result); setAvailabilityLoaded(true); }
+    });
     return () => controller.abort();
   }, []);
   useEffect(() => {
@@ -50,7 +55,8 @@ export function PaymentPortal() {
   }, [order]);
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!enabled || busy || order) return;
+    if (!enabled || submitting.current || order || (purpose === "project" && projectAmountPaise(amount) === null)) return;
+    submitting.current = true;
     setBusy(true);
     setMessage("");
     setAttempted(true);
@@ -66,13 +72,15 @@ export function PaymentPortal() {
       if (!attempted && error instanceof CheckoutError && error.editable) setAttempted(false);
       setMessage(error instanceof Error ? error.message : "Unable to open checkout. Please contact support.");
     }
-    finally { setBusy(false); }
+    finally { submitting.current = false; setBusy(false); }
   };
   const statusCopy = status?.state === "COMPLETED" ? "Payment verified. Service delivery is handled separately; a project payment does not settle any remaining balance."
     : status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
       : status?.state === "REVIEW" ? "This payment needs review. Please contact support and do not pay again."
         : "Your payment is being verified. A return from checkout is not proof of payment. Please do not pay again.";
-  const projectAmount = /^\d+(\.\d{1,2})?$/.test(amount) ? Number(amount) : 0;
+  const amountError = purpose === "project" ? projectAmountError(amount) : "";
+  const validAmount = purpose === "community" || projectAmountPaise(amount) !== null;
+  const projectAmount = (projectAmountPaise(amount) ?? 0) / 100;
   const total = status ? status.amountPaise / 100 : purpose === "community" ? 699 : projectAmount;
   const formattedTotal = total > 0 && Number.isFinite(total)
     ? new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(total)
@@ -86,51 +94,55 @@ export function PaymentPortal() {
       </header>
 
       <div className="payment-intro">
-        <h1>A clear payment.<br /><span>A good beginning.</span></h1>
-        <p>Register for the community or pay an agreed amount towards your project.</p>
+        <div className="payment-eyebrow"><span>PROJECT PAYMENTS</span><span className="payment-availability">{!availabilityLoaded ? "Checking availability" : enabled ? "Checkout available" : "Checkout not open"}</span></div>
+        <h1>For what we’re<br /><span>building together.</span></h1>
+        <p>Pay the amount we’ve agreed for your project. Keep your reference handy; it connects this payment to the right work.</p>
+        <ol className="payment-steps" aria-label="Payment process"><li aria-current={order ? undefined : "step"}><span>1</span> Your details</li><li><span>2</span> PhonePe checkout</li><li aria-current={order ? "step" : undefined}><span>3</span> Verified status</li></ol>
       </div>
 
       <div className="payment-layout">
         <section className="payment-form-panel" aria-labelledby="payment-details-heading" aria-busy={busy}>
-          <h2 id="payment-details-heading">Payment details</h2>
-          {order && <div className="payment-setup-notice" role="status"><ShieldCheck size={18} aria-hidden="true" /><p>{statusCopy}<br />Reference: {order}</p></div>}
+          <div className="payment-panel-heading"><h2 id="payment-details-heading">Payment details</h2><span>01 / DETAILS</span></div>
+          {order && <div className="payment-setup-notice payment-status-notice" role="status">{status?.state === "COMPLETED" ? <CheckCircle2 size={20} aria-hidden="true" /> : <CircleHelp size={20} aria-hidden="true" />}<p>{statusCopy}<br /><span className="payment-reference">Reference: {order}</span></p></div>}
           <fieldset className="payment-purpose" disabled={attempted || !!order}>
             <legend>What are you paying for?</legend>
             <div className="payment-options">
-              <label className={purpose === "community" ? "payment-option selected" : "payment-option"}>
-                <input type="radio" name="purpose" value="community" checked={purpose === "community"} onChange={() => setPurpose("community")} />
-                <span><strong>Community registration</strong><small>Fixed fee of ₹699</small></span>
-              </label>
               <label className={purpose === "project" ? "payment-option selected" : "payment-option"}>
                 <input type="radio" name="purpose" value="project" checked={purpose === "project"} onChange={() => setPurpose("project")} />
-                <span><strong>Project payment</strong><small>Enter your agreed amount</small></span>
+                <span><strong>Project payment</strong><small>Advance, instalment or agreed balance</small></span>
+              </label>
+              <label className={purpose === "community" ? "payment-option selected" : "payment-option"}>
+                <input type="radio" name="purpose" value="community" disabled={!availability.communityEnabled} checked={purpose === "community"} onChange={() => setPurpose("community")} />
+                <span><strong>Community registration</strong><small>{availability.communityEnabled ? "Fixed fee of ₹699" : "Not open for registration"}</small></span>
               </label>
             </div>
           </fieldset>
 
           <form onSubmit={submit}>
-            <fieldset className="payment-fields" disabled={attempted || !!order} style={{ border: 0, margin: 0, padding: 0, minWidth: 0 }}>
+            <fieldset className="payment-fields" disabled={attempted || !!order}>
               <legend className="sr-only">Customer details</legend>
               <div><label htmlFor="payer-name">Full name</label><input id="payer-name" name="name" autoComplete="name" maxLength={100} required value={name} onChange={event => setName(event.target.value)} /></div>
-              <div><label htmlFor="payer-email">Email address</label><input id="payer-email" name="email" type="email" autoComplete="email" maxLength={254} required value={email} onChange={event => setEmail(event.target.value)} /><p>Used to identify your payment and contact you if needed.</p></div>
+              <div><label htmlFor="payer-email">Email address</label><input id="payer-email" name="email" type="email" autoComplete="email" aria-describedby="payer-email-help" maxLength={254} required value={email} onChange={event => setEmail(event.target.value)} /><p id="payer-email-help">For payment support and matching your project.</p></div>
               {purpose === "project" && <>
-                <div><label htmlFor="payer-amount">Amount in INR</label><div className="payment-amount-input"><span aria-hidden="true">₹</span><input id="payer-amount" name="amount" type="text" inputMode="decimal" autoComplete="off" maxLength={12} pattern="[0-9]+([.][0-9]{1,2})?" required value={amount} onChange={event => setAmount(event.target.value)} aria-describedby="payer-amount-help" /></div><p id="payer-amount-help">Enter the amount agreed for your project. Use up to two decimal places.</p></div>
-                <div><label htmlFor="payer-reference">Project or invoice reference</label><input id="payer-reference" name="reference" maxLength={120} required value={reference} onChange={event => setReference(event.target.value)} /><p>This helps us match your payment to the right project.</p></div>
+                <div><label htmlFor="payer-amount">Agreed amount in INR</label><div className="payment-amount-input"><span aria-hidden="true">₹</span><input id="payer-amount" name="amount" type="text" inputMode="decimal" autoComplete="off" maxLength={12} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="0.00" required value={amount} onChange={event => setAmount(event.target.value)} aria-invalid={!!amountError} aria-describedby={amountError ? "payer-amount-help payer-amount-error" : "payer-amount-help"} /></div><p id="payer-amount-help">₹200 to ₹50,000. Enter only the amount agreed for your project.</p>{amountError && <p id="payer-amount-error" className="payment-field-error">{amountError}</p>}</div>
+                <div><label htmlFor="payer-reference">Project or invoice reference</label><input id="payer-reference" name="reference" aria-describedby="payer-reference-help" placeholder="Your agreed project reference" maxLength={120} required value={reference} onChange={event => setReference(event.target.value)} /><p id="payer-reference-help">Use the reference from our project discussion or invoice.</p></div>
               </>}
             </fieldset>
-            {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{purpose === "community" ? "Community registration is not open yet. The benefits and access details will be shared before payments are enabled." : "Online checkout is being set up. No payment can be taken from this page yet."}</p></div>}
-            {message && <p role="alert">{message}</p>}
-            <button className="payment-checkout-button" type="submit" disabled={!enabled || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "COMPLETED" ? "Payment verified" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout coming soon"} <ArrowUpRight size={18} aria-hidden="true" /></button>
+            {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}
+            {message && <p className="payment-error-notice" role="alert">{message}</p>}
+            <button className="payment-checkout-button" type="submit" disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "COMPLETED" ? "Payment verified" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
+            <p className="payment-privacy-note"><LockKeyhole size={14} aria-hidden="true" /> Card details and UPI PINs are never entered on this website.</p>
           </form>
         </section>
 
         <aside className="payment-summary" aria-labelledby="payment-summary-heading">
-          <div className="payment-summary-icon"><ShieldCheck size={26} strokeWidth={1.5} aria-hidden="true" /></div>
-          <h2 id="payment-summary-heading">Your payment</h2>
+          <div className="payment-summary-top"><div className="payment-summary-icon"><ShieldCheck size={24} strokeWidth={1.5} aria-hidden="true" /></div><span>02 / REVIEW</span></div>
+          <h2 id="payment-summary-heading">Review your payment</h2>
           <p>{purpose === "community" ? "Community registration" : "Payment towards your project"}</p>
-          <div className="payment-total"><span>Total in INR</span><strong aria-live="polite" aria-atomic="true">{formattedTotal}</strong></div>
+          <div className="payment-total"><span>{status ? "Server-confirmed amount" : "Amount to pay · INR"}</span><strong aria-live="polite" aria-atomic="true">{formattedTotal}</strong></div>
+          <dl className="payment-merchant"><div><dt>Paid to</dt><dd>Keshav Kumar Karn</dd></div><div><dt>Checkout provider</dt><dd>PhonePe</dd></div></dl>
           <p className="payment-summary-note">{purpose === "community" ? "Registration details will be explained before checkout is enabled." : "Paying an advance or instalment does not mark the full project balance as paid."}</p>
-          <div className="payment-expectations"><h3>When checkout opens</h3><ul><li>Pay through PhonePe’s hosted checkout.</li><li>Scan a QR on desktop or choose an available payment option.</li><li>Receive confirmation after payment is verified.</li></ul></div>
+          <div className="payment-expectations"><h3>What happens next</h3><ul><li>Continue to PhonePe’s hosted checkout when enabled.</li><li>Choose from the payment methods PhonePe makes available.</li><li>Return here for a server-verified payment status. If pending, do not pay again.</li></ul></div>
           <a href={`mailto:${profile.email}`} className="payment-summary-help">Discuss payment details <ArrowUpRight size={16} aria-hidden="true" /></a>
         </aside>
       </div>
