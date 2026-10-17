@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Bound payment request-body reads to four seconds and reject malformed/ambiguous checkout redirects, with regression tests. Published with checkout and jobs disabled.
 - Rewrites TypeScript-relative imports when compiling native Vercel API functions, preventing missing-module startup failures. Added an emitted-module-graph regression check and disabled dependency installation scripts for deployments.
 
 ### Added
@@ -28,6 +29,7 @@
 
 ### Changed
 
+- Refined the payment portal with amount guidance, a recipient/review summary, clearer closed/loading/error states, keyboard-accessible field guidance and reduced-motion styling. Published to kkarn.vercel.app with all checkout/job/alert gates false; no Git push or real payment.
 - Recorded the owner-approved ₹200–₹50,000 inclusive project-payment range in the setup template, with boundary tests. Live payments remain disabled and hosting configuration is unchanged.
 
 ### Security

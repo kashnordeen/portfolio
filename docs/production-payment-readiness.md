@@ -6,25 +6,32 @@ by this document. Sandbox evidence is recorded in `payment-uat.md`.
 
 ## Current handoff
 
-Local checks pass, but the production release is on hold. The owner has confirmed
-the Option A refund terms, seller name, support email and support calendar. The
-following items still prevent a completed live rollout:
+The updated UI/backend is deployed with payments disabled; real-charge activation
+is still on hold. The owner has confirmed the Option A refund terms, seller name,
+support email and support calendar. The following items still prevent a completed
+live rollout:
 
 - Production alert delivery has no verified sender. The owner has only a Vercel
   subdomain and declined another monitoring service. No domain purchase, service
-  addition or workaround using Resend's testing sender is authorised.
+  addition or workaround using Resend's testing sender is authorised. The owner
+  approved investigating the existing Gmail account; this work has created no
+  Gmail credentials, permissions or runtime integration.
 - Service/delivery approval, remaining seller disclosures, retention periods and
   the support/refund procedure need completion before public policy pages can be
   published. Do not replace those choices with invented commitments.
 - A hosted backup and isolated restore rehearsal need approval of the source,
   destination, encrypted storage and any cost. Do not use the owner's unrelated
   Supabase project as a disposable target.
-- PhonePe must confirm any remaining go-live/refund cases and its exact API-access
-  deadline. Provider sign-off, a real-payment test and production activation are
-  not established by local tests or sandbox callbacks.
+- PhonePe's deadline was communicated on a call, with no written message. Treat
+  that as an owner report; clarify which access closes and when, without inventing
+  an expiry or requiring a nonexistent written message to continue safe work.
+  Confirm remaining go-live/refund cases. Provider sign-off, a real-payment test
+  and production activation are not established by local tests or sandbox callbacks.
 
-After those items are resolved, request explicit deployment and activation
-approval. Git push requires separate permission. Community checkout stays off.
+The owner explicitly approved deploying and publishing commits `f23bbfc` and
+`006ef75` with checkout, community, jobs and alerts disabled. That scoped approval
+does not enable real charges or authorise a Git push. Resolve the remaining checks
+before requesting the separate activation stage. Community checkout stays off.
 
 ## Completed evidence
 
@@ -36,26 +43,56 @@ approval. Git push requires separate permission. Community checkout stays off.
   was removed. After reload one Enabled SHA registration with two events remained.
   Its dashboard validation reached the application (400 for the unsupported probe).
   No production webhook or credential was modified.
-- Production alert support is now a local candidate, not deployed or configured.
-- Fresh local checks: 169 tests passed, including UAT compatibility and production
+- Production alert code is deployed but disabled, without a configured or verified
+  production sending route. The Gmail alternative remains investigation only.
+- Fresh local checks: 176 tests passed, including UAT compatibility and production
   isolation, lint, TypeScript/API compilation and frontend build. Native npm audit
   reported zero known vulnerabilities; no server-only alert/queue markers appeared
   in the browser bundle. This is local evidence, not hosted production acceptance.
-- Read-only live checks on 17 October 2026 (IST): the homepage returned HTTP 200
+- Pre-deployment read-only live checks on 17 October 2026 (IST): the homepage returned HTTP 200
   with HSTS, and the public configuration returned project/community disabled.
   Other selected browser security headers were absent from the homepage response.
 - The hosted `portfolio-payments` Supabase security advisor returned no findings.
   Metadata showed RLS enabled on all five production and five UAT payment tables.
   This does not prove backup recovery or certify all database permissions.
 
-## Local security-header candidate
+## Published disabled build (17 October 2026, IST)
 
-`vercel.json` now prepares `nosniff`, `X-Frame-Options: DENY`, `no-referrer` and
+- Source: `006ef75`, including security fix `f23bbfc` and prior header work.
+- Existing project: `portfolio`, `prj_SV6MLqre8MI2eFF1hY2AdOJgik9z`, owned by
+  `kashnordeens-projects`; no project was created or relinked.
+- Deployment: `dpl_C7c6CbT6oLB27RqTTTWQjAAuYbuH`, Ready, then explicitly promoted.
+  The public `kkarn.vercel.app` bundle contains the revised payment UI.
+- Deployment-specific runtime and build overrides keep `PAYMENTS_ENABLED`,
+  `PAYMENT_RELEASE_APPROVED`, `PAYMENT_JOBS_ENABLED`, `COMMUNITY_PAYMENTS_ENABLED`,
+  `PAYMENT_PRODUCTION_ALERTS_ENABLED` and `PAYMENT_UAT_ALERTS_ENABLED` false.
+  Provider environment/origin are production / `https://kkarn.vercel.app`.
+  No project-level secrets, scheduler or UAT deployment were changed.
+- Candidate checks: root 200, both public checkout flags false, sessionless status
+  request rejected with 404. Public post-promotion checks confirm root 200, both
+  checkout flags false and the deployed baseline/report-only security headers.
+- Chrome verified the published UI and disabled checkout. Local Chrome tests
+  checked the INR 199.99 error, INR 50,000 boundary, summary amount and keyboard
+  progression. Captured warning/error console output was empty. Other responsive
+  breakpoints and enabled/real-payment browser flows are not newly verified.
+- Security changes add a four-second request-body deadline and reject malformed
+  checkout response objects/IDs, URL fragments and redirects on ambiguous HTTP
+  responses. Regression tests failed before the fixes and pass afterwards.
+  An upper-amount-bound mutation was also caught by the input tests and restored.
+- No Git push, real order/payment/refund, credential rotation or Gmail access was
+  performed. Existing native dependencies still skip installation scripts. The
+  remote build completed with zero known audit vulnerabilities, while warning
+  about an unsupported ESLint version and unapproved install scripts; no scripts
+  were blanket-approved and no dependency upgrade was made in this change.
+
+## Deployed baseline headers and report-only CSP
+
+`vercel.json` sets `nosniff`, `X-Frame-Options: DENY`, `no-referrer` and
 disabled camera/microphone/geolocation permissions on all paths. It changes no
 rewrites, CORS, API caching, authentication or payment flags. The configuration has
 two regression tests, verified failing before the change and passing afterwards.
-The new headers are not deployed; check the actual hosted HTML, asset and API
-responses after a separately approved UAT deployment.
+The homepage headers are now confirmed on the published build. Further route and
+browser acceptance remains necessary before broadening or enforcing the CSP.
 
 The resource CSP starts in report-only mode. It restricts the proposed script
 sources to self and the exact static theme-script hash, while allowing existing
@@ -75,6 +112,32 @@ inline-script hash against the built HTML if the theme script changes. Enforceme
 requires a reviewed follow-up, not an automatic flag change.
 
 ## Gate 1: production operational alerts and recovery
+
+### Gmail investigation (no configuration change)
+
+The owner approved investigation only. Gmail API OAuth with the `gmail.send`
+scope can send mail without mailbox read/modify permissions. It is preferable to
+granting a general account app password for this owner-alert use case. Sending
+permission itself is not limited to the owner's recipient address; any future
+implementation must enforce that fixed recipient and fixed category/hour content
+in code, retain signature verification before sending, and keep secrets server-only.
+
+This requires a separately approved Google OAuth client/consent setup and private
+credential storage, followed by a no-customer-data delivery test. Do not reuse this
+chat's Gmail connector tokens or read the owner's mailbox to configure runtime
+email. Do not generate, paste or copy a credential through model-visible output.
+An external OAuth app left in Testing normally gets a seven-day refresh-token
+lifetime for Gmail scopes; do not present that as durable production monitoring.
+Handle revoked/expired credentials and validate the actual deployment configuration.
+Google discourages app passwords, which also require 2-Step Verification and may
+be unavailable for some accounts. No Google Cloud project, consent, billing, mail,
+account setting or Gmail runtime code was changed during investigation.
+
+References: [Gmail OAuth scopes](https://developers.google.com/workspace/gmail/api/auth/scopes),
+[refresh-token expiry](https://developers.google.com/identity/protocols/oauth2#expiration),
+[Google app-password guidance](https://support.google.com/accounts/answer/185833?hl=en).
+
+### Existing Resend candidate
 
 The code uses a distinct `PAYMENT_PRODUCTION_ALERTS_ENABLED=false` default. Enabling
 it requires the exact live Vercel project ID/origin, Production environment, healthy
@@ -168,9 +231,11 @@ the live database or rotate active credentials as part of rehearsal.
 
 ## Gate 4: provider and controlled release sign-off
 
-Confirm PhonePe's exact written deadline/time zone and what access closes. Ask the
-provider which UAT evidence/refund scenarios remain required; the local integration
-does not implement automated refunds. Do not represent the UAT pass as provider sign-off.
+Clarify PhonePe's exact deadline/time zone and what access closes using the owner's
+call details or a provider follow-up; a written message is not a prerequisite to
+safe preparatory work. Ask which UAT evidence/refund scenarios remain required;
+the local integration does not implement automated refunds. Do not represent the
+UAT pass as provider sign-off.
 
 Then obtain explicit authority for production configuration/deployment, recovery/job
 activation, an owner-performed bounded real-payment test, and finally public project
