@@ -1,10 +1,36 @@
-# Checkout handoff incident — open
+# Checkout handoff incident — controlled live payment verified
+
+## Accepted real-payment result — 17 October 2026, 21:45 IST
+
+The owner completed the live INR 200 payment themselves. The agent did not enter
+payment credentials, authorize funds, make another automated checkout or refund.
+The production website displayed Payment verified for
+`c7050c88-1641-4dd0-b9f8-585537c6dec5`.
+
+Independent read-only database verification confirmed production/project,
+COMPLETED, INR 20000 paise, paid_at 2026-10-17 16:15:10.217393 UTC, a bound
+provider order reference, a NULL optional project reference, one recorded
+checkout.order.completed notification, exactly one fulfilment record and zero
+pending verification jobs for this order. Notification receipt is confirmed;
+its processed_at field was still NULL at this snapshot, so it is not represented
+as a processed notification. The independent provider-status verification, not
+the browser return or a notification alone, authorized completion. Fulfilment
+record creation does not mean project/service delivery or full balance payment.
+
+The owner initially described continued loading, but the live page subsequently
+returned verified and these backend checks confirmed success. A sanitized browser
+screenshot was saved as live-payment-verified.png in this task's visual artifacts.
+The optional-reference and end-to-end live-payment acceptance criteria are now
+met. Earlier sections below preserve the incident timeline, not current blockers.
+Older unpaid attempts are not replayed or manually marked paid. Community and
+automated alerts remain disabled; monitoring/backups retain the owner's prior
+manual/deferred decisions. No Git push occurred.
 
 ## Second-stage checkout and optional-reference repair
 
 After the exact-host fix, the owner reported that PhonePe opened but encountered
-an immediate error, later described as continuous loading. No final completed
-payment has been confirmed. The owner also showed Chrome's native saved reference
+an immediate error, later described as continuous loading. At that stage no final
+completed payment had been confirmed. The owner also showed Chrome's native saved reference
 suggestions; the field incorrectly remained required in the UI, API and database.
 
 PhonePe's current official troubleshooting documentation explicitly requires

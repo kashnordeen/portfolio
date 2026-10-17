@@ -1,18 +1,21 @@
 # Production project payments — launch evidence
 
-**Open acceptance:** source `bdbd0f7`, deployment
-`dpl_2jfComLTybSVH9sTofdJCP7YJPN8`, is now published for the owner-controlled real
-test. It retains the exact alternate PhonePe host fix, adds PhonePe's documented
-source referrer policy, and makes project reference optional in UI/API/storage.
-All 234 tests, lint/build/audit, strict remote DB preflight and public header/config/
-unsigned-callback guards passed; the fresh Chrome form was checked. See
-`checkout-incident-2026-10-17.md`; do not claim real-payment acceptance until the
-owner's transaction is independently verified. The earlier launch evidence below
-is historical.
+**Live payment accepted:** the owner completed INR 200 on source `bdbd0f7`,
+deployment `dpl_2jfComLTybSVH9sTofdJCP7YJPN8`, with project reference left blank.
+Payment `c7050c88-1641-4dd0-b9f8-585537c6dec5` independently verified COMPLETED
+at 21:45 IST on 17 October 2026, with one received completion notification,
+one fulfilment record and no pending jobs. The website displayed Payment verified.
+It retains the exact alternate PhonePe host fix, adds PhonePe's documented source
+referrer policy and makes project reference optional in UI/API/storage. All 234
+tests, lint/build/audit, strict remote DB preflight and public header/config/
+unsigned-callback guards passed; the live Chrome form was checked. Full evidence
+and notification-processing caveat: `checkout-incident-2026-10-17.md`. Earlier
+launch evidence below is historical. This verifies payment, not service delivery.
 
 17 October 2026 (IST). This record is not a claim of legal certification or an
 independent financial-security audit. Community checkout remains closed. No Git
-push, real payment, refund, database export or password rotation was performed.
+push, agent-authorized payment, refund, database export or password rotation was
+performed. The real payment above was authorized privately by the owner.
 
 ## Owner decisions
 

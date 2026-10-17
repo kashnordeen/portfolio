@@ -10,7 +10,10 @@
 - Set the document referrer policy to PhonePe's documented
   `strict-origin-when-cross-origin` requirement. API responses retain no-referrer;
   cross-origin checkout receives only the public source origin, not URL queries.
-- Real owner-performed live payment acceptance is still outstanding.
+- Verified an owner-performed INR 200 production payment with reference left
+  blank: independent provider-verified COMPLETED state, one received completion
+  webhook, exactly one fulfilment record and no pending jobs. The website displays
+  Payment verified. No agent financial authorization, refund or Git push occurred.
 
 ## Checkout redirect repair — 2026-10-17
 
