@@ -1,5 +1,15 @@
 # Payment portal setup
 
+## Optional project reference (2026-10-17)
+
+Project/invoice reference is optional. Empty input is stored as NULL, not a fake
+invoice reference; the server-issued payment UUID remains the support identifier.
+For a new production database, apply `database/optional-project-reference.sql`
+after the canonical payment store/backend/jobs migrations. It is a guarded,
+idempotent additive migration; never edit an existing order to add a reference.
+It is applied to production, and fresh UAT rendering includes it. Existing UAT
+requires its own separately scoped migration before testing blank references.
+
 ## Current status
 
 ### Managed checks implementation — local main and approved database setup

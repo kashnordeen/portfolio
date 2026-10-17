@@ -16,7 +16,8 @@ test('deployment headers deny framing, MIME sniffing and unused browser capabili
   const headers = globalHeaders();
   assert.equal(headers.get('x-frame-options'), 'DENY');
   assert.equal(headers.get('x-content-type-options'), 'nosniff');
-  assert.equal(headers.get('referrer-policy'), 'no-referrer');
+  // PhonePe validates the registered source origin. Never send its full URL/query.
+  assert.equal(headers.get('referrer-policy'), 'strict-origin-when-cross-origin');
   assert.equal(headers.get('permissions-policy'), 'camera=(), microphone=(), geolocation=()');
   assert.equal(config.framework, 'vite');
   assert.equal(config.installCommand, 'npm ci --ignore-scripts');

@@ -38,7 +38,10 @@ export function validateCustomer(input: Record<string, unknown>, min: number, ma
   const purpose = input.purpose;
   const amount = purpose === 'community' ? 69900 : parsePaise(input.amount);
   if (purpose === 'project' && (amount < min || amount > max)) throw new PaymentError(400, 'Amount is outside the accepted project payment range.');
-  return { purpose, name, email, reference: purpose === 'project' ? text('reference', 120) : null, amount };
+  const reference = purpose === 'project' && input.reference != null &&
+    !(typeof input.reference === 'string' && /^ *$/.test(input.reference))
+    ? text('reference', 120) : null;
+  return { purpose, name, email, reference, amount };
 }
 
 export function sessionHash(token: string, secret: string) {

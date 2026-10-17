@@ -1,5 +1,47 @@
 # Checkout handoff incident — open
 
+## Second-stage checkout and optional-reference repair
+
+After the exact-host fix, the owner reported that PhonePe opened but encountered
+an immediate error, later described as continuous loading. No final completed
+payment has been confirmed. The owner also showed Chrome's native saved reference
+suggestions; the field incorrectly remained required in the UI, API and database.
+
+PhonePe's current official troubleshooting documentation explicitly requires
+`strict-origin-when-cross-origin` for its processing-error/missing-QR case:
+https://developer.phonepe.com/payment-gateway/website-integration/standard-checkout/api-integration/troubleshooting
+The deployed document used `no-referrer`. This is a confirmed configuration
+mismatch, not yet proof that it is the sole cause of the owner's loading issue.
+The fix sends only the public website origin on cross-origin HTTPS checkout;
+no customer fields, query strings or opaque checkout tokens are added to logs.
+Payment API responses keep their own no-referrer policy, and same-tab navigation
+through the provider's exact returned URL is unchanged.
+
+Project reference is now optional across form, server validation and storage.
+Missing/null/blank references normalize to SQL NULL; supplied references still
+reject invalid types, controls and more than 120 characters. The additive
+`database/optional-project-reference.sql` migration removes only the expected
+required-reference constraint after checking its exact definition, with bounded
+lock/statement timeouts. It preserves data, RLS, immutable payment terms and all
+other amount/state checks. Production migration `make_project_reference_optional`
+was applied and its security-preservation metadata checks passed. Fresh isolated
+UAT provisioning also includes the migration; existing UAT is not changed.
+
+Five RED failures reproduced the form/server/schema/header problems before the
+fix. GREEN: all 234 tests passed, lint passed, the normal-access build passed and
+native npm audit found zero known vulnerabilities. The sandboxed build had the
+same Windows realpath EPERM as earlier; no file/security protection was weakened.
+New checkout is temporarily paused on the jobs-preserving rollback while the
+reviewed candidate is prepared. Existing verification/recovery remains enabled.
+No additional automated live checkout, funds authorization or Git push occurred.
+
+### Deployment/acceptance
+
+Candidate publication and owner-controlled acceptance remain pending. Do not
+reuse/replay an ambiguous old intent or call this incident resolved from tests
+alone. Chrome may retain old local form history despite autocomplete off; no
+browser-wide history/settings were cleared.
+
 ## Root cause identified; live acceptance pending
 
 The single approved no-charge diagnostic session was submitted only to protected

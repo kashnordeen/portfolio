@@ -96,7 +96,7 @@ export function PaymentPortal() {
       <div className="payment-intro">
         <div className="payment-eyebrow"><span>PROJECT PAYMENTS</span><span className="payment-availability">{!availabilityLoaded ? "Checking availability" : enabled ? "Checkout available" : "Checkout not open"}</span></div>
         <h1>For what we’re<br /><span>building together.</span></h1>
-        <p>Pay the amount we’ve agreed for your project. Keep your reference handy; it connects this payment to the right work.</p>
+        <p>Pay the amount we’ve agreed for your project. Have a project or invoice reference? You can add it below, or leave it blank.</p>
         <ol className="payment-steps" aria-label="Payment process"><li aria-current={order ? undefined : "step"}><span>1</span> Your details</li><li><span>2</span> PhonePe checkout</li><li aria-current={order ? "step" : undefined}><span>3</span> Verified status</li></ol>
       </div>
 
@@ -125,7 +125,7 @@ export function PaymentPortal() {
               <div><label htmlFor="payer-email">Email address</label><input id="payer-email" name="email" type="email" autoComplete="email" aria-describedby="payer-email-help" maxLength={254} required value={email} onChange={event => setEmail(event.target.value)} /><p id="payer-email-help">For payment support and matching your project.</p></div>
               {purpose === "project" && <>
                 <div><label htmlFor="payer-amount">Agreed amount in INR</label><div className="payment-amount-input"><span aria-hidden="true">₹</span><input id="payer-amount" name="amount" type="text" inputMode="decimal" autoComplete="off" maxLength={12} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="0.00" required value={amount} onChange={event => setAmount(event.target.value)} aria-invalid={!!amountError} aria-describedby={amountError ? "payer-amount-help payer-amount-error" : "payer-amount-help"} /></div><p id="payer-amount-help">₹200 to ₹50,000. Enter only the amount agreed for your project.</p>{amountError && <p id="payer-amount-error" className="payment-field-error">{amountError}</p>}</div>
-                <div><label htmlFor="payer-reference">Project or invoice reference</label><input id="payer-reference" name="reference" aria-describedby="payer-reference-help" placeholder="Your agreed project reference" maxLength={120} required value={reference} onChange={event => setReference(event.target.value)} /><p id="payer-reference-help">Use the reference from our project discussion or invoice.</p></div>
+                <div><label htmlFor="payer-reference">Project or invoice reference (optional)</label><input id="payer-reference" name="projectReference" autoComplete="off" aria-describedby="payer-reference-help" placeholder="Add a reference, if you have one" maxLength={120} value={reference} onChange={event => setReference(event.target.value)} /><p id="payer-reference-help">Leave blank if you don’t have one. We’ll match your payment using your name and email.</p></div>
               </>}
             </fieldset>
             {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}

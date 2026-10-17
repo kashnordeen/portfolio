@@ -16,12 +16,23 @@ test('exact decimal paise conversion rejects negative, exponent, excess decimals
   assert.equal(parsePaise('10.1'), 1010);
   for (const value of [1, '-1', '1e3', '0', '0.99', '1.001', 'Infinity', ' 10', '99999999']) assert.throws(() => parsePaise(value));
 });
-test('community amount is server-owned; projects require bounded amount and reference', () => {
+test('community amount is server-owned; project amounts remain bounded with an optional reference', () => {
   const input = { purpose: 'community', name: 'Test', email: 'test@example.test', amount: '1' };
   assert.equal(validateCustomer(input, 100, 999999).amount, 69900);
-  assert.throws(() => validateCustomer({ ...input, purpose: 'project', amount: '10' }, 100, 999999));
+  assert.equal(validateCustomer({ ...input, purpose: 'project', amount: '10' }, 100, 999999).reference, null);
   assert.throws(() => validateCustomer({ ...input, purpose: 'project', reference: 'INV', amount: '10000' }, 100, 999999));
   assert.throws(() => validateCustomer({ ...input, name: 'Test\nName' }, 100, 999999));
+});
+
+test('missing or blank project reference normalizes to null without accepting invalid supplied values', () => {
+  const input = { purpose: 'project', name: 'Fixture', email: 'fixture@example.test', amount: '200' };
+  for (const reference of [undefined, null, '', '   ']) {
+    assert.equal(validateCustomer({ ...input, reference }, 20000, 5000000).reference, null);
+  }
+  assert.equal(validateCustomer({ ...input, reference: '  INV-1  ' }, 20000, 5000000).reference, 'INV-1');
+  for (const reference of [42, false, {}, [], '\n', 'INV\n1', '\u007f', 'x'.repeat(121)]) {
+    assert.throws(() => validateCustomer({ ...input, reference }, 20000, 5000000));
+  }
 });
 test('live credentials and checkout cannot accidentally run in preview', () => {
   assert.throws(() => loadConfig({ ...env, PHONEPE_ENV: 'production', VERCEL_ENV: 'preview' }));

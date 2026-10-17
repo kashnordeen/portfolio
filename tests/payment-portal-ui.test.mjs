@@ -55,3 +55,16 @@ test('pending status does not claim the customer returned from checkout when che
   assert.match(html, /Please do not pay again/);
   assert.doesNotMatch(html, /A return from checkout/);
 });
+
+test('project reference is clearly optional and does not request saved form suggestions', t => {
+  t.mock.property(globalThis, 'window', { location: { search: '?payment=project' } });
+  const html = renderToStaticMarkup(createElement(PaymentPortal));
+  const reference = html.match(/<input[^>]*id="payer-reference"[^>]*>/)?.[0] ?? '';
+  assert.ok(reference);
+  assert.doesNotMatch(reference, /\brequired(?:=|\s|>)/);
+  assert.match(reference, /autoComplete="off"/i);
+  assert.doesNotMatch(reference, /\blist=/);
+  assert.match(html, /Project or invoice reference \(optional\)/);
+  assert.match(html, /Leave blank if you don’t have one/);
+  assert.doesNotMatch(html, /Keep your reference handy|UAT-ONLY|UAT-DIAGNOSTIC/);
+});

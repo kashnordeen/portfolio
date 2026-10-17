@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises';
 
 export async function renderUatSchema() {
-  const migrations = await Promise.all(['payment-orders.sql', 'payment-backend.sql', 'payment-jobs.sql']
+  const migrations = await Promise.all(['payment-orders.sql', 'payment-backend.sql', 'payment-jobs.sql', 'optional-project-reference.sql']
     .map(file => readFile(new URL(`../database/${file}`, import.meta.url), 'utf8')));
   const body = migrations.map(text => text
     .replace(/^BEGIN;\s*$/gm, '').replace(/^COMMIT;\s*$/gm, '')

@@ -1,5 +1,17 @@
 # Changelog
 
+## Checkout source and optional reference — 2026-10-17
+
+- Made project/invoice references optional in the form, API validation and a
+  guarded additive database migration. Supplied references retain length and
+  control-character validation; existing order identities remain immutable.
+- Disabled reference-field autocomplete and changed its browser form name to
+  avoid the old UAT form-history suggestions. No application suggestion list exists.
+- Set the document referrer policy to PhonePe's documented
+  `strict-origin-when-cross-origin` requirement. API responses retain no-referrer;
+  cross-origin checkout receives only the public source origin, not URL queries.
+- Real owner-performed live payment acceptance is still outstanding.
+
 ## Checkout redirect repair — 2026-10-17
 
 - Corrected backend and browser checkout-host validation for the exact
