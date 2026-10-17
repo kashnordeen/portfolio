@@ -1,5 +1,14 @@
 # Changelog
 
+## Portfolio links restored — 2026-10-17
+
+- Restored all five project GitHub buttons, the configured project website link,
+  Downloads Organizer platform/download menus and release notes, both Credly
+  verification links, and contact GitHub/LinkedIn links at the owner's request.
+- Existing safe external-link attributes, release validation/fallbacks and
+  unsigned-installer notice are unchanged. Community checkout stays disabled;
+  payment configuration and Mumbai backend placement are unchanged.
+
 ## Payment backend locality — 2026-10-17
 
 - Pin backend functions to Mumbai (`bom1`), close to the existing production

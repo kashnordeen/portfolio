@@ -31,10 +31,10 @@ export const profile = {
 };
 
 export const policyVisibility = {
-  projectLinks: false,
-  projectDownloads: false,
-  credlyLinks: false,
-  contactSocialLinks: false,
+  projectLinks: true,
+  projectDownloads: true,
+  credlyLinks: true,
+  contactSocialLinks: true,
 } as const;
 
 export const stats = [
