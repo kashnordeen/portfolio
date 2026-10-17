@@ -61,7 +61,8 @@ for (const [environment, event] of [['production', 'PAYMENT_PROVIDER_FAILURE'], 
         }, now, entry => entries.push(entry));
         await assert.rejects(failure.operation === 'STATUS' ? provider.status(order.merchant_order_id) : provider.pay(order));
         assertDiagnostic(entries, { event, operation:failure.operation, code:failure.code,
-          ...(failure.status === undefined ? {} : {status:failure.status}) });
+          ...(failure.status === undefined ? {} : {status:failure.status}),
+          ...(failure.code === 'INVALID_CHECKOUT_URL' ? {reason:'HOST',hostClass:'FOREIGN'} : {}) });
         assert.ok(calls.filter(operation => operation === 'PAY').length <= 1, 'diagnostics must not retry /pay');
       });
     }

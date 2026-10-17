@@ -3,6 +3,18 @@ import { PaymentError } from './security.ts';
 
 export type ProviderStatus = { orderId: string; state: 'PENDING' | 'COMPLETED' | 'FAILED'; amount: number };
 
+// Only fixed classes leave this function; never log the redirect URL, token or credentials.
+export function checkoutUrlDiagnostic(value: unknown, hostname: string) {
+  if (typeof value !== 'string') return {reason:'TYPE',hostClass:'NONE'};
+  let url: URL;
+  try { url = new URL(value); } catch { return {reason:'PARSE',hostClass:'NONE'}; }
+  const hostClass = url.hostname === hostname ? 'EXPECTED' : url.hostname === 'mercury-t2.phonepe.com' ? 'MERCURY_T2'
+    : url.hostname.endsWith('.phonepe.com') ? 'PHONEPE_OTHER' : 'FOREIGN';
+  const reason = url.protocol !== 'https:' ? 'SCHEME' : url.hostname !== hostname ? 'HOST' : url.port ? 'PORT'
+    : url.username || url.password ? 'CREDENTIALS' : url.hash ? 'FRAGMENT' : 'VALID';
+  return {reason,hostClass};
+}
+
 export function safeCheckoutUrl(value: unknown, hostname: string): string {
   if (typeof value !== 'string') throw new PaymentError(502, 'Invalid payment provider response.');
   let url: URL;
@@ -30,9 +42,9 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
   const authUrl = config.environment === 'sandbox' ? `${base}/v1/oauth/token` : 'https://api.phonepe.com/apis/identity-manager/v1/oauth/token';
   let cached: { token: string; expires: number } | undefined;
   let inflight: Promise<string> | undefined;
-  const report = (operation: 'TOKEN' | 'PAY' | 'STATUS', code: 'TRANSPORT_FAILED' | 'HTTP_REJECTED' | 'INVALID_RESPONSE' | 'INVALID_CHECKOUT_URL' | 'INVALID_CHECKOUT_EXPIRY' | 'INVALID_CHECKOUT_STATE', status?: number) => {
+  const report = (operation: 'TOKEN' | 'PAY' | 'STATUS', code: 'TRANSPORT_FAILED' | 'HTTP_REJECTED' | 'INVALID_RESPONSE' | 'INVALID_CHECKOUT_URL' | 'INVALID_CHECKOUT_EXPIRY' | 'INVALID_CHECKOUT_STATE', status?: number, urlDetail?: ReturnType<typeof checkoutUrlDiagnostic>) => {
     const event = config.environment === 'sandbox' ? 'UAT_PROVIDER_FAILURE' : 'PAYMENT_PROVIDER_FAILURE';
-    try { log(JSON.stringify({event,operation,code,...(status === undefined ? {} : {status})})); }
+    try { log(JSON.stringify({event,operation,code,...(status === undefined ? {} : {status}),...urlDetail})); }
     catch { /* Operational logging must not change payment behaviour. */ }
   };
   const json = async (operation: 'TOKEN' | 'PAY' | 'STATUS', url: string, init: RequestInit) => {
@@ -82,7 +94,7 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
       }
       let url: string;
       try { url = safeCheckoutUrl(data.redirectUrl, config.checkoutHost); }
-      catch (error) { report('PAY','INVALID_CHECKOUT_URL'); throw error; }
+      catch (error) { report('PAY','INVALID_CHECKOUT_URL',undefined,checkoutUrlDiagnostic(data.redirectUrl,config.checkoutHost)); throw error; }
       // The provider may return a longer sandbox lifetime. Never extend our requested
       // 20-minute checkout window, or the provider's earlier expiry.
       return { orderId: data.orderId, expires: new Date(Math.min(data.expireAt,checkoutStarted+1_200_000)), url };

@@ -35,6 +35,17 @@ payment and independent provider verification records the correct completed stat
 
 ## Acceptance still required
 
+The owner-controlled reproduction on the diagnostic build emitted
+`PAYMENT_PROVIDER_FAILURE / PAY / INVALID_CHECKOUT_URL` followed by the fixed
+PROVIDER-stage event. The failure is response URL validation, not OAuth or DB
+checkout persistence. Structural diagnostics now classify URL components and
+known host classes using fixed values only; they do not record hostnames, URLs,
+tokens or customer data. All 228 tests, lint/build and native audit pass.
+The owner approved exactly one additional no-charge INR 200 diagnostic session
+using their public name/support email and reference CHECKOUT-DIAGNOSTIC. It has
+not yet been submitted. Public checkout is paused again on the safe stage;
+the diagnostic session is intended for a protected candidate only.
+
 Diagnostic source `2c4fcbd` was built with a passing strict production DB preflight,
 deployed as `dpl_DPLotpDu78iz27SjemN7gF1Lvjhr`, candidate config checked true/false,
 then explicitly promoted. New project checkout is reopened only for the agreed
