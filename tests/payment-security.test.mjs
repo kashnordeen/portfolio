@@ -86,6 +86,22 @@ test('bounded JSON rejects oversized, non-object and non-JSON bodies', async () 
   for (const body of ['[]', 'null', 'invalid']) await assert.rejects(boundedJson(request(body)));
   await assert.rejects(boundedJson(request(JSON.stringify({ large: 'x'.repeat(9000) }))));
 });
+
+test('bounded JSON stops a stalled request body instead of occupying a function indefinitely', async () => {
+  let streamController, cancelled = false;
+  const stream = new ReadableStream({
+    start(controller) { streamController = controller; controller.enqueue(new TextEncoder().encode('{"value":')); },
+    cancel() { cancelled = true; },
+  });
+  const request = new Request('https://example.test', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: stream, duplex: 'half' });
+  // The fixture eventually finishes so a missing deadline fails instead of hanging the suite.
+  const finish = setTimeout(() => { if (!cancelled) { streamController.enqueue(new TextEncoder().encode('1}')); streamController.close(); } }, 80);
+  try {
+    await assert.rejects(boundedJson(request, 8192, 10), error => error instanceof Error && error.status === 408);
+    assert.equal(cancelled, true);
+    assert.equal(request.body.locked, false);
+  } finally { clearTimeout(finish); }
+});
 test('status normalization uses root state, accepts numeric strings, ignores attempt states', () => {
   assert.deepEqual(normalizeStatus({ orderId: 'OMO1', state: 'PENDING', amount: '69900', paymentDetails: [{ state: 'COMPLETED' }] }), { orderId: 'OMO1', state: 'PENDING', amount: 69900 });
   assert.throws(() => normalizeStatus({ orderId: 'OMO1', amount: 69900, paymentDetails: [{ state: 'COMPLETED' }] }));

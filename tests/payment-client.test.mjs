@@ -48,3 +48,21 @@ test('client distinguishes definitive validation rejection from uncertain backen
     stub.mock.restore();
   }
 });
+
+test('checkout rejects redirect URLs attached to ambiguous responses and URL fragments', async t => {
+  const id = randomUUID();
+  for (const [status, checkoutUrl] of [[202, 'https://mercury.phonepe.com/transact?token=fixture'],
+    [409, 'https://mercury.phonepe.com/transact?token=fixture'], [200, 'https://mercury.phonepe.com/transact#unexpected']]) {
+    const stub = t.mock.method(globalThis, 'fetch', async () => Response.json({ orderId: id, checkoutUrl }, { status }));
+    await assert.rejects(startCheckout({}, randomUUID()));
+    stub.mock.restore();
+  }
+});
+
+test('checkout rejects malformed order identifiers and non-object API responses', async t => {
+  for (const body of [null, [], { orderId: '-'.repeat(36) }]) {
+    const stub = t.mock.method(globalThis, 'fetch', async () => Response.json(body));
+    await assert.rejects(startCheckout({}, randomUUID()), /Unable to confirm the order/);
+    stub.mock.restore();
+  }
+});

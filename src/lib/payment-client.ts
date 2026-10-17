@@ -22,18 +22,27 @@ export async function startCheckout(input: { purpose: string; name: string; emai
     response = await fetch('/api/payments/orders', { method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(20000),
       headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify(input) });
   } catch { throw new Error('Connection interrupted. Keep these details unchanged and retry this same request; do not start another payment.'); }
-  const data = await response.json();
+  let data: Record<string, unknown>;
+  try {
+    const parsed: unknown = await response.json();
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('object required');
+    data = parsed as Record<string, unknown>;
+  } catch { throw new Error('Unable to confirm the order. Please contact support before retrying.'); }
   if (!response.ok && ![202, 409].includes(response.status)) {
     throw new CheckoutError(typeof data.error === 'string' ? data.error : 'Unable to open checkout.', [400, 403, 415, 429].includes(response.status));
   }
-  if (typeof data.orderId !== 'string' || !/^[0-9a-f-]{36}$/i.test(data.orderId)) throw new Error('Unable to confirm the order. Please contact support before retrying.');
+  if (typeof data.orderId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(data.orderId)) throw new Error('Unable to confirm the order. Please contact support before retrying.');
   if (data.checkoutUrl) {
+    if (![200, 201].includes(response.status) || typeof data.checkoutUrl !== 'string') {
+      throw new Error('Unable to confirm checkout. Contact support before making another payment.');
+    }
     const url = new URL(data.checkoutUrl);
-    if (url.protocol !== 'https:' || !['mercury.phonepe.com', 'mercury-uat.phonepe.com'].includes(url.hostname) || url.username || url.password || url.port) {
+    if (url.protocol !== 'https:' || !['mercury.phonepe.com', 'mercury-uat.phonepe.com'].includes(url.hostname) || url.username || url.password || url.port || url.hash) {
       throw new Error('Unable to verify the checkout destination. Please contact support.');
     }
   }
-  return data;
+  return { orderId: data.orderId, ...(typeof data.checkoutUrl === 'string' ? { checkoutUrl: data.checkoutUrl } : {}),
+    ...(typeof data.state === 'string' ? { state: data.state } : {}), ...(typeof data.message === 'string' ? { message: data.message } : {}) };
 }
 
 export async function getPaymentStatus(order: string, signal: AbortSignal): Promise<PaymentStatus> {

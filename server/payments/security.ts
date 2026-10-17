@@ -55,18 +55,25 @@ export function readSession(request: Request) {
 export const newSession = () => randomBytes(32).toString('hex');
 export const sessionCookie = (token: string) => `__Host-payment-session=${token}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=86400`;
 
-export async function boundedJson(request: Request, limit = 8192): Promise<Record<string, unknown>> {
+export async function boundedJson(request: Request, limit = 8192, timeoutMs = 4000): Promise<Record<string, unknown>> {
   if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) throw new PaymentError(415, 'JSON is required.');
   const reader = request.body?.getReader();
   if (!reader) throw new PaymentError(400, 'Request body is required.');
   let size = 0;
   const chunks: Uint8Array[] = [];
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      reject(new PaymentError(408, 'Request body timed out.'));
+      void reader.cancel().catch(() => {});
+    }, timeoutMs);
+  });
   try {
     for (;;) {
-      const { done, value } = await reader.read();
+      const { done, value } = await Promise.race([reader.read(), deadline]);
       if (done) break;
       size += value.length;
-      if (size > limit) { await reader.cancel(); throw new PaymentError(413, 'Request is too large.'); }
+      if (size > limit) { void reader.cancel().catch(() => {}); throw new PaymentError(413, 'Request is too large.'); }
       chunks.push(value);
     }
     const parsed: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'));
@@ -75,7 +82,7 @@ export async function boundedJson(request: Request, limit = 8192): Promise<Recor
   } catch (error) {
     if (error instanceof PaymentError) throw error;
     throw new PaymentError(400, 'Invalid JSON request.');
-  } finally { reader.releaseLock(); }
+  } finally { clearTimeout(timer); reader.releaseLock(); }
 }
 
 // Only the documented SHA scheme is implemented. HMAC must not be guessed.
