@@ -225,6 +225,13 @@ dump its eventual contents into chat/logs or treat an empty field as approval.
 
 ## Gate 3: real backup and isolated restore rehearsal
 
+This is a recoverability release check, not an established PhonePe API requirement.
+Checkout can technically operate without a backup. The reason for this check is to
+recover the site's own order, customer/project reference and verification records
+after deletion, corruption or a bad migration; source-code Git history and the
+provider's transaction history are not substitutes for those database records.
+The owner's question about backups does not itself approve a database export.
+
 No full backup/restore is claimed. Local PostgreSQL regression tests are not a
 backup of the hosted database. A local command-availability check found none of
 `docker`, `pg_dump`, `psql` or `supabase` on PATH; this does not prove they are absent
