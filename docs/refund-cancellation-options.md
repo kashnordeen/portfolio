@@ -1,9 +1,12 @@
-# Project refund and cancellation policy — OPTIONS FOR OWNER REVIEW
+# Project refund and cancellation policy — decision record
 
-Draft date: 17 October 2026 (IST). Status: UNAPPROVED / UNPUBLISHED.
-This is a commercial drafting starting point, not legal advice or a statement that
-the website satisfies applicable law. The owner must choose an option, approve the
-wording/timings and confirm the actual support/refund process before publication.
+Decision date: 17 October 2026 (IST). Status: OPTION A SELECTED / UNPUBLISHED.
+The owner selected Option A, including its stated response/processing targets.
+The prepared customer wording is now [project-refund-policy.md](project-refund-policy.md).
+This file preserves the original alternatives and draft wording for traceability;
+Option B is not selected. It is not the text to publish. Legal seller, contact,
+support calendar, operational checks and policy/legal review remain outstanding.
+Selection does not certify compliance or authorise deployment, checkout or refunds.
 
 ## Choice summary
 
@@ -16,9 +19,10 @@ wording/timings and confirm the actual support/refund process before publication
 | Pending debit | Reconcile first; do not ask the customer to pay again or label it refunded prematurely | Same |
 
 Neither option creates a blanket "non-refundable deposit" or removes remedies for
-deficient, misdescribed or undelivered services. No option is selected by default.
+deficient, misdescribed or undelivered services. Option A was explicitly selected;
+the original proposal below remains historical context, not publication approval.
 
-## Option A: proposed customer-facing wording
+## Option A: original proposal — superseded by the prepared policy
 
 ### 1. Scope and payment
 
@@ -88,9 +92,9 @@ will be proportionate; do not send full card details, banking passwords, UPI PIN
 or OTPs. Do not send unrelated bank-statement transactions or identity documents
 unless a necessary, secure verification process has been explained.
 
-### 7. Proposed response and processing targets — owner approval required
+### 7. Response and processing targets — selected with Option A
 
-| Stage | Proposed target, NOT yet an approved promise |
+| Stage | Owner-selected target; not yet published |
 | --- | --- |
 | Acknowledge the request | Within 48 hours of receipt |
 | Explain the eligibility decision and calculation | Normally within 5 business days of receipt; explain missing information or a genuine dependency promptly |
@@ -137,8 +141,8 @@ automatic acceptance deadline or non-refundable percentage is invented here.
 
 ## Internal execution checklist — NOT customer promises
 
-- Choose A or B; confirm legal seller, support address, kickoff/acceptance method,
-  proposed response targets and third-party-cost handling. Obtain appropriate legal
+- Option A selected; confirm legal seller, support address, kickoff/acceptance method,
+  support calendar and actual refund handling. Obtain appropriate legal
   review for the actual business and jurisdiction before publication.
 - Confirm PhonePe's merchant refund permissions, applicable limits/fees and required
   UAT/refund tests. This application currently does not implement automated refunds.

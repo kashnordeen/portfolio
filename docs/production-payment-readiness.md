@@ -71,8 +71,11 @@ recheck the actual account limits and usage before activation.
 ## Gate 2: customer-facing policies and service definition
 
 `payment-policy-draft.md` is an unpublished review draft, not enforceable published
-terms or legal advice. Confirm the business identity/contact, scope/delivery terms,
-refund/cancellation decision rules and actual retention process. Publish approved
+terms or legal advice. On 17 October 2026 (IST), the owner selected Option A and
+its response/processing targets. `project-refund-policy.md` contains prepared
+customer wording; Option B is not selected. Confirm the business identity/contact,
+support calendar, scope/delivery terms, actual refund procedure and retention
+process, and complete policy/legal review before publication. Publish approved
 pages and link them before checkout. Do not invent refund promises or a tax-invoice
 status. Community stays off until its benefits, access delivery and refund terms
 are separately defined.
