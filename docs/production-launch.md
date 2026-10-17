@@ -1,11 +1,14 @@
 # Production project payments — launch evidence
 
-**Open acceptance:** the rejected alternate PhonePe checkout hostname was identified
-and repaired in both server/browser. Source `87ddc37`, deployment
-`dpl_4dLS6wnZVUQDQzgmaBjPtCe5eQVo`, is now published for the owner-controlled real
-test. See `checkout-incident-2026-10-17.md`; do not claim real-payment acceptance
-until the owner's transaction is independently verified. The earlier launch
-evidence below is historical.
+**Open acceptance:** source `bdbd0f7`, deployment
+`dpl_2jfComLTybSVH9sTofdJCP7YJPN8`, is now published for the owner-controlled real
+test. It retains the exact alternate PhonePe host fix, adds PhonePe's documented
+source referrer policy, and makes project reference optional in UI/API/storage.
+All 234 tests, lint/build/audit, strict remote DB preflight and public header/config/
+unsigned-callback guards passed; the fresh Chrome form was checked. See
+`checkout-incident-2026-10-17.md`; do not claim real-payment acceptance until the
+owner's transaction is independently verified. The earlier launch evidence below
+is historical.
 
 17 October 2026 (IST). This record is not a claim of legal certification or an
 independent financial-security audit. Community checkout remains closed. No Git

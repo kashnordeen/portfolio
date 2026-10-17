@@ -37,10 +37,27 @@ No additional automated live checkout, funds authorization or Git push occurred.
 
 ### Deployment/acceptance
 
-Candidate publication and owner-controlled acceptance remain pending. Do not
-reuse/replay an ambiguous old intent or call this incident resolved from tests
-alone. Chrome may retain old local form history despite autocomplete off; no
-browser-wide history/settings were cleared.
+Application source `bdbd0f7` was deployed as
+`dpl_2jfComLTybSVH9sTofdJCP7YJPN8`
+(`portfolio-1mr6b8fqp-kashnordeens-projects.vercel.app`), verified as a candidate,
+then explicitly promoted to kkarn.vercel.app. Remote strict DB preflight passed.
+Runtime project checkout/release/jobs are true; community and both automated
+alert flags are false; origin/environment and INR 200–50,000 bounds are unchanged.
+
+Public checks: HTML 200 with strict-origin-when-cross-origin, config 200 with
+project true/community false and API no-referrer; unsigned jobs/recover/webhook
+POSTs each returned 401. A fresh Chrome payment tab displayed the optional label,
+had no required/list attributes and autocomplete off; no console errors appeared.
+The focused empty-reference screenshot is saved with the task's visual artifacts.
+No new checkout was submitted by the agent.
+
+The owner was handed a fresh form for one controlled INR 200 test with blank
+reference, conditional on no previous authorization/debit. A previous unresolved
+order remains PENDING with no paid timestamp, and its independent jobs continue.
+Owner-controlled real-payment acceptance remains pending. Do not reuse/replay an
+ambiguous old intent or call this incident resolved from tests alone. Chrome may
+retain old local form history despite autocomplete off; no browser-wide
+history/settings were cleared.
 
 ## Root cause identified; live acceptance pending
 
