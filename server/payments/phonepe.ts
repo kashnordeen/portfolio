@@ -31,8 +31,8 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
   let cached: { token: string; expires: number } | undefined;
   let inflight: Promise<string> | undefined;
   const report = (operation: 'TOKEN' | 'PAY' | 'STATUS', code: 'TRANSPORT_FAILED' | 'HTTP_REJECTED' | 'INVALID_RESPONSE' | 'INVALID_CHECKOUT_URL' | 'INVALID_CHECKOUT_EXPIRY' | 'INVALID_CHECKOUT_STATE', status?: number) => {
-    if (config.environment !== 'sandbox') return;
-    try { log(JSON.stringify({event:'UAT_PROVIDER_FAILURE',operation,code,...(status === undefined ? {} : {status})})); }
+    const event = config.environment === 'sandbox' ? 'UAT_PROVIDER_FAILURE' : 'PAYMENT_PROVIDER_FAILURE';
+    try { log(JSON.stringify({event,operation,code,...(status === undefined ? {} : {status})})); }
     catch { /* Operational logging must not change payment behaviour. */ }
   };
   const json = async (operation: 'TOKEN' | 'PAY' | 'STATUS', url: string, init: RequestInit) => {

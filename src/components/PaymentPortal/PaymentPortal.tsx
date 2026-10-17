@@ -77,7 +77,7 @@ export function PaymentPortal() {
   const statusCopy = status?.state === "COMPLETED" ? "Payment verified. Service delivery is handled separately; a project payment does not settle any remaining balance."
     : status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
       : status?.state === "REVIEW" ? "This payment needs review. Please contact support and do not pay again."
-        : "Your payment is being verified. A return from checkout is not proof of payment. Please do not pay again.";
+        : "Checkout or payment verification is still pending. This is not confirmation of payment. Please do not pay again; contact support if checkout did not open.";
   const amountError = purpose === "project" ? projectAmountError(amount) : "";
   const validAmount = purpose === "community" || projectAmountPaise(amount) !== null;
   const projectAmount = (projectAmountPaise(amount) ?? 0) / 100;

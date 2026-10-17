@@ -74,7 +74,9 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
         await store.checkout(order.id, checkout);
         return reply({ orderId: order.id, checkoutUrl: checkout.url }, 201);
       } catch {
-        if (config.environment === 'sandbox') console.warn(JSON.stringify({event:'UAT_CHECKOUT_DEFERRED',stage:checkoutStage}));
+        try {
+          console.warn(JSON.stringify({event:config.environment === 'sandbox' ? 'UAT_CHECKOUT_DEFERRED' : 'PAYMENT_CHECKOUT_DEFERRED',stage:checkoutStage}));
+        } catch { /* Logging failure must not change an ambiguous payment response. */ }
         // The persisted order will be reconciled; a timeout must not imply failed payment.
         return reply({ orderId: order.id, state: 'PENDING', message: 'We could not open checkout. Your order is being checked; do not create another payment.' }, 202);
       }

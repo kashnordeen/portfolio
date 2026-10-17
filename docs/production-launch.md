@@ -1,5 +1,10 @@
 # Production project payments — launch evidence
 
+**Open incident:** a real checkout attempt failed before opening PhonePe. The owner
+approved pausing NEW checkout on the jobs-preserving safe-stage deployment while
+the handoff is diagnosed. See `checkout-incident-2026-10-17.md`; the launch record
+below is historical evidence, not proof of successful real-payment acceptance.
+
 17 October 2026 (IST). This record is not a claim of legal certification or an
 independent financial-security audit. Community checkout remains closed. No Git
 push, real payment, refund, database export or password rotation was performed.

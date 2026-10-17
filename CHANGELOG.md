@@ -1,5 +1,13 @@
 # Changelog
 
+## Checkout incident — diagnostic repair (2026-10-17)
+
+- Added fixed-category production provider/checkout diagnostics with no raw
+  exceptions, credentials, customer data or checkout URLs. Logging failures cannot
+  change ambiguous-payment behavior; the single-initiation safeguard is unchanged.
+- Corrected pending copy so it does not imply checkout opened. Live handoff root
+  cause and owner-performed real-payment acceptance remain open, not "fixed".
+
 ## Production rollout — 2026-10-17
 
 - Published the owner-approved service terms, Option A refund policy and factual

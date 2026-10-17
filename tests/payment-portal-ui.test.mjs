@@ -46,3 +46,12 @@ test('a community URL never grants checkout availability and UI supports reduced
   assert.match(css, /payment-checkout-button:not\(:disabled\)[^{]*\{[^}]*cursor: pointer/);
   assert.match(css, /prefers-reduced-motion: reduce/);
 });
+
+test('pending status does not claim the customer returned from checkout when checkout never opened', t => {
+  t.mock.property(globalThis, 'window', { location: { search: '?payment=project&order=11111111-1111-4111-8111-111111111111' } });
+  const html = renderToStaticMarkup(createElement(PaymentPortal));
+  assert.match(html, /Checkout or payment verification is still pending/);
+  assert.match(html, /contact support if checkout did not open/);
+  assert.match(html, /Please do not pay again/);
+  assert.doesNotMatch(html, /A return from checkout/);
+});
