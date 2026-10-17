@@ -3,6 +3,7 @@ import { loadJobConfig } from './job-config.ts';
 import { readJobBody } from './job-queue.ts';
 import { sandboxTarget, productionTarget } from './targets.ts';
 import { productionAlertSender } from './alert-settings.ts';
+import { sendGmailAlert } from './gmail-alerts.ts';
 import { uuidPattern } from './security.ts';
 
 // No HTTP-controlled recipients, senders, callback destinations or email templates.
@@ -11,6 +12,7 @@ export function loadDeliveryAlertConfig(env: Record<string, string | undefined>,
   const sandbox = job.environment === 'sandbox';
   const target = sandbox ? sandboxTarget : productionTarget;
   return { ready: Boolean(job.failureCallbackUrl) && (!expectedEnvironment || job.environment === expectedEnvironment),
+    provider: env.PAYMENT_ALERT_PROVIDER ?? 'resend',
     job, apiKey: env.RESEND_API_KEY ?? '', url: `${target.origin}/api/payments/alerts`,
     label: sandbox ? 'UAT' : 'LIVE', keyPrefix: sandbox ? 'uat-payment-alert' : 'live-payment-alert',
     scheduleId: sandbox ? 'portfolio-payments-uat-recovery-v1' : 'portfolio-payments-production-recovery-v1',
@@ -62,9 +64,13 @@ export async function handleDeliveryAlert(request: Request, {
   try { category = categoryFor(JSON.parse(raw), config.job, config.scheduleId); }
   catch { return reply(400, 'Invalid failure notification.'); }
   try {
-    // Provider-enforced idempotency coalesces each category into one email per UTC hour.
-    // This needs no database, so database outages can still produce an alert.
+    // No database dependency, so database outages can still produce an alert.
     const hour = new Date(Math.floor(now().getTime() / 3600000) * 3600000).toISOString();
+    if (config.provider === 'gmail') {
+      await sendGmailAlert(env, category, hour, send);
+      return reply(200);
+    }
+    // Resend-enforced idempotency coalesces each category into one email per UTC hour.
     const response = await send('https://api.resend.com/emails', {
       method:'POST', redirect:'error', credentials:'omit', signal:AbortSignal.timeout(8000),
       headers:{ Authorization:`Bearer ${config.apiKey}`, 'Content-Type':'application/json',

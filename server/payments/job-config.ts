@@ -1,5 +1,5 @@
 import { paymentTarget, productionTarget } from './targets.ts';
-import { hasAlertKey, productionAlertSender } from './alert-settings.ts';
+import { alertDeliveryReady } from './alert-settings.ts';
 
 export function loadJobConfig(env: Record<string, string | undefined>) {
   const enabled = env.PAYMENT_JOBS_ENABLED === 'true';
@@ -20,9 +20,9 @@ export function loadJobConfig(env: Record<string, string | undefined>) {
     Boolean(publishToken && currentSigningKey && nextSigningKey) &&
     (target.environment !== 'sandbox' || automationBypassSecret.length >= 32);
   const alertOptIn = target.environment === 'sandbox' ? env.PAYMENT_UAT_ALERTS_ENABLED === 'true' :
-    env.PAYMENT_PRODUCTION_ALERTS_ENABLED === 'true' && env.VERCEL_PROJECT_ID === productionTarget.projectId &&
-      Boolean(productionAlertSender(env));
-  const failureCallbackUrl = ready && alertOptIn && hasAlertKey(env) ? `${target.origin}/api/payments/alerts` : '';
+    env.PAYMENT_PRODUCTION_ALERTS_ENABLED === 'true' && env.VERCEL_PROJECT_ID === productionTarget.projectId;
+  const failureCallbackUrl = ready && alertOptIn && alertDeliveryReady(env, target.environment === 'sandbox') ?
+    `${target.origin}/api/payments/alerts` : '';
   return { enabled, ready, publishToken, currentSigningKey, nextSigningKey, automationBypassSecret, environment: target.environment, queueOrigin: target.queueOrigin,
     jobUrl: `${target.origin}/api/payments/jobs`, recoveryUrl: `${target.origin}/api/payments/recover`, failureCallbackUrl };
 }

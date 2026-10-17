@@ -8,6 +8,8 @@ test('all committed payment and worker templates remain disabled and credential-
   const template=await read('../.env.example');
   for(const flag of ['PAYMENTS_ENABLED','PAYMENT_RELEASE_APPROVED','COMMUNITY_PAYMENTS_ENABLED','PAYMENT_JOBS_ENABLED']) assert.match(template,new RegExp(`^${flag}=false$`,'m'));
   for(const name of ['QSTASH_TOKEN','QSTASH_CURRENT_SIGNING_KEY','QSTASH_NEXT_SIGNING_KEY']) assert.match(template,new RegExp(`^${name}=$`,'m'));
+  for(const name of ['GMAIL_CLIENT_ID','GMAIL_CLIENT_SECRET','GMAIL_REFRESH_TOKEN']) assert.match(template,new RegExp(`^${name}=$`,'m'));
+  assert.match(template,/^PAYMENT_ALERT_PROVIDER=resend$/m);
   assert.match(await read('../workers/.env.example'),/^RECONCILIATION_WORKER_ENABLED=false$/m);
   assert.equal(loadJobConfig({PAYMENT_JOBS_ENABLED:'true',NODE_TLS_REJECT_UNAUTHORIZED:'0'}).ready,false);
 });

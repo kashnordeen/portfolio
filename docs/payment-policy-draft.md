@@ -68,7 +68,8 @@ retention before publishing this notice.
 
 Relevant processors are PhonePe for hosted payment processing, Supabase for backend
 storage, Vercel for hosting, QStash for opaque verification-job delivery, and—only
-when separately approved/configured—Resend for owner operational alerts. Alert emails
+when separately approved/configured—Resend or Gmail for owner operational alerts.
+Gmail account setup is currently deferred; its local sender candidate is not active. Alert emails
 are designed to contain a fixed failure category and hour, not customer data or
 payment details. Do not claim no third-party processing or that hashing removes
 every privacy obligation.

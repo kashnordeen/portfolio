@@ -14,8 +14,9 @@ live rollout:
 - Production alert delivery has no verified sender. The owner has only a Vercel
   subdomain and declined another monitoring service. No domain purchase, service
   addition or workaround using Resend's testing sender is authorised. The owner
-  approved investigating the existing Gmail account; this work has created no
-  Gmail credentials, permissions or runtime integration.
+  approved preparing a Gmail send-only integration, then deferred Google account
+  setup. Tested local sender code is prepared but not deployed or configured;
+  no Gmail credentials or permissions were created. See `gmail-payment-alerts.md`.
 - Service/delivery approval, remaining seller disclosures, retention periods and
   the support/refund procedure need completion before public policy pages can be
   published. Do not replace those choices with invented commitments.
@@ -43,8 +44,8 @@ before requesting the separate activation stage. Community checkout stays off.
   was removed. After reload one Enabled SHA registration with two events remained.
   Its dashboard validation reached the application (400 for the unsupported probe).
   No production webhook or credential was modified.
-- Production alert code is deployed but disabled, without a configured or verified
-  production sending route. The Gmail alternative remains investigation only.
+- Production Resend alert code is deployed but disabled, without a configured or
+  verified production sending route. Gmail sender code remains a local candidate.
 - Fresh local checks: 176 tests passed, including UAT compatibility and production
   isolation, lint, TypeScript/API compilation and frontend build. Native npm audit
   reported zero known vulnerabilities; no server-only alert/queue markers appeared
@@ -113,17 +114,28 @@ requires a reviewed follow-up, not an automatic flag change.
 
 ## Gate 1: production operational alerts and recovery
 
-### Gmail investigation (no configuration change)
+### Gmail candidate (account setup deferred; no configuration change)
 
-The owner approved investigation only. Gmail API OAuth with the `gmail.send`
-scope can send mail without mailbox read/modify permissions. It is preferable to
+The owner approved preparing the integration, then asked to defer Google project
+setup. Gmail API OAuth with the `gmail.send` scope can send mail without mailbox
+read/modify permissions. It is preferable to
 granting a general account app password for this owner-alert use case. Sending
 permission itself is not limited to the owner's recipient address; any future
 implementation must enforce that fixed recipient and fixed category/hour content
 in code, retain signature verification before sending, and keep secrets server-only.
 
-This requires a separately approved Google OAuth client/consent setup and private
-credential storage, followed by a no-customer-data delivery test. Do not reuse this
+The local candidate has 182 passing tests, including unchanged UAT/Resend behavior,
+Gmail scope/recipient restrictions, authentication-first handling and generic
+provider failures. Lint and the local production build pass. These are mocked
+Google transport tests, not evidence of an authorized account or delivered mail.
+The native npm audit reported zero known vulnerabilities with no dependency changes.
+No Gmail code from this candidate has been deployed. A GET-only follow-up still
+found live root/config HTTP 200, both checkout flags false, `nosniff` and framing
+DENY; recovery/alerts reject GET with 405. No signed job or email was sent.
+
+Account setup must wait until the owner resumes it. It then requires private
+Google OAuth client/consent setup and credential storage, followed by a
+no-customer-data delivery test. Do not reuse this
 chat's Gmail connector tokens or read the owner's mailbox to configure runtime
 email. Do not generate, paste or copy a credential through model-visible output.
 An external OAuth app left in Testing normally gets a seven-day refresh-token
@@ -131,7 +143,10 @@ lifetime for Gmail scopes; do not present that as durable production monitoring.
 Handle revoked/expired credentials and validate the actual deployment configuration.
 Google discourages app passwords, which also require 2-Step Verification and may
 be unavailable for some accounts. No Google Cloud project, consent, billing, mail,
-account setting or Gmail runtime code was changed during investigation.
+account setting was changed. Gmail has no provider-enforced hourly deduplication
+in this implementation; ambiguous sends may yield duplicate notifications.
+Deferring Gmail does not authorize payment activation or waive production recovery
+acceptance. Any monitored pilot needs an explicitly accepted monitoring process.
 
 References: [Gmail OAuth scopes](https://developers.google.com/workspace/gmail/api/auth/scopes),
 [refresh-token expiry](https://developers.google.com/identity/protocols/oauth2#expiration),
@@ -202,7 +217,10 @@ refund terms are separately defined.
 ## Gate 3: real backup and isolated restore rehearsal
 
 No full backup/restore is claimed. Local PostgreSQL regression tests are not a
-backup of the hosted database. Before exporting, the owner must approve:
+backup of the hosted database. A local command-availability check found none of
+`docker`, `pg_dump`, `psql` or `supabase` on PATH; this does not prove they are absent
+elsewhere. No tooling was installed or database export attempted. Before exporting,
+the owner must approve:
 
 - The exact source project, isolated destination and private encrypted storage.
 - Who can access the backup, retention, and handling of financial/customer data.
