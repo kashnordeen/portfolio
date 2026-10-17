@@ -30,6 +30,7 @@
 
 ### Changed
 
+- Recorded the owner-confirmed email agreement on project scope, milestones, delivery dates and acceptance criteria before payment. Customer-policy publication and live activation remain pending.
 - Refined the payment portal with amount guidance, a recipient/review summary, clearer closed/loading/error states, keyboard-accessible field guidance and reduced-motion styling. Published to kkarn.vercel.app with all checkout/job/alert gates false; no Git push or real payment.
 - Recorded the owner-approved ₹200–₹50,000 inclusive project-payment range in the setup template, with boundary tests. Live payments remain disabled and hosting configuration is unchanged.
 

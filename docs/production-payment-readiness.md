@@ -17,9 +17,10 @@ live rollout:
   approved preparing a Gmail send-only integration, then deferred Google account
   setup. Tested local sender code is prepared but not deployed or configured;
   no Gmail credentials or permissions were created. See `gmail-payment-alerts.md`.
-- Service/delivery approval, remaining seller disclosures, retention periods and
-  the support/refund procedure need completion before public policy pages can be
-  published. Do not replace those choices with invented commitments.
+- The owner confirmed email agreement on scope, milestones, delivery dates and
+  acceptance criteria with each customer before payment. Remaining seller
+  disclosures, retention periods and the support/refund procedure still need
+  completion before public policy pages can be published. Do not invent those choices.
 - A hosted backup and isolated restore rehearsal need approval of the source,
   destination, encrypted storage and any cost. Do not use the owner's unrelated
   Supabase project as a disposable target.
@@ -208,11 +209,19 @@ its response/processing targets. `project-refund-policy.md` contains prepared
 customer wording; Option B is not selected. The owner confirmed Keshav Kumar Karn
 as an individual freelancer, support email kash.nordeen@gmail.com and business days
 of Monday to Friday excluding applicable Indian public holidays. Complete the
-remaining seller disclosures and confirm scope/delivery terms, the actual refund
-procedure and retention process. Complete policy/legal review before publication.
+remaining seller disclosures and confirm the actual refund procedure and retention
+process. Scope/delivery/acceptance agreement by email before payment is owner-confirmed.
+Complete policy/legal review before publication.
 Publish approved pages and link them before checkout. Do not invent refund promises
 or a tax-invoice status. Community stays off until its benefits, access delivery and
 refund terms are separately defined.
+
+The owner has now confirmed written email agreements before payment covering
+scope, milestones, delivery dates and acceptance criteria. The policy and refund
+drafts reflect that decision. `docs/payment-owner-decisions.local` is a private,
+Git-ignored review template for unresolved business/retention/storage decisions;
+it is not a secrets file or authority to publish its contents. Do not commit it,
+dump its eventual contents into chat/logs or treat an empty field as approval.
 
 ## Gate 3: real backup and isolated restore rehearsal
 
@@ -225,6 +234,14 @@ the owner must approve:
 - The exact source project, isolated destination and private encrypted storage.
 - Who can access the backup, retention, and handling of financial/customer data.
 - Any additional project/compute cost. Free-plan restores are not assumed.
+
+A metadata-only transaction on 17 October 2026 confirmed PostgreSQL 17.11 and
+`transaction_read_only=on`, with RLS enabled on the five production and five UAT
+payment tables. Available selected extensions were pgcrypto 1.3, uuid-ossp 1.1
+and supabase_vault 0.3.1; no pg_cron/pg_net row was returned. No customer rows,
+Vault contents, passwords or schema exports were requested. Use PostgreSQL 17
+tooling for a version-matched restore target; the existing embedded PostgreSQL 18
+tests with mocked extensions are not proof of a hosted PostgreSQL 17 restore.
 
 Use the current Supabase procedure to export roles, schema and data consistently,
 with required custom payment schemas included. Do not store exports in this repo,

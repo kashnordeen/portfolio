@@ -5,8 +5,10 @@ approved published customer terms. Do not publish with unresolved fields. The ow
 selected Option A and its response/processing targets on 17 October 2026 (IST);
 the owner has also confirmed seller Keshav Kumar Karn as an individual freelancer,
 support email kash.nordeen@gmail.com and business days of Monday to Friday excluding
-applicable Indian public holidays. Retention, delivery, remaining seller disclosures
-and operational/publication review still need confirmation.
+applicable Indian public holidays. The owner subsequently confirmed that scope,
+milestones, delivery dates and acceptance criteria will be agreed with each
+customer by email before payment. Retention, remaining seller disclosures and
+operational/publication review still need confirmation.
 
 ## Owner decisions required before publication
 
@@ -14,7 +16,7 @@ and operational/publication review still need confirmation.
 | --- | --- |
 | Legal seller/business identity and required address details | Owner confirmed Keshav Kumar Karn, individual freelancer; remaining required seller/address disclosures still need completion |
 | Support contact | Owner confirmed kash.nordeen@gmail.com |
-| Project delivery | Confirm how scope, milestones, acceptance and delivery dates are agreed |
+| Project delivery | Owner confirmed written email agreement on scope, milestones, delivery dates and acceptance criteria with each customer before payment |
 | Cancellation/refund eligibility | Option A selected: full pre-work refund; unused funds after documented agreed work; delivered-work remedies preserved. Prepared wording in project-refund-policy.md; publication review pending |
 | Refund request/processing timing | Selected: acknowledge within 48 hours; normally decide within 5 business days of receipt; initiate approved refund within 5 business days of approval, or sooner where required. Owner confirmed Monday to Friday excluding applicable Indian public holidays. Operational process still needs confirmation; bank credit is separate |
 | Payment discrepancies/duplicate debits | Confirm the investigation and customer communication process |
@@ -23,11 +25,14 @@ and operational/publication review still need confirmation.
 
 ## Proposed service/payment notice
 
-Project payments are for a scope and amount agreed with the customer. The payment
+Before any project payment, the customer and I agree by email on the project scope,
+price, milestones, delivery dates and acceptance criteria. Project payments are
+for that agreed scope and amount. The payment
 page accepts an agreed INR amount and project/invoice reference; the advertised
 package ranges are estimates, not a binding invoice. An advance or instalment does
 not settle a remaining project balance. Scope changes and delivery milestones need
-separate agreement. **Owner must approve this wording and the agreement method.**
+separate written agreement. The email-agreement method is owner-confirmed; the
+remaining policy/publication review is still required.
 
 Payment is handled by PhonePe's hosted checkout. A redirect, bank debit notification
 or screenshot alone is not our confirmation. The site displays completion only after

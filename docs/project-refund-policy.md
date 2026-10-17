@@ -11,9 +11,10 @@ Status: local and unpublished. No effective date has been set.
 ## 1. Your project agreement
 
 I am Keshav Kumar Karn, an individual freelancer. This policy covers payments for
-my custom project and software services. Before work begins, we agree in writing
-on the scope, price, deliverables, milestones and delivery schedule. An advance or
-instalment does not settle any remaining balance or include extra features.
+my custom project and software services. Before any project payment, we agree by
+email on the scope, price, deliverables, milestones, delivery dates and acceptance
+criteria. An advance or instalment does not settle any remaining balance or include
+extra features.
 
 Work starts once we have confirmed kickoff in writing and I have begun the agreed
 work. Payment alone does not mean work has started. Any work or purchase requested
