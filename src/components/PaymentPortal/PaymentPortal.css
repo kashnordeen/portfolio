@@ -49,6 +49,9 @@
 .payment-checkout-button:not(:disabled):active { transform: translateY(0); }
 .payment-privacy-note { display: flex; justify-content: center; align-items: flex-start; gap: 0.375rem; margin-top: 0.875rem; color: var(--muted-fg); font-size: 0.6875rem; line-height: 1.6; }
 .payment-privacy-note svg { flex-shrink: 0; margin-top: 0.125rem; }
+.payment-policy-links { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1.25rem; margin-top: .75rem; font-size: .75rem; }
+.payment-policy-links a { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--primary); text-decoration: underline; text-underline-offset: .2em; }
+.payment-policy-links a:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: .125rem; }
 .payment-error-notice { padding: 0.875rem 1rem; margin-top: 1rem; border: 1px solid var(--border); border-left: 3px solid var(--primary); border-radius: 0.5rem; font-size: 0.8125rem; line-height: 1.6; overflow-wrap: anywhere; }
 .payment-reference { display: block; margin-top: 0.5rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .payment-summary { background: color-mix(in srgb, var(--primary) 4%, var(--card)); }

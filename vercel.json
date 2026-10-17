@@ -3,6 +3,7 @@
   "framework": "vite",
   "outputDirectory": "dist",
   "installCommand": "npm ci --ignore-scripts",
+  "buildCommand": "node scripts/payment-production-preflight.mjs && npm run build",
   "headers": [
     {
       "source": "/(.*)",

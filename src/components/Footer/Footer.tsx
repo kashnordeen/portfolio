@@ -21,6 +21,9 @@ export const Footer = () => {
         <a href={profile.linkedin} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-sm hover:text-primary">LinkedIn</a>
         <a href={`mailto:${profile.email}`} className="inline-flex min-h-11 items-center text-sm hover:text-primary">Email</a>
         <a href="/?payment=project" className="inline-flex min-h-11 items-center text-sm hover:text-primary">Payments</a>
+        <a href="/policies/terms.html" className="inline-flex min-h-11 items-center text-sm hover:text-primary">Service terms</a>
+        <a href="/policies/refunds.html" className="inline-flex min-h-11 items-center text-sm hover:text-primary">Refunds</a>
+        <a href="/policies/privacy.html" className="inline-flex min-h-11 items-center text-sm hover:text-primary">Privacy</a>
         <a href="#hero" onClick={event => {
           if (lenis) { event.preventDefault(); lenis.scrollTo('#hero', { immediate: !!reduceMotion }); }
         }} className="inline-flex min-h-11 items-center gap-2 text-sm hover:text-primary">Back to top <ArrowUp aria-hidden="true" size={16} /></a>

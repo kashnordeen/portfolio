@@ -9,6 +9,7 @@
 
 ### Added
 
+- Added owner-approved service, refund and privacy pages linked from checkout and the footer, plus an opt-in read-only production database preflight. Community remains closed; Gmail and backup setup are deferred by the owner.
 - Prepared a production-only Gmail send-only owner-alert option with fixed recipients, strict OAuth scope checks and credential-safe failure handling. Account setup is deferred; this code is not deployed and all gates remain off.
 - Added a project-payment button beside pricing, plus desktop/mobile navigation and footer links to the same-origin payment page. Checkout release gates are unchanged; community payments remain off.
 - Added disabled managed-job transport with official QStash signature verification, opaque payloads, fixed targets and bounded publishing; not deployed or configured with real keys.

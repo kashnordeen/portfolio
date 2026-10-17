@@ -6,8 +6,10 @@ by this document. Sandbox evidence is recorded in `payment-uat.md`.
 
 ## Current handoff
 
-The updated UI/backend is deployed with payments disabled; real-charge activation
-is still on hold. The owner has confirmed the Option A refund terms, seller name,
+The updated UI/backend is deployed with payments disabled. The owner has now asked
+for a project-only launch and confirmed an enabled production PhonePe webhook at
+`https://kkarn.vercel.app/api/payments/webhook` for completed/failed checkout events.
+The owner has confirmed the Option A refund terms, seller name,
 support email and support calendar. The following items still prevent a completed
 live rollout:
 
@@ -17,13 +19,20 @@ live rollout:
   approved preparing a Gmail send-only integration, then deferred Google account
   setup. Tested local sender code is prepared but not deployed or configured;
   no Gmail credentials or permissions were created. See `gmail-payment-alerts.md`.
-- The owner confirmed email agreement on scope, milestones, delivery dates and
-  acceptance criteria with each customer before payment. Remaining seller
-  disclosures, retention periods and the support/refund procedure still need
-  completion before public policy pages can be published. Do not invent those choices.
-- A hosted backup and isolated restore rehearsal need approval of the source,
-  destination, encrypted storage and any cost. Do not use the owner's unrelated
-  Supabase project as a disposable target.
+- The owner approved publishing service/email-agreement terms, Option A refunds
+  and a factual privacy notice with purpose/obligation-based retention criteria,
+  email privacy requests and no invented fixed statutory period or automatic
+  deletion guarantee. Three standalone policy pages and checkout/footer links are
+  implemented. No unprovided address, tax status or legal-compliance certification
+  is published. Remaining operational/legal review is not represented as completed.
+- The owner explicitly deferred backup/restore setup. Do not continue demanding
+  backup approval as the immediate blocker, export data or claim recovery has been
+  verified. Record the accepted absence of this recovery safeguard.
+- Gmail setup remains deferred. The owner accepted manually reviewing existing
+  PhonePe, Upstash and Vercel dashboards for the initial launch and handling issues
+  through kash.nordeen@gmail.com. This is not automatic outage detection or proof
+  of operational production recovery; the signed production recovery path still
+  needs acceptance before public checkout activation.
 - PhonePe's deadline was communicated on a call, with no written message. Treat
   that as an owner report; clarify which access closes and when, without inventing
   an expiry or requiring a nonexistent written message to continue safe work.
@@ -34,6 +43,15 @@ The owner explicitly approved deploying and publishing commits `f23bbfc` and
 `006ef75` with checkout, community, jobs and alerts disabled. That scoped approval
 does not enable real charges or authorise a Git push. Resolve the remaining checks
 before requesting the separate activation stage. Community checkout stays off.
+
+The subsequent request to continue and launch is authority to prepare the
+project-only production rollout, not to perform a payment/refund, push Git, enable
+community, rotate secrets or add a service. Stage the production jobs/policies with
+new checkout closed first. The new build-time database preflight requires exact
+production identity/origin, approved amount bounds, verified TLS, the restricted
+login, a read-only transaction, UAT isolation and five RLS tables. It never reads
+customer rows, queues work or calls `/pay`. It runs only under the explicit
+`PAYMENT_PRODUCTION_PREFLIGHT=true` build opt-in; UAT/default builds skip it.
 
 ## Completed evidence
 
