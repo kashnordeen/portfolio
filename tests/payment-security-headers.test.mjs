@@ -12,6 +12,11 @@ const globalHeaders = () => {
   return headers;
 };
 
+test('payment functions stay in one Mumbai region close to the production database', () => {
+  assert.deepEqual(config.regions, ['bom1']);
+  assert.equal(config.functionFailoverRegions, undefined, 'No unapproved cross-region failover.');
+});
+
 test('deployment headers deny framing, MIME sniffing and unused browser capabilities without changing routing', () => {
   const headers = globalHeaders();
   assert.equal(headers.get('x-frame-options'), 'DENY');

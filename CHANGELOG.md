@@ -1,5 +1,14 @@
 # Changelog
 
+## Payment backend locality — 2026-10-17
+
+- Pin backend functions to Mumbai (`bom1`), close to the existing production
+  database (`ap-south-1`), instead of Washington (`iad1`). Static CDN delivery,
+  payment protections, credentials, flags and queue destinations are unchanged.
+- Add a deployment regression guard for the single approved region. Actual
+  checkout-speed improvement still requires measurement; PhonePe's hosted-page
+  loading time is separate from backend preparation.
+
 ## Checkout source and optional reference — 2026-10-17
 
 - Made project/invoice references optional in the form, API validation and a
