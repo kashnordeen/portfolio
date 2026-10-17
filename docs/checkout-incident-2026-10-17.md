@@ -17,6 +17,24 @@ PhonePe-subdomain allowance is added. New reproduction tests failed in both serv
 and client before the change, then passed. All 231 tests, lint/build and native
 audit pass. Deployment and owner-performed real payment acceptance remain pending.
 
+## Root fix published; waiting for owner authorization
+
+Application source `87ddc37` is deployed as
+`dpl_4dLS6wnZVUQDQzgmaBjPtCe5eQVo` and explicitly promoted to kkarn.vercel.app.
+The production build preflight passed again; candidate and public config returned
+project enabled/community disabled. The published `index-C04RFwdJ.js` bundle was
+retrieved directly and contains the alternate host. Unsigned POSTs to jobs,
+recovery and webhook still return 401. Existing amount limits, managed jobs and
+disabled automated alerts are preserved. No Git push, financial authorization,
+manual payment-state change or refund occurred.
+
+The owner was asked to perform one final INR 200 checkout using reference
+LIVE-CHECKOUT-ACCEPTANCE in a fresh Chrome tab, authorize payment privately, then
+return the website reference for independent state/webhook/fulfilment checks.
+The diagnostic-session approval was used exactly once and grants no permission
+for another automated live checkout or any funds transfer. Real acceptance is
+still pending; do not call this incident closed yet.
+
 17 October 2026 (IST). Do not mark resolved until the owner can complete a real
 payment and independent provider verification records the correct completed state.
 
