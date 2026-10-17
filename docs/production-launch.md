@@ -1,7 +1,22 @@
 # Production project payments — launch evidence
 
-**Current infrastructure:** source `838a408`, deployment
-`dpl_E9yLRPMQ5yh7B89ziDSiKV79uRL5`, now serves kkarn.vercel.app with functions in
+**Current release:** source `28fa575`, deployment
+`dpl_GPSXrx6x5uV71sk8apqchQHhypmt`, now serves kkarn.vercel.app. At the owner's
+request, the four originally hidden groups are restored: five project repository
+buttons and one configured website link, three download menus with six existing
+installers plus release notes, two Credly verification links, and contact GitHub/
+LinkedIn links. Candidate and public Chrome rendering were verified; all three
+download menus were exercised without downloading/installing binaries. The live
+release check returned v1.1.0. No contact submission, financial action or Git push
+occurred. All 239 tests, lint/build/audit and remote strict DB preflight passed.
+Public config remains project true/community false, bom1 routing and no-store;
+unsigned jobs/recover/webhook POSTs still return 401. No payment backend code,
+credentials, limits, policies or release gates were changed. The previous Mumbai
+deployment below remains available for rollback. Chrome proof is saved as
+portfolio-links-restored.png in the task's visual artifacts.
+
+**Infrastructure baseline:** source `838a408`, deployment
+`dpl_E9yLRPMQ5yh7B89ziDSiKV79uRL5`, established the functions in
 Mumbai (`bom1`), close to the existing database. Payment code, flags and secrets
 are unchanged from the accepted flow below. All 235 tests, lint/build/audit, remote
 strict DB preflight, function-region and public security checks passed. The existing
