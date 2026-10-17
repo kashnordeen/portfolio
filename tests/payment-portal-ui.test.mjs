@@ -22,6 +22,18 @@ for (const [alias, path] of [['@/data/portfolio', '../src/data/portfolio.ts'],
 source = `import * as React from ${JSON.stringify(import.meta.resolve('react'))};\n${source.replace(/import "\.\/PaymentPortal\.css";/, '')}`;
 const { PaymentPortal } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
+async function renderWithVerifiedStatus(status) {
+  // Inject only the status state returned by the API; all other React state stays real.
+  // This component has exactly one useState(null): the server-verified status.
+  const fixtureSource = source.replace('useEffect, useRef, useState', 'useEffect, useRef') +
+    `\nconst useState = initial => React.useState(initial === null ? ${JSON.stringify(status)} : initial);`;
+  const { PaymentPortal: PortalWithStatus } = await import(`data:text/javascript;base64,${Buffer.from(fixtureSource).toString('base64')}`);
+  return renderToStaticMarkup(createElement(PortalWithStatus));
+}
+
+const verifiedPayment = { orderId: '11111111-1111-4111-8111-111111111111', purpose: 'project',
+  state: 'COMPLETED', amountPaise: 20000, currency: 'INR', paidAt: '2026-10-17T16:15:10.000Z' };
+
 test('portal first render stays disabled, labels fields and explains the approved amount range', t => {
   t.mock.property(globalThis, 'window', { location: { search: '?payment=project' } });
   const html = renderToStaticMarkup(createElement(PaymentPortal));
@@ -67,4 +79,30 @@ test('project reference is clearly optional and does not request saved form sugg
   assert.match(html, /Project or invoice reference \(optional\)/);
   assert.match(html, /Leave blank if you don’t have one/);
   assert.doesNotMatch(html, /Keep your reference handy|UAT-ONLY|UAT-DIAGNOSTIC/);
+});
+
+test('server-verified completion replaces checkout with a thank-you receipt and return-home action', async t => {
+  t.mock.property(globalThis, 'window', { location: { search: `?payment=project&order=${verifiedPayment.orderId}` } });
+  const html = await renderWithVerifiedStatus(verifiedPayment);
+  assert.match(html, /Thank you/);
+  assert.match(html, /Payment successful/);
+  assert.match(html, /₹200\.00/);
+  assert.match(html, /Payment reference/);
+  assert.match(html, new RegExp(verifiedPayment.orderId));
+  assert.match(html, /<a[^>]*href="\/"[^>]*>[^<]*Return to home/);
+  assert.match(html, /tabindex="-1"/);
+  assert.match(html, /does not settle any remaining project balance/);
+  assert.doesNotMatch(html, /<form|Continue to PhonePe|Review your payment|payer-name/);
+  assert.doesNotMatch(html, /receipt.*(?:sent|emailed)|automatically redirect/i);
+});
+
+test('pending, failed, review and URL success claims never show a success receipt', async t => {
+  t.mock.property(globalThis, 'window', { location: { search: `?payment=project&order=${verifiedPayment.orderId}&status=COMPLETED&success=true` } });
+  for (const state of ['CREATED', 'PENDING', 'FAILED', 'REVIEW']) {
+    const html = await renderWithVerifiedStatus({ ...verifiedPayment, state, paidAt: null });
+    assert.doesNotMatch(html, /Payment successful|Thank you|Return to home/);
+    assert.match(html, /<form/);
+  }
+  const html = renderToStaticMarkup(createElement(PaymentPortal));
+  assert.doesNotMatch(html, /Payment successful|Thank you|Return to home/);
 });

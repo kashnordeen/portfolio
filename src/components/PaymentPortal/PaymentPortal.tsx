@@ -21,6 +21,7 @@ export function PaymentPortal() {
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(() => new URLSearchParams(window.location.search).get("order") ?? "");
   const [status, setStatus] = useState<PaymentStatus | null>(null);
+  const successHeading = useRef<HTMLHeadingElement>(null);
   const requestKey = useRef<string | null>(null);
   const submitting = useRef(false);
   const [attempted, setAttempted] = useState(false);
@@ -53,6 +54,9 @@ export function PaymentPortal() {
     void check();
     return () => { controller.abort(); clearTimeout(timer); };
   }, [order]);
+  useEffect(() => {
+    if (status?.state === "COMPLETED") successHeading.current?.focus();
+  }, [status?.state]);
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!enabled || submitting.current || order || (purpose === "project" && projectAmountPaise(amount) === null)) return;
@@ -74,8 +78,7 @@ export function PaymentPortal() {
     }
     finally { submitting.current = false; setBusy(false); }
   };
-  const statusCopy = status?.state === "COMPLETED" ? "Payment verified. Service delivery is handled separately; a project payment does not settle any remaining balance."
-    : status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
+  const statusCopy = status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
       : status?.state === "REVIEW" ? "This payment needs review. Please contact support and do not pay again."
         : "Checkout or payment verification is still pending. This is not confirmation of payment. Please do not pay again; contact support if checkout did not open.";
   const amountError = purpose === "project" ? projectAmountError(amount) : "";
@@ -85,6 +88,31 @@ export function PaymentPortal() {
   const formattedTotal = total > 0 && Number.isFinite(total)
     ? new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(total)
     : "₹0";
+
+  if (status?.state === "COMPLETED") {
+    return (
+      <main className="payment-portal payment-success">
+        <header className="payment-header"><a href="/" className="payment-back"><ArrowLeft size={18} aria-hidden="true" /> Portfolio</a><a href={`mailto:${profile.email}`} className="payment-help">Need help? <ArrowUpRight size={16} aria-hidden="true" /></a></header>
+        <section className="payment-success-card" aria-labelledby="payment-success-heading">
+          <div className="payment-success-icon"><CheckCircle2 size={36} strokeWidth={1.5} aria-hidden="true" /></div>
+          <p className="payment-success-label" role="status">Payment successful</p>
+          <h1 id="payment-success-heading" ref={successHeading} tabIndex={-1}>Thank you.</h1>
+          <p className="payment-success-intro">Your payment has been received and verified. You’re all set for this payment.</p>
+          <div className="payment-success-total"><span>Amount received · INR</span><strong>{formattedTotal}</strong></div>
+          <dl className="payment-success-details">
+            <div><dt>Payment reference</dt><dd className="payment-reference">{status.orderId}</dd></div>
+            <div><dt>Paid to</dt><dd>{profile.name}</dd></div>
+            <div><dt>Payment provider</dt><dd>PhonePe</dd></div>
+            {status.paidAt && <div><dt>Received on</dt><dd><time dateTime={status.paidAt}>{new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(status.paidAt))} IST</time></dd></div>}
+          </dl>
+          <p className="payment-success-note">Keep this reference for your records. {status.purpose === "project" ? "This confirms this payment only and does not settle any remaining project balance. Your agreed scope and delivery schedule are unchanged." : "Registration access and service delivery are handled separately."}</p>
+          <a href="/" className="payment-success-home">Return to home <ArrowUpRight size={18} aria-hidden="true" /></a>
+          <a href={`mailto:${profile.email}`} className="payment-success-help">Questions about your payment? Contact me.</a>
+        </section>
+        <footer className="payment-footer"><span>{profile.name}</span><span>Verified by our server. No further payment is needed for this transaction.</span></footer>
+      </main>
+    );
+  }
 
   return (
     <main className="payment-portal">
@@ -103,7 +131,7 @@ export function PaymentPortal() {
       <div className="payment-layout">
         <section className="payment-form-panel" aria-labelledby="payment-details-heading" aria-busy={busy}>
           <div className="payment-panel-heading"><h2 id="payment-details-heading">Payment details</h2><span>01 / DETAILS</span></div>
-          {order && <div className="payment-setup-notice payment-status-notice" role="status">{status?.state === "COMPLETED" ? <CheckCircle2 size={20} aria-hidden="true" /> : <CircleHelp size={20} aria-hidden="true" />}<p>{statusCopy}<br /><span className="payment-reference">Reference: {order}</span></p></div>}
+          {order && <div className="payment-setup-notice payment-status-notice" role="status"><CircleHelp size={20} aria-hidden="true" /><p>{statusCopy}<br /><span className="payment-reference">Reference: {order}</span></p></div>}
           <fieldset className="payment-purpose" disabled={attempted || !!order}>
             <legend>What are you paying for?</legend>
             <div className="payment-options">
@@ -130,7 +158,7 @@ export function PaymentPortal() {
             </fieldset>
             {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}
             {message && <p className="payment-error-notice" role="alert">{message}</p>}
-            <button className="payment-checkout-button" type="submit" disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "COMPLETED" ? "Payment verified" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
+            <button className="payment-checkout-button" type="submit" disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
             <nav className="payment-policy-links" aria-label="Payment policies"><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer" aria-label="Service terms (opens in a new tab)">Service terms</a><a href="/policies/refunds.html" target="_blank" rel="noopener noreferrer" aria-label="Refund policy (opens in a new tab)">Refunds</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer" aria-label="Privacy notice (opens in a new tab)">Privacy</a></nav>
             <p className="payment-privacy-note"><LockKeyhole size={14} aria-hidden="true" /> Card details and UPI PINs are never entered on this website.</p>
           </form>
