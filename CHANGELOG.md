@@ -8,6 +8,9 @@
 - Add a deployment regression guard for the single approved region. Actual
   checkout-speed improvement still requires measurement; PhonePe's hosted-page
   loading time is separate from backend preparation.
+- Published and verified actual bom1 function placement, unchanged public payment
+  configuration/security guards and the existing authenticated recovery HTTP 200.
+  All 235 tests, lint/build/audit and strict production DB preflight passed.
 
 ## Checkout source and optional reference — 2026-10-17
 

@@ -1,5 +1,15 @@
 # Production project payments — launch evidence
 
+**Current infrastructure:** source `838a408`, deployment
+`dpl_E9yLRPMQ5yh7B89ziDSiKV79uRL5`, now serves kkarn.vercel.app with functions in
+Mumbai (`bom1`), close to the existing database. Payment code, flags and secrets
+are unchanged from the accepted flow below. All 235 tests, lint/build/audit, remote
+strict DB preflight, function-region and public security checks passed. The existing
+authenticated recovery schedule returned HTTP 200 on this deployment at 22:00 IST.
+The prior
+accepted deployment remains the rollback target. See `payment-performance.md`
+for measurements, verification and the limit on claimed speed improvements.
+
 **Live payment accepted:** the owner completed INR 200 on source `bdbd0f7`,
 deployment `dpl_2jfComLTybSVH9sTofdJCP7YJPN8`, with project reference left blank.
 Payment `c7050c88-1641-4dd0-b9f8-585537c6dec5` independently verified COMPLETED

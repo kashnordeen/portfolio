@@ -33,8 +33,27 @@ Rollback target: `dpl_2jfComLTybSVH9sTofdJCP7YJPN8`, the owner-accepted payment
 deployment, preserving recovery/jobs. No database rollback is needed. Roll back
 on startup/DB failures, broken authenticated recovery or a checkout regression.
 
-## Verification status
+## Deployment and verification
 
-Candidate deployment and runtime acceptance pending. No faster-checkout number
-is claimed before measurement. A region change cannot guarantee an instant
-PhonePe-hosted page; provider/network latency remains outside this app's control.
+- Source `838a408`, deployment `dpl_E9yLRPMQ5yh7B89ziDSiKV79uRL5`, URL
+  `portfolio-7hqjb9qjg-kashnordeens-projects.vercel.app`, explicitly promoted to
+  kkarn.vercel.app after candidate checks. No Git push or new payment occurred.
+- All 235 tests passed, lint/build passed, native npm audit found zero known
+  vulnerabilities, and the remote strict production DB preflight passed.
+  Existing remote npm deprecation/cache/script-policy warnings were not suppressed;
+  dependency installation scripts remain disabled.
+- Vercel's deployed function summary reports bom1 for orders, config, jobs,
+  reconciliation and alerts. Public config response routing also reports
+  bom1::bom1, confirming actual execution rather than only build placement.
+- Candidate and public config: project true, community false. Public root 200,
+  correct PhonePe-compatible referrer policy, config no-store. Unsigned POSTs to
+  jobs/recover/webhook remain 401 in both candidate and public checks.
+- The existing scheduled authenticated recovery POST returned HTTP 200 on this
+  exact deployment at 16:30:00 UTC / 22:00 IST. Its database/permission path worked
+  after promotion; the 401s above were deliberate unsigned guard probes. No new
+  schedule, credentials, financial request or customer-data probe was created.
+
+No faster-checkout number is claimed before measurement. A region change cannot
+guarantee an instant PhonePe-hosted page; provider/network latency remains outside
+this app's control. The previous successful real-payment acceptance is retained;
+this region-only change has not been used to initiate another real payment.
