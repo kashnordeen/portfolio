@@ -53,11 +53,37 @@ the production queue/signature/database recovery path, not PhonePe payment succe
 Five-minute recovery uses 288 publications/day before order jobs and retries.
 Review the account's live quota, delivery failures and DLQ; manual checks do not
 replace automated outage alerts. Do not upgrade a plan automatically.
+The existing EU dashboard identifies the Free plan with 1,000 messages/day and a
+15-minute maximum timeout. The displayed daily counter lagged a known delivery;
+do not treat that counter alone as proof that no messages have been sent.
+
+## Project checkout published
+
+- Source `401ea32` (application source unchanged from `bb39a5e`); deployment
+  `dpl_4FeuNPbr4GnwwEUARyZNYmAvDTnX`, Ready, explicitly promoted to
+  `https://kkarn.vercel.app` on 17 October 2026 (IST).
+- Deployment runtime overrides: `PAYMENTS_ENABLED=true`,
+  `PAYMENT_RELEASE_APPROVED=true`, `PAYMENT_JOBS_ENABLED=true`;
+  `COMMUNITY_PAYMENTS_ENABLED=false`, `PAYMENT_PRODUCTION_ALERTS_ENABLED=false`,
+  `PAYMENT_UAT_ALERTS_ENABLED=false`. Provider/origin/amount bounds are unchanged.
+  Build-time checkout flags stayed false for the gated read-only preflight; the
+  candidate and public runtime config were separately verified true/false.
+- Public config returned HTTP 200, project enabled and community disabled, with
+  `Cache-Control: no-store` and Secure/HttpOnly/SameSite=Lax session attributes.
+  Cookie values were not recorded here. Unsigned POSTs to recovery, jobs and
+  webhook each returned 401. Root and all three policy pages returned 200 with
+  nosniff and framing DENY. Chrome shows "Checkout available" and policy links;
+  Continue is disabled for an empty form, as intended. Captured warning/error
+  browser output was empty. No checkout submission or real transaction was made.
+- Enablement is deployment-specific. Project-level defaults remain fail-closed;
+  no production credential or UAT environment was altered. Future redeployments
+  must explicitly preserve production verification/jobs for pending orders and
+  recheck the public runtime flags. Do not push an older/unreviewed main build.
 
 ## Remaining acceptance and safe operation
 
-- Open project checkout only on a verified candidate, now that signed recovery
-  has returned 200. Keep community and alerts false.
+- Project checkout is now open on the verified deployment. Community and alerts
+  remain false. Do not call real-payment or refund acceptance complete yet.
 - The owner, not the agent, must perform the first agreed, bounded real transaction
   and check independent completed state, webhook delivery and exactly one recorded
   fulfilment. No bank debit/screenshot alone is proof. Do not repay a pending or

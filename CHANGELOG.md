@@ -1,5 +1,17 @@
 # Changelog
 
+## Production rollout — 2026-10-17
+
+- Published the owner-approved service terms, Option A refund policy and factual
+  privacy notice with checkout/footer links.
+- Opened project-only checkout for agreed INR 200–50,000 payments after verified
+  production TLS/restricted-login checks and a signed recovery delivery (HTTP 200).
+  Community remains closed. Automated alerts and backup/restore are owner-deferred;
+  initial monitoring is manual through existing dashboards.
+- Recorded the verified deployment and jobs-preserving rollback in
+  `docs/production-launch.md`. No Git push, real payment or refund was performed;
+  owner-performed real-payment acceptance is still outstanding.
+
 ## Unreleased — payment integration (disabled)
 
 ### Fixed
