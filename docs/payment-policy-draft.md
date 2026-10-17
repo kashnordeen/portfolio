@@ -1,8 +1,9 @@
 # Payment policies — UNPUBLISHED OWNER-REVIEW DRAFT
 
 This is a starting point for review, not legal advice, a compliance certification or
-approved customer terms. Do not publish with unresolved fields. No refund deadline,
-retention period, automatic delivery commitment or legal business identity is invented.
+approved customer terms. Do not publish with unresolved fields. Proposed refund
+timelines are not approved commitments; retention, delivery and legal seller details
+still require confirmation.
 
 ## Owner decisions required before publication
 
@@ -33,13 +34,13 @@ card details, UPI PINs or OTPs to support.
 
 ## Refund/cancellation section — owner choices outstanding
 
-Before publication, state the agreed eligibility rules and request method for each
-of these cases: cancellation before work starts; cancellation after work starts;
-unresolved service/delivery disputes; duplicate successful charges; unsuccessful or
-pending debits needing provider reconciliation. Specify review and processing
-timeframes, any lawful deductions and how the customer is informed.
+See [refund-cancellation-options.md](refund-cancellation-options.md) for the newly
+drafted balanced project option (A), milestone-funded alternative (B), proposed
+response/refund-initiation targets and customer request wording. These are options
+for review, not an approved policy or an instruction to publish. Choose one and
+confirm the actual support/refund process before moving it into customer-facing pages.
 
-Do not state "no refunds," guarantee a refund time, waive statutory protections,
+Do not state "no refunds," guarantee a bank-credit time, waive statutory protections,
 or promise automatic refunds without appropriate review and an actual process.
 The application currently has no automated refund flow. A failed/ambiguous order
 must not be treated as an automatically completed refund.
