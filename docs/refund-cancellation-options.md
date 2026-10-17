@@ -4,8 +4,12 @@ Decision date: 17 October 2026 (IST). Status: OPTION A SELECTED / UNPUBLISHED.
 The owner selected Option A, including its stated response/processing targets.
 The prepared customer wording is now [project-refund-policy.md](project-refund-policy.md).
 This file preserves the original alternatives and draft wording for traceability;
-Option B is not selected. It is not the text to publish. Legal seller, contact,
-support calendar, operational checks and policy/legal review remain outstanding.
+Option B is not selected. It is not the text to publish. The owner has since
+confirmed Keshav Kumar Karn as an individual freelancer, support email
+kash.nordeen@gmail.com and business days of Monday to Friday excluding applicable
+Indian public holidays. Remaining seller disclosures, operational checks and
+policy/legal review are still outstanding. Unresolved identity/contact/calendar
+wording in the original proposal below is historical; use the prepared policy.
 Selection does not certify compliance or authorise deployment, checkout or refunds.
 
 ## Choice summary

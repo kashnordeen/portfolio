@@ -3,18 +3,20 @@
 This is a starting point for review, not legal advice, a compliance certification or
 approved published customer terms. Do not publish with unresolved fields. The owner
 selected Option A and its response/processing targets on 17 October 2026 (IST);
-retention, delivery, legal seller details and operational/publication review still
-require confirmation.
+the owner has also confirmed seller Keshav Kumar Karn as an individual freelancer,
+support email kash.nordeen@gmail.com and business days of Monday to Friday excluding
+applicable Indian public holidays. Retention, delivery, remaining seller disclosures
+and operational/publication review still need confirmation.
 
 ## Owner decisions required before publication
 
 | Decision | Current state |
 | --- | --- |
-| Legal seller/business identity and required address details | Owner must confirm; portfolio name alone does not establish these |
-| Support contact | Proposed: kash.nordeen@gmail.com; confirm before publishing |
+| Legal seller/business identity and required address details | Owner confirmed Keshav Kumar Karn, individual freelancer; remaining required seller/address disclosures still need completion |
+| Support contact | Owner confirmed kash.nordeen@gmail.com |
 | Project delivery | Confirm how scope, milestones, acceptance and delivery dates are agreed |
 | Cancellation/refund eligibility | Option A selected: full pre-work refund; unused funds after documented agreed work; delivered-work remedies preserved. Prepared wording in project-refund-policy.md; publication review pending |
-| Refund request/processing timing | Selected: acknowledge within 48 hours; normally decide within 5 business days of receipt; initiate approved refund within 5 business days of approval, or sooner where required. Confirm support calendar and operational process; bank credit is separate |
+| Refund request/processing timing | Selected: acknowledge within 48 hours; normally decide within 5 business days of receipt; initiate approved refund within 5 business days of approval, or sooner where required. Owner confirmed Monday to Friday excluding applicable Indian public holidays. Operational process still needs confirmation; bank credit is separate |
 | Payment discrepancies/duplicate debits | Confirm the investigation and customer communication process |
 | Customer-data retention | Define periods, purposes, backup retention and deletion/restriction procedure |
 | Community service | Not defined; registration payments remain disabled |
@@ -39,8 +41,9 @@ See [project-refund-policy.md](project-refund-policy.md) for the prepared Option
 customer wording. The owner selected the balanced project policy and stated targets;
 Option B is not selected. The original alternatives remain in
 [refund-cancellation-options.md](refund-cancellation-options.md) for traceability.
-Confirm the legal seller, contact, calendar and actual support/refund procedure,
-complete policy/legal review and obtain publication authority before adding pages.
+Seller name, support email and business days are owner-confirmed. Complete the
+remaining seller disclosures, confirm the actual support/refund procedure, complete
+policy/legal review and obtain publication authority before adding pages.
 This commercial choice does not approve a live release or automated refunds.
 
 Do not state "no refunds," guarantee a bank-credit time, waive statutory protections,
@@ -77,8 +80,9 @@ appropriate disclosures/agreements for actual business operation and jurisdictio
 **Owner must define retention and deletion/access handling before publication.**
 Financial records, unresolved orders and backups need an explicit lawful retention
 and recovery process; no automatic financial-record deletion is currently implemented.
-Support contact and request-verification procedures must be confirmed. Do not
-promise immediate deletion of records that the system cannot safely erase.
+The support contact is confirmed; request-verification procedures still need
+review. Do not promise immediate deletion of records that the system cannot safely
+erase.
 
 ## Publication checklist
 

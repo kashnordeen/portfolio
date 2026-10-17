@@ -73,12 +73,14 @@ recheck the actual account limits and usage before activation.
 `payment-policy-draft.md` is an unpublished review draft, not enforceable published
 terms or legal advice. On 17 October 2026 (IST), the owner selected Option A and
 its response/processing targets. `project-refund-policy.md` contains prepared
-customer wording; Option B is not selected. Confirm the business identity/contact,
-support calendar, scope/delivery terms, actual refund procedure and retention
-process, and complete policy/legal review before publication. Publish approved
-pages and link them before checkout. Do not invent refund promises or a tax-invoice
-status. Community stays off until its benefits, access delivery and refund terms
-are separately defined.
+customer wording; Option B is not selected. The owner confirmed Keshav Kumar Karn
+as an individual freelancer, support email kash.nordeen@gmail.com and business days
+of Monday to Friday excluding applicable Indian public holidays. Complete the
+remaining seller disclosures and confirm scope/delivery terms, the actual refund
+procedure and retention process. Complete policy/legal review before publication.
+Publish approved pages and link them before checkout. Do not invent refund promises
+or a tax-invoice status. Community stays off until its benefits, access delivery and
+refund terms are separately defined.
 
 ## Gate 3: real backup and isolated restore rehearsal
 
