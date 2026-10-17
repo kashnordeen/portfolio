@@ -35,6 +35,14 @@ payment and independent provider verification records the correct completed stat
 
 ## Acceptance still required
 
+Diagnostic source `2c4fcbd` was built with a passing strict production DB preflight,
+deployed as `dpl_DPLotpDu78iz27SjemN7gF1Lvjhr`, candidate config checked true/false,
+then explicitly promoted. New project checkout is reopened only for the agreed
+owner-controlled attempt; community/alerts remain false and managed jobs remain
+true. Chrome disconnected before a fresh agent tab could be opened, so the owner
+was asked to open a new Chrome tab and try Continue once, stopping before payment
+authorization. The failed initial intent must not be automatically replayed.
+
 Deploy the reviewed diagnostic candidate, preserve amount bounds and community off,
 verify runtime flags, then use one owner-controlled checkout attempt. Inspect the
 fixed failure category, reproduce the actual handoff defect, fix it with a failing
