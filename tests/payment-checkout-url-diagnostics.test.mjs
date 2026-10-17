@@ -9,7 +9,6 @@ test('rejected checkout URL diagnostics identify structural causes without retur
     ['not a URL PRIVATE_TOKEN', 'PARSE', 'NONE'],
     [`http://${host}/?token=PRIVATE_TOKEN`, 'SCHEME', 'EXPECTED'],
     ['https://private.invalid/?token=PRIVATE_TOKEN', 'HOST', 'FOREIGN'],
-    ['https://mercury-t2.phonepe.com/?token=PRIVATE_TOKEN', 'HOST', 'MERCURY_T2'],
     ['https://other.phonepe.com/?token=PRIVATE_TOKEN', 'HOST', 'PHONEPE_OTHER'],
     [`https://${host}:8443/?token=PRIVATE_TOKEN`, 'PORT', 'EXPECTED'],
     [`https://PRIVATE_USER:PRIVATE_PASSWORD@${host}/?token=PRIVATE_TOKEN`, 'CREDENTIALS', 'EXPECTED'],
@@ -21,4 +20,6 @@ test('rejected checkout URL diagnostics identify structural causes without retur
     assert.doesNotMatch(JSON.stringify(checkoutUrlDiagnostic(value, host)), /PRIVATE|https?:|phonepe\.com|private\.invalid/);
   }
   assert.deepEqual(checkoutUrlDiagnostic(`https://${host}/?token=PRIVATE_TOKEN`, host), {reason:'VALID', hostClass:'EXPECTED'});
+  assert.deepEqual(checkoutUrlDiagnostic('https://mercury-t2.phonepe.com/?token=PRIVATE_TOKEN', host), {reason:'VALID',hostClass:'MERCURY_T2'});
+  assert.deepEqual(checkoutUrlDiagnostic('https://mercury-t2.phonepe.com/?token=PRIVATE_TOKEN', 'mercury-uat.phonepe.com'), {reason:'HOST',hostClass:'MERCURY_T2'});
 });

@@ -37,7 +37,7 @@ export async function startCheckout(input: { purpose: string; name: string; emai
       throw new Error('Unable to confirm checkout. Contact support before making another payment.');
     }
     const url = new URL(data.checkoutUrl);
-    if (url.protocol !== 'https:' || !['mercury.phonepe.com', 'mercury-uat.phonepe.com'].includes(url.hostname) || url.username || url.password || url.port || url.hash) {
+    if (url.protocol !== 'https:' || !['mercury.phonepe.com', 'mercury-t2.phonepe.com', 'mercury-uat.phonepe.com'].includes(url.hostname) || url.username || url.password || url.port || url.hash) {
       throw new Error('Unable to verify the checkout destination. Please contact support.');
     }
   }

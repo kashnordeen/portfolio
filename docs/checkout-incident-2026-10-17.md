@@ -1,5 +1,22 @@
 # Checkout handoff incident — open
 
+## Root cause identified; live acceptance pending
+
+The single approved no-charge diagnostic session was submitted only to protected
+candidate `dpl_4QvjqAYAJjqDS4VdZoAR4eQRPctL`, source `42eec7f`. It produced fixed
+diagnostics `INVALID_CHECKOUT_URL`, reason `HOST`, host class `MERCURY_T2`.
+PhonePe's authenticated production API returned its alternate
+`mercury-t2.phonepe.com` checkout host, which both server and client rejected.
+A token-free HTTPS HEAD to that exact host returned 200 under normal certificate
+validation. The session was not authorized/paid and will not be replayed.
+
+The root fix accepts exactly that additional production hostname in both layers,
+retains the legacy production host and leaves sandbox pinned to its own host.
+No wildcard, HTTP, credentials, non-default port, fragment, lookalike or arbitrary
+PhonePe-subdomain allowance is added. New reproduction tests failed in both server
+and client before the change, then passed. All 231 tests, lint/build and native
+audit pass. Deployment and owner-performed real payment acceptance remain pending.
+
 17 October 2026 (IST). Do not mark resolved until the owner can complete a real
 payment and independent provider verification records the correct completed state.
 

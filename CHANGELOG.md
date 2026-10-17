@@ -1,5 +1,13 @@
 # Changelog
 
+## Checkout redirect repair — 2026-10-17
+
+- Corrected backend and browser checkout-host validation for the exact
+  `mercury-t2.phonepe.com` host observed from PhonePe's production API. Existing
+  HTTPS, lookalike/credential/port/fragment checks and sandbox isolation remain.
+- Added server/client regression tests reproducing the real rejected-host defect.
+  A real owner-performed successful payment is still required for acceptance.
+
 ## Checkout incident — diagnostic repair (2026-10-17)
 
 - Added fixed-category production provider/checkout diagnostics with no raw
