@@ -53,3 +53,17 @@ database, secret, feature flag, or checkout authorization changes.
   or payment was created. The normal Vite page safely reports checkout unavailable
   because it has no local payment API. Test fixtures live only in ignored build output.
 - Kept local per the owner's instruction: no deployment and no Git push.
+
+## Connected progress and click feedback
+
+- Three aligned points now share a connecting track. Transform-based fill advances
+  from details to checkout when a submission starts, then to status verification
+  when an order is being checked. The last point says "Verify status", not "paid".
+- Submission triggers one short button lift and arrow launch. Disabled checkout
+  does not animate on click or become enabled. Busy remains disabled and visibly busy.
+- Desktop and 320px mobile tracker checked without overflow; native stage semantics
+  retain exactly one `aria-current="step"`. Reduced-motion disables the transitions.
+- A disposable loopback fixture confirmed actual click → stage 2 / both finite
+  animations → stage 3 / pending, with no success receipt. The fixture never calls
+  a provider or database and creates no real order or payment.
+- 247 tests, ESLint, TypeScript and production build pass. Backend/flags unchanged.

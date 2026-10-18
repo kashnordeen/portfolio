@@ -26,6 +26,7 @@ for (const [alias, path] of [['@/data/portfolio', '../src/data/portfolio.ts'],
 }
 source = `import * as React from ${JSON.stringify(import.meta.resolve('react'))};\n${source.replace(/import "\.\/PaymentPortal\.css";/, '')}`;
 const { PaymentPortal } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+const { PaymentIntro } = await import(`data:text/javascript;base64,${Buffer.from(chrome).toString('base64')}`);
 
 async function renderWithVerifiedStatus(status) {
   // Inject only the status state returned by the API; all other React state stays real.
@@ -45,7 +46,7 @@ test('portal first render stays disabled, labels fields and explains the approve
   assert.match(html, /aria-label="Payment process"/);
   assert.match(html, /₹200 to ₹50,000/);
   assert.match(html, /Keshav Kumar Karn/);
-  assert.match(html, /type="submit" disabled=""/);
+  assert.match(html, /type="submit"[^>]*disabled=""/);
   assert.match(html.match(/<input[^>]*value="community"[^>]*>/)?.[0] ?? '', /disabled=""/);
   assert.match(html, /aria-describedby="payer-email-help"/);
   assert.doesNotMatch(html, /<fieldset[^>]*style=/);
@@ -57,7 +58,7 @@ test('a community URL never grants checkout availability and UI supports reduced
   const communityInput = html.match(/<input[^>]*value="community"[^>]*>/)?.[0] ?? '';
   assert.match(communityInput, /disabled=""/);
   assert.match(communityInput, /checked=""/);
-  assert.match(html, /type="submit" disabled=""/);
+  assert.match(html, /type="submit"[^>]*disabled=""/);
   assert.match(html, /Not open for registration/);
   const css = await read('../src/components/PaymentPortal/PaymentPortal.css');
   assert.match(css, /payment-checkout-button:not\(:disabled\)[^{]*\{[^}]*cursor: pointer/);
@@ -160,4 +161,31 @@ test('scroll effects are progressive, motion-safe and do not gate payment contro
   assert.doesNotMatch(css, /\.payment-fields[^}]*animation-timeline|\binfinite\b|scroll-behavior:\s*smooth/);
   assert.match(css, /prefers-reduced-motion: reduce[^]*animation: none !important/);
   assert.match(css, /:focus-visible[^}]*outline: 2px solid/);
+});
+
+test('connected payment milestones follow actual flow state without claiming payment success', () => {
+  for (const [order, checkoutStarted, stage] of [['', false, 1], ['', true, 2], [verifiedPayment.orderId, false, 3]]) {
+    const html = renderToStaticMarkup(createElement(PaymentIntro, { loaded: true, enabled: true, order, checkoutStarted }));
+    assert.match(html, new RegExp(`data-stage="${stage}"`));
+    assert.equal((html.match(/aria-current="step"/g) ?? []).length, 1);
+    assert.match(html, /Verify status/);
+    assert.doesNotMatch(html, /Payment successful|Payment complete/);
+  }
+});
+
+test('checkout boost is tied to submission, stays finite and never animates disabled clicks', async () => {
+  const css = await read('../src/components/PaymentPortal/PaymentPortal.css');
+  const component = await read('../src/components/PaymentPortal/PaymentPortal.tsx');
+  assert.match(component, /data-busy=\{busy\}/);
+  assert.match(css, /payment-steps\[data-stage="2"\]::after[^}]*scaleX\(\.5\)/);
+  assert.match(css, /payment-steps\[data-stage="3"\]::after[^}]*scaleX\(1\)/);
+  assert.match(css, /payment-checkout-button:not\(:disabled\):active[^}]*scale\(\.97\)/);
+  assert.match(css, /payment-checkout-button\[data-busy="true"\] svg[^}]*payment-button-boost/);
+  assert.doesNotMatch(css, /payment-checkout-button:disabled:active|\binfinite\b/);
+  for (const name of ['lift', 'boost']) {
+    const body = css.match(new RegExp(`@keyframes payment-button-${name} ([^]*?)(?=\\n  @|\\n})`))?.[1] ?? '';
+    const properties = [...body.matchAll(/(?:\{|;)\s*([\w-]+)\s*:/g)].map(match => match[1]);
+    assert.ok(properties.length > 0);
+    assert.ok(properties.every(property => ['transform', 'opacity'].includes(property)));
+  }
 });

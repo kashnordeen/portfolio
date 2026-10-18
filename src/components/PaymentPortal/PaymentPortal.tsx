@@ -118,7 +118,7 @@ export function PaymentPortal() {
   return (
     <main className="payment-portal">
       <PaymentHeader />
-      <PaymentIntro loaded={availabilityLoaded} enabled={enabled} order={order} />
+      <PaymentIntro loaded={availabilityLoaded} enabled={enabled} order={order} checkoutStarted={busy || attempted} />
 
       <div className="payment-layout">
         <section className="payment-form-panel" aria-labelledby="payment-details-heading" aria-busy={busy}>
@@ -151,7 +151,7 @@ export function PaymentPortal() {
             </fieldset>
             {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}
             {message && <p className="payment-error-notice" role="alert">{message}</p>}
-            <button className="payment-checkout-button" type="submit" disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
+            <button className="payment-checkout-button" type="submit" data-busy={busy} disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
             <nav className="payment-policy-links" aria-label="Payment policies"><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer" aria-label="Service terms (opens in a new tab)">Service terms</a><a href="/policies/refunds.html" target="_blank" rel="noopener noreferrer" aria-label="Refund policy (opens in a new tab)">Refunds</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer" aria-label="Privacy notice (opens in a new tab)">Privacy</a></nav>
             <p className="payment-privacy-note"><LockKeyhole size={14} aria-hidden="true" /> Card details and UPI PINs are never entered on this website.</p>
           </form>

@@ -8,12 +8,17 @@ export function PaymentHeader() {
   </header>;
 }
 
-export function PaymentIntro({ loaded, enabled, order }: { loaded: boolean; enabled: boolean; order: string }) {
+export function PaymentIntro({ loaded, enabled, order, checkoutStarted = false }: { loaded: boolean; enabled: boolean; order: string; checkoutStarted?: boolean }) {
+  const stage = order ? 3 : checkoutStarted ? 2 : 1;
   return <section className="payment-intro" aria-labelledby="payment-title">
     <div className="payment-eyebrow"><span>THE PAYMENT DESK</span><span className="payment-availability" data-available={loaded && enabled}><span aria-hidden="true" />{!loaded ? "Checking availability" : enabled ? "Checkout available" : "Checkout not open"}</span></div>
     <h1 id="payment-title">Your project.<br /><span>One step forward.</span></h1>
     <p>A clear next step for what we’re building together. Pay an agreed advance, instalment or project balance through PhonePe.</p>
-    <ol className="payment-steps" aria-label="Payment process"><li aria-current={order ? undefined : "step"}><span>01</span><div>Your details<small>Set your agreed amount</small></div></li><li><span>02</span><div>PhonePe checkout<small>Choose how to pay</small></div></li><li aria-current={order ? "step" : undefined}><span>03</span><div>Confirmation<small>Verified payment status</small></div></li></ol>
+    <ol className="payment-steps" aria-label="Payment process" data-stage={stage}>
+      <li aria-current={stage === 1 ? "step" : undefined} data-passed={stage > 1}><span>01</span><div>Your details<small>Set your agreed amount</small></div></li>
+      <li aria-current={stage === 2 ? "step" : undefined} data-passed={stage > 2}><span>02</span><div>PhonePe checkout<small>Choose how to pay</small></div></li>
+      <li aria-current={stage === 3 ? "step" : undefined}><span>03</span><div>Verify status<small>Server checks your payment</small></div></li>
+    </ol>
   </section>;
 }
 
