@@ -1,0 +1,17 @@
+# Build from reviewed source, never upload local builds or UI fixtures.
+dist
+dist-ssr
+node_modules
+.git
+.vercel
+
+# Keep environment files and private credential material off deployments.
+.env
+.env.*
+**/.env
+**/.env.*
+**/*.local
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
