@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowUpRight, CheckCircle2, CircleHelp, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, CircleHelp, LockKeyhole, ShieldCheck } from "lucide-react";
 import { profile } from "@/data/portfolio";
 import { CheckoutError, getPaymentAvailability, getPaymentStatus, startCheckout } from "@/lib/payment-client";
 import type { PaymentStatus } from "@/lib/payment-client";
 import { projectAmountError, projectAmountPaise } from "@/lib/project-payment-input";
+import { PaymentFooter, PaymentGuide, PaymentHeader, PaymentIntro } from "./PaymentPageChrome";
 import "./PaymentPortal.css";
 
 type PaymentPurpose = "community" | "project";
@@ -92,7 +93,7 @@ export function PaymentPortal() {
   if (status?.state === "COMPLETED") {
     return (
       <main className="payment-portal payment-success">
-        <header className="payment-header"><a href="/" className="payment-back"><ArrowLeft size={18} aria-hidden="true" /> Portfolio</a><a href={`mailto:${profile.email}`} className="payment-help">Need help? <ArrowUpRight size={16} aria-hidden="true" /></a></header>
+        <PaymentHeader />
         <section className="payment-success-card" aria-labelledby="payment-success-heading">
           <div className="payment-success-icon" aria-hidden="true"><CheckCircle2 size={36} strokeWidth={1.5} /></div>
           <p className="payment-success-label" role="status">Payment successful</p>
@@ -109,39 +110,31 @@ export function PaymentPortal() {
           <a href="/" className="payment-success-home">Return to home <ArrowUpRight size={18} aria-hidden="true" /></a>
           <a href={`mailto:${profile.email}`} className="payment-success-help">Questions about your payment? Contact me.</a>
         </section>
-        <footer className="payment-footer"><span>{profile.name}</span><span>Verified by our server. No further payment is needed for this transaction.</span></footer>
+        <PaymentFooter completed />
       </main>
     );
   }
 
   return (
     <main className="payment-portal">
-      <header className="payment-header">
-        <a href="/#about" className="payment-back"><ArrowLeft size={18} aria-hidden="true" /> Back to portfolio</a>
-        <a href={`mailto:${profile.email}`} className="payment-help">Need help? <ArrowUpRight size={16} aria-hidden="true" /></a>
-      </header>
-
-      <div className="payment-intro">
-        <div className="payment-eyebrow"><span>PROJECT PAYMENTS</span><span className="payment-availability">{!availabilityLoaded ? "Checking availability" : enabled ? "Checkout available" : "Checkout not open"}</span></div>
-        <h1>For what we’re<br /><span>building together.</span></h1>
-        <p>Pay the amount we’ve agreed for your project. Have a project or invoice reference? You can add it below, or leave it blank.</p>
-        <ol className="payment-steps" aria-label="Payment process"><li aria-current={order ? undefined : "step"}><span>1</span> Your details</li><li><span>2</span> PhonePe checkout</li><li aria-current={order ? "step" : undefined}><span>3</span> Verified status</li></ol>
-      </div>
+      <PaymentHeader />
+      <PaymentIntro loaded={availabilityLoaded} enabled={enabled} order={order} />
 
       <div className="payment-layout">
         <section className="payment-form-panel" aria-labelledby="payment-details-heading" aria-busy={busy}>
-          <div className="payment-panel-heading"><h2 id="payment-details-heading">Payment details</h2><span>01 / DETAILS</span></div>
+          <div className="payment-panel-heading"><div><span className="payment-section-label">LET’S GET THE DETAILS RIGHT</span><h2 id="payment-details-heading">Your payment details.</h2></div><LockKeyhole size={20} aria-hidden="true" /></div>
+          <p className="payment-panel-description">A few details to connect your payment to your project. Fields are required unless marked optional.</p>
           {order && <div className="payment-setup-notice payment-status-notice" role="status"><CircleHelp size={20} aria-hidden="true" /><p>{statusCopy}<br /><span className="payment-reference">Reference: {order}</span></p></div>}
           <fieldset className="payment-purpose" disabled={attempted || !!order}>
-            <legend>What are you paying for?</legend>
+            <legend>Payment for</legend>
             <div className="payment-options">
               <label className={purpose === "project" ? "payment-option selected" : "payment-option"}>
                 <input type="radio" name="purpose" value="project" checked={purpose === "project"} onChange={() => setPurpose("project")} />
-                <span><strong>Project payment</strong><small>Advance, instalment or agreed balance</small></span>
+                <span><strong>Project payment</strong><small>Advance, instalment or balance</small></span>
               </label>
               <label className={purpose === "community" ? "payment-option selected" : "payment-option"}>
                 <input type="radio" name="purpose" value="community" disabled={!availability.communityEnabled} checked={purpose === "community"} onChange={() => setPurpose("community")} />
-                <span><strong>Community registration</strong><small>{availability.communityEnabled ? "Fixed fee of ₹699" : "Not open for registration"}</small></span>
+                <span><strong>Community</strong><small>{availability.communityEnabled ? "Registration · ₹699" : "Not open for registration"}</small></span>
               </label>
             </div>
           </fieldset>
@@ -149,11 +142,11 @@ export function PaymentPortal() {
           <form onSubmit={submit}>
             <fieldset className="payment-fields" disabled={attempted || !!order}>
               <legend className="sr-only">Customer details</legend>
-              <div><label htmlFor="payer-name">Full name</label><input id="payer-name" name="name" autoComplete="name" maxLength={100} required value={name} onChange={event => setName(event.target.value)} /></div>
-              <div><label htmlFor="payer-email">Email address</label><input id="payer-email" name="email" type="email" autoComplete="email" aria-describedby="payer-email-help" maxLength={254} required value={email} onChange={event => setEmail(event.target.value)} /><p id="payer-email-help">For payment support and matching your project.</p></div>
+              <div className="payment-customer-fields"><div><label htmlFor="payer-name">Full name</label><input id="payer-name" name="name" placeholder="Your full name" autoComplete="name" maxLength={100} required value={name} onChange={event => setName(event.target.value)} /></div>
+              <div><label htmlFor="payer-email">Email address</label><input id="payer-email" name="email" type="email" placeholder="you@example.com" autoComplete="email" aria-describedby="payer-email-help" maxLength={254} required value={email} onChange={event => setEmail(event.target.value)} /><p id="payer-email-help">To identify your payment and help if needed.</p></div></div>
               {purpose === "project" && <>
-                <div><label htmlFor="payer-amount">Agreed amount in INR</label><div className="payment-amount-input"><span aria-hidden="true">₹</span><input id="payer-amount" name="amount" type="text" inputMode="decimal" autoComplete="off" maxLength={12} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="0.00" required value={amount} onChange={event => setAmount(event.target.value)} aria-invalid={!!amountError} aria-describedby={amountError ? "payer-amount-help payer-amount-error" : "payer-amount-help"} /></div><p id="payer-amount-help">₹200 to ₹50,000. Enter only the amount agreed for your project.</p>{amountError && <p id="payer-amount-error" className="payment-field-error">{amountError}</p>}</div>
-                <div><label htmlFor="payer-reference">Project or invoice reference (optional)</label><input id="payer-reference" name="projectReference" autoComplete="off" aria-describedby="payer-reference-help" placeholder="Add a reference, if you have one" maxLength={120} value={reference} onChange={event => setReference(event.target.value)} /><p id="payer-reference-help">Leave blank if you don’t have one. We’ll match your payment using your name and email.</p></div>
+                <div className="payment-amount-field"><label htmlFor="payer-amount">Agreed amount in INR <span>Indian rupees</span></label><div className="payment-amount-input"><span aria-hidden="true">₹</span><input id="payer-amount" name="amount" type="text" inputMode="decimal" autoComplete="off" maxLength={12} pattern="[0-9]+([.][0-9]{1,2})?" placeholder="0.00" required value={amount} onChange={event => setAmount(event.target.value)} aria-invalid={!!amountError} aria-describedby={amountError ? "payer-amount-help payer-amount-error" : "payer-amount-help"} /></div><p id="payer-amount-help">₹200 to ₹50,000. Only enter the amount we’ve agreed by email.</p>{amountError && <p id="payer-amount-error" className="payment-field-error" role="status">{amountError}</p>}</div>
+                <div><label htmlFor="payer-reference">Project or invoice reference (optional)</label><input id="payer-reference" name="projectReference" autoComplete="off" aria-describedby="payer-reference-help" placeholder="Have a reference? Add it here" maxLength={120} value={reference} onChange={event => setReference(event.target.value)} /><p id="payer-reference-help">Leave blank if you don’t have one. Your name and email help us match your payment.</p></div>
               </>}
             </fieldset>
             {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}
@@ -165,17 +158,18 @@ export function PaymentPortal() {
         </section>
 
         <aside className="payment-summary" aria-labelledby="payment-summary-heading">
-          <div className="payment-summary-top"><div className="payment-summary-icon"><ShieldCheck size={24} strokeWidth={1.5} aria-hidden="true" /></div><span>02 / REVIEW</span></div>
+          <div className="payment-summary-top"><span className="payment-section-label">THE OVERVIEW</span><ShieldCheck size={22} strokeWidth={1.5} aria-hidden="true" /></div>
           <h2 id="payment-summary-heading">Review your payment</h2>
           <p>{purpose === "community" ? "Community registration" : "Payment towards your project"}</p>
-          <div className="payment-total"><span>{status ? "Server-confirmed amount" : "Amount to pay · INR"}</span><strong aria-live="polite" aria-atomic="true">{formattedTotal}</strong></div>
-          <dl className="payment-merchant"><div><dt>Paid to</dt><dd>Keshav Kumar Karn</dd></div><div><dt>Checkout provider</dt><dd>PhonePe</dd></div></dl>
+          <div className="payment-total"><span>{status ? "Server-confirmed amount" : "Your amount · INR"}</span><strong aria-live="polite" aria-atomic="true">{formattedTotal}</strong><small>{total > 0 ? "Review this amount before continuing." : "Add your agreed amount to get started."}</small></div>
+          <dl className="payment-merchant"><div><dt>Recipient</dt><dd>{profile.name}</dd></div><div><dt>Checkout</dt><dd>PhonePe <ArrowUpRight size={13} aria-hidden="true" /></dd></div><div><dt>Currency</dt><dd>INR · Indian rupee</dd></div></dl>
           <p className="payment-summary-note">{purpose === "community" ? "Registration details will be explained before checkout is enabled." : "Paying an advance or instalment does not mark the full project balance as paid."}</p>
-          <div className="payment-expectations"><h3>What happens next</h3><ul><li>Continue to PhonePe’s hosted checkout when enabled.</li><li>Choose from the payment methods PhonePe makes available.</li><li>Return here for a server-verified payment status. If pending, do not pay again.</li></ul></div>
-          <a href={`mailto:${profile.email}`} className="payment-summary-help">Discuss payment details <ArrowUpRight size={16} aria-hidden="true" /></a>
+          <div className="payment-expectations"><h3>From here, it’s simple.</h3><ol><li><span>1</span><p>Continue to PhonePe<span>Use the provider’s hosted checkout.</span></p></li><li><span>2</span><p>Pay with an available method<span>Options are provided by PhonePe.</span></p></li><li><span>3</span><p>Come back for confirmation<span>Pending? Don’t pay again. Contact me.</span></p></li></ol></div>
+          <a href={`mailto:${profile.email}`} className="payment-summary-help">Let’s clear up any questions <ArrowUpRight size={16} aria-hidden="true" /></a>
         </aside>
       </div>
-      <footer className="payment-footer"><span>{profile.name}</span><span>Have a question? <a href={`mailto:${profile.email}`}>Contact me</a></span></footer>
+      <PaymentGuide />
+      <PaymentFooter />
     </main>
   );
 }

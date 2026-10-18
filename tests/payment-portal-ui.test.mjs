@@ -14,6 +14,11 @@ const compile = source => ts.transpileModule(source, { compilerOptions: {
 const moduleUrl = source => `data:text/javascript;base64,${Buffer.from(compile(source)).toString('base64')}`;
 const read = path => readFile(new URL(path, import.meta.url), 'utf8');
 let source = compile(await read('../src/components/PaymentPortal/PaymentPortal.tsx'));
+let chrome = compile(await read('../src/components/PaymentPortal/PaymentPageChrome.tsx'));
+for (const dependency of ['react', 'lucide-react']) chrome = chrome.replaceAll(`"${dependency}"`, JSON.stringify(import.meta.resolve(dependency)));
+chrome = chrome.replaceAll('"@/data/portfolio"', JSON.stringify(moduleUrl(await read('../src/data/portfolio.ts'))));
+chrome = `import * as React from ${JSON.stringify(import.meta.resolve('react'))};\n${chrome}`;
+source = source.replace('"./PaymentPageChrome"', JSON.stringify(`data:text/javascript;base64,${Buffer.from(chrome).toString('base64')}`));
 for (const dependency of ['react', 'lucide-react']) source = source.replaceAll(`"${dependency}"`, JSON.stringify(import.meta.resolve(dependency)));
 for (const [alias, path] of [['@/data/portfolio', '../src/data/portfolio.ts'],
   ['@/lib/payment-client', '../src/lib/payment-client.ts'], ['@/lib/project-payment-input', '../src/lib/project-payment-input.ts']]) {
@@ -119,7 +124,7 @@ test('thank-you copy is warm and clear while celebration graphics stay decorativ
 
 test('confirmation motion is opt-in, finite and animates only transform and opacity', async () => {
   const css = await read('../src/components/PaymentPortal/PaymentPortal.css');
-  const motion = css.split('@media (prefers-reduced-motion: no-preference)')[1] ?? '';
+  const motion = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: no-preference)'));
   assert.ok(motion, 'Celebration must be opt-in for users who allow motion');
   const frames = [...motion.matchAll(/@keyframes (payment-confirmation-[\w-]+)\s*\{([\s\S]*?)(?=@keyframes|$)/g)];
   assert.deepEqual(frames.map(frame => frame[1]).sort(), ['payment-confirmation-check', 'payment-confirmation-reveal', 'payment-confirmation-ring']);
@@ -129,4 +134,30 @@ test('confirmation motion is opt-in, finite and animates only transform and opac
     assert.ok(properties.every(property => ['opacity', 'transform'].includes(property)), `${name} must not animate layout or paint properties`);
   }
   assert.doesNotMatch(motion, /\binfinite\b|animation-iteration-count\s*:\s*[2-9]/);
+});
+
+test('redesigned checkout has a single primary heading, labelled navigation and accessible supporting help', t => {
+  t.mock.property(globalThis, 'window', { location: { search: '?payment=project' } });
+  const html = renderToStaticMarkup(createElement(PaymentPortal));
+  assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
+  assert.match(html, /Your project\./);
+  assert.match(html, /One step forward\./);
+  assert.match(html, /Fields are required unless marked optional/);
+  assert.match(html, /aria-label="Back to portfolio"/);
+  assert.match(html, /aria-label="Payment navigation"/);
+  assert.equal((html.match(/<details>/g) ?? []).length, 3);
+  assert.match(html, /Do I need a project reference/);
+  assert.match(html, /No\. The reference is optional/);
+  assert.equal((html.match(/type="submit"/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /100% secure|guaranteed|receipt sent/i);
+});
+
+test('scroll effects are progressive, motion-safe and do not gate payment controls', async () => {
+  const css = await read('../src/components/PaymentPortal/PaymentPortal.css');
+  assert.match(css, /@supports \(animation-timeline: view\(\)\)/);
+  assert.match(css, /animation-range: entry 0% entry 25%/);
+  assert.match(css, /payment-guide:focus-within/);
+  assert.doesNotMatch(css, /\.payment-fields[^}]*animation-timeline|\binfinite\b|scroll-behavior:\s*smooth/);
+  assert.match(css, /prefers-reduced-motion: reduce[^]*animation: none !important/);
+  assert.match(css, /:focus-visible[^}]*outline: 2px solid/);
 });
