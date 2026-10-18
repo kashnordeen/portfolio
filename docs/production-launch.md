@@ -1,6 +1,41 @@
 # Production project payments — launch evidence
 
-**Current release:** source `28fa575`, deployment
+**Current UI release — 18 October 2026 (IST):** source `7935714`, deployment
+`dpl_8VotKPvm8bqmWZq3oY6Renz1wa7u`, explicitly staged, verified, then promoted to
+`https://kkarn.vercel.app`. The owner requested deployment of the local payment-page
+redesign, connected progress tracker, checkout click feedback and verified thank-you
+screen. No Git push was requested or performed.
+
+- All 248 tests, ESLint and TypeScript pass; production dependency audit reports
+  zero known vulnerabilities. Remote strict read-only DB/TLS/RLS preflight and build
+  pass. Existing npm configuration/ESLint-deprecation/install-script warnings remain;
+  no new dependency or weakened installation/TLS protection was introduced.
+- A dry upload audit stopped the first attempt before upload because Vercel included
+  local `dist` files. Added `.vercelignore` and its regression test. The verified
+  182-file source upload excludes all build fixtures, environment files and private
+  key material. This deployment builds fresh from source.
+- Functions remain in Mumbai (`bom1`). Runtime project checkout/release/recovery
+  flags stay true; community and both alert flags stay false. Production PhonePe,
+  the exact site origin and INR 200–50,000 bounds are preserved via deployment-only
+  overrides. No project-level variables, credentials, webhook or scheduler changed.
+- Candidate unsigned webhook/jobs/recovery probes return 401, and the expected UI
+  assets match. Public site and all three policy pages return 200; config is
+  project true/community false with no-store. Public unsigned callback/recovery
+  probes return 401 and GET orders returns 405. Framing DENY and nosniff remain.
+- Public alias independently resolves to this Ready production deployment. Browser
+  check confirms connected points, optional reference, safe disabled empty form,
+  no horizontal overflow and no captured console errors. Screenshot:
+  `payment-ui-production-release.png` in the task visual artifacts.
+- Existing scheduled production recovery returned HTTP 200 on this deployment at
+  21:35:00.677 IST (16:05:00.677 UTC). The scoped recent runtime error/fatal/stderr
+  scan returned zero records. Automated alerts and backup/restore remain deferred;
+  the owner's existing manual monitoring commitment is unchanged.
+- Rollback target: the previous Mumbai deployment below, retaining payment recovery.
+  No database rollback is needed. No real checkout, payment, refund or fulfilment
+  was created by this UI release verification. The earlier owner acceptance remains
+  historical payment evidence, not a newly executed transaction.
+
+**Previous release / UI rollback:** source `28fa575`, deployment
 `dpl_GPSXrx6x5uV71sk8apqchQHhypmt`, now serves kkarn.vercel.app. At the owner's
 request, the four originally hidden groups are restored: five project repository
 buttons and one configured website link, three download menus with six existing

@@ -67,3 +67,13 @@ database, secret, feature flag, or checkout authorization changes.
   animations → stage 3 / pending, with no success receipt. The fixture never calls
   a provider or database and creates no real order or payment.
 - 247 tests, ESLint, TypeScript and production build pass. Backend/flags unchanged.
+
+## Approved production release
+
+On 18 October 2026 the owner subsequently requested deployment. Source `7935714`
+was staged as `dpl_8VotKPvm8bqmWZq3oY6Renz1wa7u`, checked, then promoted to
+kkarn.vercel.app. The safety-only source commit adds deployment exclusions and one
+regression test (248 passing tests total). Production flags and payment behavior
+are unchanged. UI/browser, endpoint guards, remote DB preflight and one actual
+scheduled recovery execution were verified. No Git push or real payment occurred.
+Full release and rollback evidence: `production-launch.md`.

@@ -1,8 +1,14 @@
-# Verified payment confirmation — local update
+# Verified payment confirmation
 
 Prepared 17 October 2026. The owner explicitly requested keeping this change local:
 do not push or deploy it without new approval. Production settings and notification
 services are unchanged.
+
+Release update: on 18 October 2026 the owner gave new deployment approval. The
+confirmation, its animation and the redesigned portal are now published at
+kkarn.vercel.app from source `7935714`, deployment
+`dpl_8VotKPvm8bqmWZq3oY6Renz1wa7u`. No Git push, notification activation or
+new payment was performed. See `production-launch.md` for verification/rollback.
 
 ## Customer experience
 
