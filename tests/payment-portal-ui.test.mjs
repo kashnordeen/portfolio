@@ -106,3 +106,27 @@ test('pending, failed, review and URL success claims never show a success receip
   const html = renderToStaticMarkup(createElement(PaymentPortal));
   assert.doesNotMatch(html, /Payment successful|Thank you|Return to home/);
 });
+
+test('thank-you copy is warm and clear while celebration graphics stay decorative', async t => {
+  t.mock.property(globalThis, 'window', { location: { search: `?payment=project&order=${verifiedPayment.orderId}` } });
+  const html = await renderWithVerifiedStatus(verifiedPayment);
+  assert.match(html, />Thank you!</);
+  assert.match(html, /Your payment is confirmed\./);
+  assert.match(html, /Thank you for your trust\./);
+  assert.match(html, /class="payment-success-icon" aria-hidden="true"/);
+  assert.match(html, /Return to home/);
+});
+
+test('confirmation motion is opt-in, finite and animates only transform and opacity', async () => {
+  const css = await read('../src/components/PaymentPortal/PaymentPortal.css');
+  const motion = css.split('@media (prefers-reduced-motion: no-preference)')[1] ?? '';
+  assert.ok(motion, 'Celebration must be opt-in for users who allow motion');
+  const frames = [...motion.matchAll(/@keyframes (payment-confirmation-[\w-]+)\s*\{([\s\S]*?)(?=@keyframes|$)/g)];
+  assert.deepEqual(frames.map(frame => frame[1]).sort(), ['payment-confirmation-check', 'payment-confirmation-reveal', 'payment-confirmation-ring']);
+  for (const [, name, body] of frames) {
+    const properties = [...body.matchAll(/(?:\{|;)\s*([\w-]+)\s*:/g)].map(match => match[1]);
+    assert.ok(properties.length > 0, `${name} must animate`);
+    assert.ok(properties.every(property => ['opacity', 'transform'].includes(property)), `${name} must not animate layout or paint properties`);
+  }
+  assert.doesNotMatch(motion, /\binfinite\b|animation-iteration-count\s*:\s*[2-9]/);
+});

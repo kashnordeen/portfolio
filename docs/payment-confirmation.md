@@ -7,15 +7,14 @@ services are unchanged.
 ## Customer experience
 
 - A server-verified `COMPLETED` status replaces the frozen checkout form with
-  “Payment successful” and “Thank you.”
+  “Payment successful” and “Thank you!”
 - The confirmation displays the server-confirmed INR amount, payment reference,
   recipient, PhonePe as provider and received time in IST.
 - A real `Return to home` link navigates to `/`. There is no automatic redirect,
   so the customer can retain their reference. No further checkout form is shown.
 - Focus moves to the confirmation heading once completion is received. Tab reaches
-  the return-home link. Existing entrance animation/reduced-motion behavior and
-  the portfolio's semantic color tokens are retained; no animation dependency
-  was added.
+  the return-home link. The portfolio's semantic color tokens are retained;
+  no animation dependency was added.
 - The copy confirms this transaction only, not remaining project balance or
   delivery fulfilment. It does not claim that any email or receipt was sent.
 
@@ -31,7 +30,7 @@ webhook or background job was changed.
 
 - The new completed-state regression test failed against the old portal, then
   passed with the new UI. Six focused portal tests pass.
-- Full suite: 241 tests passed, zero failures/skips. ESLint and the TypeScript/Vite
+- Full suite after the motion refinement: 243 tests passed, zero failures/skips. ESLint and the TypeScript/Vite
   production build passed.
 - Browser verification used a read-only loopback fixture server serving the built
   application with fake API responses. It used no production credentials or orders,
@@ -54,3 +53,24 @@ Email delivery failure must not reverse or alter a verified payment.
 No Gmail permission/credential, paid SMS provider, additional service or notification
 flag was created or enabled here. The owner can consider low-volume Gmail email
 notifications and Gmail's phone push notifications before paying for SMS.
+
+## Motion refinement — 18 October 2026
+
+- Copy now reads “Thank you!” and “Your payment is confirmed. Thank you for your
+  trust.” The decorative checkmark pops in, two soft rings dissipate and the text
+  and receipt details reveal in a short sequence. The longest animation finishes
+  after 1.2 seconds; none loops.
+- New motion is scoped to `prefers-reduced-motion: no-preference`. The default
+  static receipt stays complete, and the home action never waits for an animation.
+  Keyframes animate only transform and opacity, not size, position or shadows.
+- The heading retains programmatic focus without a decorative outline around the
+  entire title. Keyboard-operated links keep their visible focus indicators.
+- Two new regression tests failed before implementation and passed afterward.
+  Browser computed styles confirmed the expected check, ring and reveal animation
+  names, each with one iteration. The heading-to-home keyboard path still works.
+- Checked 320px, 768px, 1024px, 1440px and default desktop rendering. Browser layout
+  measurements showed no horizontal overflow, and the local preview logged no
+  console errors. Reduced-motion gating was verified in the stylesheet regression
+  test; the operating system preference was not changed.
+- The read-only local preview used a fake INR 200 payment and no customer data or
+  PhonePe requests. This refinement remains local, without a push or deployment.

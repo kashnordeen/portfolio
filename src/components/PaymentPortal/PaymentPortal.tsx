@@ -94,10 +94,10 @@ export function PaymentPortal() {
       <main className="payment-portal payment-success">
         <header className="payment-header"><a href="/" className="payment-back"><ArrowLeft size={18} aria-hidden="true" /> Portfolio</a><a href={`mailto:${profile.email}`} className="payment-help">Need help? <ArrowUpRight size={16} aria-hidden="true" /></a></header>
         <section className="payment-success-card" aria-labelledby="payment-success-heading">
-          <div className="payment-success-icon"><CheckCircle2 size={36} strokeWidth={1.5} aria-hidden="true" /></div>
+          <div className="payment-success-icon" aria-hidden="true"><CheckCircle2 size={36} strokeWidth={1.5} /></div>
           <p className="payment-success-label" role="status">Payment successful</p>
-          <h1 id="payment-success-heading" ref={successHeading} tabIndex={-1}>Thank you.</h1>
-          <p className="payment-success-intro">Your payment has been received and verified. You’re all set for this payment.</p>
+          <h1 id="payment-success-heading" ref={successHeading} tabIndex={-1}>Thank you!</h1>
+          <p className="payment-success-intro"><strong>Your payment is confirmed.</strong><br />Thank you for your trust.</p>
           <div className="payment-success-total"><span>Amount received · INR</span><strong>{formattedTotal}</strong></div>
           <dl className="payment-success-details">
             <div><dt>Payment reference</dt><dd className="payment-reference">{status.orderId}</dd></div>
