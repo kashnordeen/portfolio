@@ -1,6 +1,17 @@
 export type PaymentAvailability = { projectEnabled: boolean; communityEnabled: boolean };
-export type PaymentStatus = { orderId: string; purpose: 'community' | 'project'; state: 'CREATED' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'REVIEW'; amountPaise: number; currency: 'INR'; paidAt: string | null };
+export type PaymentStatus = { orderId: string; purpose: 'community' | 'project'; state: 'CREATED' | 'PENDING' | 'COMPLETED' | 'FAILED' | 'REVIEW'; amountPaise: number; currency: 'INR'; paidAt: string | null; failureReason?: 'CANCELLED' };
 export type CheckoutResult = { orderId: string; checkoutUrl?: string; state?: string; message?: string };
+
+export function canRestartCancelledPayment(status: Pick<PaymentStatus, 'state' | 'failureReason'> | null) {
+  return status?.state === 'FAILED' && status.failureReason === 'CANCELLED';
+}
+
+export function restartCancelledPayment(status: PaymentStatus | null, storage: Pick<Storage, 'removeItem'>, navigate: (path: string) => void) {
+  if (!status || !canRestartCancelledPayment(status) || !['project', 'community'].includes(status.purpose)) return false;
+  storage.removeItem('payment-request-key');
+  navigate(`/?payment=${status.purpose}`);
+  return true;
+}
 
 export class CheckoutError extends Error {
   editable: boolean;
@@ -54,5 +65,7 @@ export async function getPaymentStatus(order: string, signal: AbortSignal): Prom
     (data.state === 'COMPLETED' && (typeof data.paidAt !== 'string' || !Number.isFinite(Date.parse(data.paidAt))))) {
     throw new Error('Payment status could not be verified. Please contact support.');
   }
-  return data;
+  return { orderId: data.orderId, purpose: data.purpose, state: data.state, amountPaise: data.amountPaise,
+    currency: data.currency, paidAt: data.paidAt,
+    ...(data.state === 'FAILED' && data.failureReason === 'CANCELLED' ? { failureReason: 'CANCELLED' as const } : {}) };
 }

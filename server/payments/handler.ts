@@ -88,7 +88,19 @@ export async function handlePayment(route: Route, request: Request, getRuntime: 
       const session = sessionHash(token, config.sessionSecret);
       await store.rate(`status:${session}`, 30, 60);
       const order = await store.owned(id, session);
-      return reply({ orderId: order.id, purpose: order.purpose, state: order.state, amountPaise: order.amount_paise, currency: 'INR', paidAt: order.paid_at?.toISOString() ?? null });
+      let failureReason: 'CANCELLED' | undefined;
+      if (order.state === 'FAILED' && order.phonepe_order_id) {
+        try {
+          // Optional explanation only: ownership precedes the lookup, and failures
+          // or conflicting responses never alter the persisted payment state.
+          await store.rate(`failure-status:${session}`, 3, 60);
+          const detail = await provider.status(order.merchant_order_id, true);
+          if (detail.state === 'FAILED' && detail.orderId === order.phonepe_order_id &&
+            detail.amount === order.amount_paise && detail.failureReason === 'CANCELLED') failureReason = 'CANCELLED';
+        } catch { /* Keep the generic terminal result when the explanation is unavailable. */ }
+      }
+      return reply({ orderId: order.id, purpose: order.purpose, state: order.state, amountPaise: order.amount_paise, currency: 'INR', paidAt: order.paid_at?.toISOString() ?? null,
+        ...(failureReason ? { failureReason } : {}) });
     }
     if (route === 'webhook') {
       authenticateWebhook(request, config.webhookUsername, config.webhookPassword);

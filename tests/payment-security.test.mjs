@@ -143,6 +143,22 @@ test('PhonePe adapter caches OAuth and never leaks customer data or retries chec
   assert.equal(failures, 1);
 });
 
+test('failure explanation explicitly requests error context without expanding payment-attempt details', async () => {
+  const calls = [];
+  const provider = createPhonePe(loadConfig(env), async url => {
+    calls.push(url);
+    return url.endsWith('/oauth/token')
+      ? Response.json({ access_token: 'fixture-token', expires_at: Date.now() / 1000 + 3600 })
+      : Response.json({ orderId: 'OMO_FIXTURE', amount: 20000, state: 'FAILED', errorContext: {
+        errorCode: 'TXN_CANCELLED', detailedErrorCode: 'REQUEST_CANCEL_BY_REQUESTEE', source: 'CUSTOMER', stage: 'PRE_AUTHENTICATION' } });
+  });
+  assert.equal((await provider.status('KK_FIXTURE', true)).failureReason, 'CANCELLED');
+  assert.equal(new URL(calls.at(-1)).searchParams.get('errorContext'), 'true');
+  assert.equal(new URL(calls.at(-1)).searchParams.get('details'), 'false');
+  await provider.status('KK_FIXTURE');
+  assert.equal(new URL(calls.at(-1)).searchParams.has('errorContext'), false);
+});
+
 test('provider failures emit only fixed environment, operation, category and HTTP status, never sensitive values',async()=>{
   const logs=[];
   const order={id:'private-id',merchant_order_id:'private-merchant-order',amount_paise:20000,purpose:'project'};

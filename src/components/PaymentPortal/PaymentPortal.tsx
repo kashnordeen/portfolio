@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, CheckCircle2, CircleHelp, LockKeyhole, ShieldCheck } from "lucide-react";
 import { profile } from "@/data/portfolio";
-import { CheckoutError, getPaymentAvailability, getPaymentStatus, startCheckout } from "@/lib/payment-client";
+import { canRestartCancelledPayment, CheckoutError, getPaymentAvailability, getPaymentStatus, restartCancelledPayment, startCheckout } from "@/lib/payment-client";
 import type { PaymentStatus } from "@/lib/payment-client";
 import { projectAmountError, projectAmountPaise } from "@/lib/project-payment-input";
 import { PaymentFooter, PaymentGuide, PaymentHeader, PaymentIntro } from "./PaymentPageChrome";
@@ -79,7 +79,13 @@ export function PaymentPortal() {
     }
     finally { submitting.current = false; setBusy(false); }
   };
-  const statusCopy = status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
+  const cancelled = canRestartCancelledPayment(status);
+  const restartCancelled = () => {
+    // Explicit owner action only. Never discard a pending/ambiguous request key.
+    restartCancelledPayment(status, sessionStorage, path => window.location.assign(path));
+  };
+  const statusCopy = cancelled ? "PhonePe reports that checkout was cancelled before authorization. This is not a successful payment. If you saw any debit, contact support before trying again."
+    : status?.state === "FAILED" ? "This payment failed. Contact support to confirm the next step before attempting another payment."
       : status?.state === "REVIEW" ? "This payment needs review. Please contact support and do not pay again."
         : "Checkout or payment verification is still pending. This is not confirmation of payment. Please do not pay again; contact support if checkout did not open.";
   const amountError = purpose === "project" ? projectAmountError(amount) : "";
@@ -151,7 +157,8 @@ export function PaymentPortal() {
             </fieldset>
             {!enabled && !order && <div className="payment-setup-notice" role="status"><LockKeyhole size={18} aria-hidden="true" /><p>{!availabilityLoaded ? "Checking whether checkout is available. No payment has started." : purpose === "community" ? "Community registration is not open yet. Benefits and access details will be shared before payments are enabled." : "Online checkout is not open yet. You can discuss your payment by email; this page cannot take a payment right now."}</p></div>}
             {message && <p className="payment-error-notice" role="alert">{message}</p>}
-            <button className="payment-checkout-button" type="submit" data-busy={busy} disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>
+            {cancelled ? <button className="payment-checkout-button" type="button" onClick={restartCancelled}>Start a new payment <ArrowUpRight size={18} aria-hidden="true" /></button>
+              : <button className="payment-checkout-button" type="submit" data-busy={busy} disabled={!enabled || !validAmount || busy || !!order}>{busy ? "Opening secure checkout…" : status?.state === "FAILED" ? "Payment failed" : status?.state === "REVIEW" ? "Review required" : order ? "Payment under verification" : enabled ? "Continue to PhonePe" : "Checkout not open"} <ArrowUpRight size={18} aria-hidden="true" /></button>}
             <nav className="payment-policy-links" aria-label="Payment policies"><a href="/policies/terms.html" target="_blank" rel="noopener noreferrer" aria-label="Service terms (opens in a new tab)">Service terms</a><a href="/policies/refunds.html" target="_blank" rel="noopener noreferrer" aria-label="Refund policy (opens in a new tab)">Refunds</a><a href="/policies/privacy.html" target="_blank" rel="noopener noreferrer" aria-label="Privacy notice (opens in a new tab)">Privacy</a></nav>
             <p className="payment-privacy-note"><LockKeyhole size={14} aria-hidden="true" /> Card details and UPI PINs are never entered on this website.</p>
           </form>

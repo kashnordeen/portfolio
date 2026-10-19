@@ -113,6 +113,19 @@ test('pending, failed, review and URL success claims never show a success receip
   assert.doesNotMatch(html, /Payment successful|Thank you|Return to home/);
 });
 
+test('only verified pre-authorization cancellation offers an explicit new-payment action', async t => {
+  t.mock.property(globalThis, 'window', { location: { search: `?payment=project&order=${verifiedPayment.orderId}` } });
+  const cancelled = await renderWithVerifiedStatus({ ...verifiedPayment, state: 'FAILED', paidAt: null, failureReason: 'CANCELLED' });
+  assert.match(cancelled, /cancelled before authorization/);
+  assert.match(cancelled, /Start a new payment/);
+  assert.match(cancelled, /If you saw any debit/);
+  assert.doesNotMatch(cancelled, /Payment successful|Thank you/);
+  for (const state of ['PENDING', 'REVIEW', 'FAILED']) {
+    const html = await renderWithVerifiedStatus({ ...verifiedPayment, state, paidAt: null });
+    assert.doesNotMatch(html, /Start a new payment/);
+  }
+});
+
 test('thank-you copy is warm and clear while celebration graphics stay decorative', async t => {
   t.mock.property(globalThis, 'window', { location: { search: `?payment=project&order=${verifiedPayment.orderId}` } });
   const html = await renderWithVerifiedStatus(verifiedPayment);

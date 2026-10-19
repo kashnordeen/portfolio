@@ -106,6 +106,33 @@ test('webhooks authenticate merchant and durably queue an event; never trust not
   assert.equal((await f.run('webhook', request(event, auth))).status, 503);
 });
 
+test('failed status explains cancellation only after ownership and matching provider identity, amount and state', async () => {
+  const url = `https://example.test/api/payments/status?order=${orderId}`;
+  const req = () => new Request(url, { headers: { cookie: `__Host-payment-session=${token}` } });
+  const f = fixture();
+  f.store.owned = async () => ({ ...baseOrder, state: 'FAILED' });
+  const cancelled = { orderId: 'OMO_TEST', amount: baseOrder.amount_paise, state: 'FAILED', failureReason: 'CANCELLED' };
+  let lookups = 0;
+  f.provider.status = async (_id, details) => { lookups++; assert.equal(details, true); return cancelled; };
+  assert.equal((await (await f.run('status', req())).json()).failureReason, 'CANCELLED');
+  for (const altered of [{ orderId: 'OTHER' }, { amount: 100 }, { state: 'PENDING' }, { state: 'COMPLETED' }, { failureReason: 'UNKNOWN' }]) {
+    f.provider.status = async () => ({ ...cancelled, ...altered });
+    const body = await (await f.run('status', req())).json();
+    assert.equal(body.state, 'FAILED'); assert.equal(body.failureReason, undefined);
+  }
+  f.provider.status = async () => { throw Error('PRIVATE_PROVIDER_ERROR'); };
+  const fallback = await f.run('status', req());
+  assert.equal(fallback.status, 200); assert.equal((await fallback.json()).state, 'FAILED');
+  f.store.rate = async bucket => { if (bucket.startsWith('failure-status:')) throw new PaymentError(429, 'Too many requests'); };
+  f.provider.status = async () => { lookups++; return cancelled; };
+  assert.equal((await (await f.run('status', req())).json()).failureReason, undefined);
+  f.store.owned = async () => { throw new PaymentError(404, 'Not found'); };
+  f.provider.status = async () => { lookups++; return cancelled; };
+  assert.equal((await f.run('status', req())).status, 404);
+  assert.equal(lookups, 1);
+  assert.equal(f.calls.filter(call => ['pay', 'apply', 'checkout'].includes(call[0])).length, 0);
+});
+
 test('UAT shape diagnostics preserve authentication, parsing, strict payload checks and zero-write guards',async t=>{
   const gate={PAYMENT_UAT_DIAGNOSTICS:'true',PHONEPE_ENV:'sandbox',VERCEL_ENV:'production',
     VERCEL_PROJECT_ID:sandboxTarget.projectId,PAYMENT_SITE_ORIGIN:sandboxTarget.origin,

@@ -1,7 +1,7 @@
 import type { PaymentConfig } from './config.ts';
 import { PaymentError } from './security.ts';
 
-export type ProviderStatus = { orderId: string; state: 'PENDING' | 'COMPLETED' | 'FAILED'; amount: number };
+export type ProviderStatus = { orderId: string; state: 'PENDING' | 'COMPLETED' | 'FAILED'; amount: number; failureReason?: 'CANCELLED' };
 
 function checkoutHostAllowed(actual: string, expected: string) {
   return actual === expected || expected === 'mercury.phonepe.com' && actual === 'mercury-t2.phonepe.com';
@@ -37,7 +37,13 @@ export function normalizeStatus(value: unknown): ProviderStatus {
     !['PENDING', 'COMPLETED', 'FAILED'].includes(String(data.state)) || !Number.isSafeInteger(amount) || Number(amount) < 100) {
     throw new PaymentError(502, 'Invalid payment provider response.');
   }
-  return { orderId: data.orderId, state: data.state as ProviderStatus['state'], amount: Number(amount) };
+  const context = data.errorContext as Record<string, unknown> | undefined;
+  // A failed attempt nested under a pending order is not a terminal cancellation.
+  // Never return provider descriptions, instrument details or arbitrary error codes.
+  const cancelled = data.state === 'FAILED' && context?.errorCode === 'TXN_CANCELLED' &&
+    context.detailedErrorCode === 'REQUEST_CANCEL_BY_REQUESTEE' && context.source === 'CUSTOMER' && context.stage === 'PRE_AUTHENTICATION';
+  return { orderId: data.orderId, state: data.state as ProviderStatus['state'], amount: Number(amount),
+    ...(cancelled ? { failureReason: 'CANCELLED' as const } : {}) };
 }
 
 export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch, now = Date.now,
@@ -103,8 +109,8 @@ export function createPhonePe(config: PaymentConfig, send: typeof fetch = fetch,
       // 20-minute checkout window, or the provider's earlier expiry.
       return { orderId: data.orderId, expires: new Date(Math.min(data.expireAt,checkoutStarted+1_200_000)), url };
     },
-    async status(merchantOrderId: string) {
-      const data = await json('STATUS', `${base}/checkout/v2/order/${encodeURIComponent(merchantOrderId)}/status?details=false`, {
+    async status(merchantOrderId: string, errorContext = false) {
+      const data = await json('STATUS', `${base}/checkout/v2/order/${encodeURIComponent(merchantOrderId)}/status?details=false${errorContext ? '&errorContext=true' : ''}`, {
         method: 'GET', headers: { Authorization: `O-Bearer ${await token()}` },
       });
       try { return normalizeStatus(data); }
