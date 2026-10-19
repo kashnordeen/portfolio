@@ -1,6 +1,18 @@
 # Production project payments — launch evidence
 
-**Current UI release — 18 October 2026 (IST):** source `7935714`, deployment
+**Current cancellation fix — 19 October 2026 (IST):** owner-approved source
+`636e8e2`, deployment `dpl_4SkeXC5FrSsLjJjV1TFrdxD14U3G`, staged, verified, then
+promoted to `https://kkarn.vercel.app`. Public alias independently verifies Ready.
+All payment settings, credentials, callbacks, scheduler and region are preserved;
+no Git push or payment was performed. All 255 tests pass; remote read-only security
+preflight and production build pass. Candidate/live config and endpoint guards
+pass. Existing cancelled order shows the precise safe explanation; the explicit
+restart opens an empty form without initiating checkout. Bounded five-minute
+warning/error/fatal scan found zero entries. Manual monitoring remains unchanged.
+Full incident and release evidence: `payment-cancellation-incident.md`.
+Rollback: the preceding deployment below, retaining active payment recovery.
+
+**Previous UI release — 18 October 2026 (IST):** source `7935714`, deployment
 `dpl_8VotKPvm8bqmWZq3oY6Renz1wa7u`, explicitly staged, verified, then promoted to
 `https://kkarn.vercel.app`. The owner requested deployment of the local payment-page
 redesign, connected progress tracker, checkout click feedback and verified thank-you

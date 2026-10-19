@@ -52,6 +52,35 @@ The first sandboxed Vite attempt hit a Windows realpath permission error; the
 approved local build outside the filesystem sandbox completed successfully.
 
 No database migration, credentials, flags, webhook, recovery schedule, payment,
-refund, Git push or production deployment was changed during this investigation.
-The local fix needs a separately approved production deployment before live users
-can see it. A new real payment has not been performed by the agent.
+refund or Git push was changed during this investigation.
+
+## Approved production deployment
+
+On 19 October the owner separately approved deployment with existing settings
+unchanged and no Git push, checkout creation or payment. Source `636e8e2` was
+staged as `dpl_4SkeXC5FrSsLjJjV1TFrdxD14U3G`, checked, then promoted to
+`https://kkarn.vercel.app`. The public alias independently resolves to this Ready
+production deployment. The prior live deployment, `dpl_8VotKPvm8bqmWZq3oY6Renz1wa7u`,
+is the rollback target retaining the same recovery configuration.
+
+The protected candidate passed runtime config, expected UI bundle and unsigned
+webhook/jobs/recovery 401 probes. Remote build passed strict read-only DB/TLS/RLS
+preflight and built from 184 audited source files, excluding local builds and
+private files. Build completion reported 24 seconds. Existing install warnings
+were unchanged; the remote dependency audit reported zero vulnerabilities.
+
+Live root and policy pages returned 200; runtime config stayed project true /
+community false with no-store. Framing DENY and nosniff remain. Unsigned callback,
+jobs and recovery POSTs returned 401; GET orders returned 405.
+
+Chrome, using the owner's existing session, displayed the verified cancellation
+message for this exact incident and an enabled "Start a new payment" button.
+Clicking it navigated to `/?payment=project`, with empty editable details, optional
+reference, INR 0 summary and disabled empty-form submit. No order POST or payment
+was initiated. A task visual records the resulting live page.
+
+The release's bounded five-minute warning/error/fatal runtime scan returned no
+entries. This is not a new payment acceptance test or proof of future uptime.
+Scheduled recovery configuration was not modified; no new signed recovery probe
+was sent. Automated alerts and backup/restore remain deferred with manual
+monitoring as previously accepted. Log drains were not re-audited for this release.
